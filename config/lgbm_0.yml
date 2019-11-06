@@ -1,0 +1,63 @@
+dataset:
+  dir: "../input"
+  feature_dir: "../features"
+  params:
+
+av:
+  split_params:
+    test_size: 0.33
+    random_state: 42
+
+  model_params:
+    objective: "binary"
+    metric: "auc"
+    boosting: "gbdt"
+    max_depth: 7
+    num_leaves: 75
+    learning_rate: 0.01
+    colsample_bytree: 0.7
+    subsample: 0.1
+    subsample_freq: 1
+    seed: 111
+    feature_fraction_seed: 111
+    drop_seed: 111
+    verbose: -1
+    first_metric_only: True
+
+  train_params:
+    num_boost_round: 1000
+    early_stopping_rounds: 100
+    verbose_eval: 100
+
+model:
+  name: "lgbm"
+  model_params:
+    objective: "regression"
+    metric: "rmse"
+    boosting_type: "gbdt"
+    max_depth: -1
+    num_leaves: 256
+    tree_learner: "serial"
+    learning_rate: 0.01
+    subsample: 0.7
+    subsample_freq: 1
+    colsample_bytree: 0.5
+    max_bin: 255
+    seed: 1213
+    bagging_seed: 1213
+    feature_fraction_seed: 1213
+    drop_seed: 1213
+    verbose: -1
+    first_metric_only: True
+
+  train_params:
+    num_boost_round: 10000
+    early_stopping_rounds: 200
+    verbose_eval: 200
+
+val:
+  name: "group_kfold"
+  params:
+    n_splits: 5
+
+output_dir: "../output"
