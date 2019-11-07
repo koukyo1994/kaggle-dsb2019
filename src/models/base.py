@@ -10,7 +10,7 @@ from typing import Union, Tuple, List
 
 from easydict import EasyDict as edict
 
-from evaluation import calc_metric
+from src.evaluation import calc_metric
 
 # type alias
 AoD = Union[np.ndarray, pd.DataFrame]
