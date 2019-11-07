@@ -10,7 +10,7 @@ def _get_default() -> edict:
     cfg = edict()
 
     # dataset
-    cfg.datset = edict()
+    cfg.dataset = edict()
     cfg.dataset.dir = "../input"
     cfg.dataset.feature_dir = "../features"
     cfg.dataset.params = edict()

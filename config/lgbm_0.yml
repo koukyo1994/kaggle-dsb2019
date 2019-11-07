@@ -1,6 +1,6 @@
 dataset:
-  dir: "../input/data-science-bowl-2019/"
-  feature_dir: "../features"
+  dir: "input/data-science-bowl-2019/"
+  feature_dir: "features"
   params:
 
 av:
@@ -60,4 +60,4 @@ val:
   params:
     n_splits: 5
 
-output_dir: "../output"
+output_dir: "output"

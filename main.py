@@ -49,3 +49,7 @@ if __name__ == "__main__":
         train_labels = pd.read_csv(input_dir / "train_labels.csv")
         specs = pd.read_csv(input_dir / "specs.csv")
         sample_submission = pd.read_csv(input_dir / "sample_submission.csv")
+
+    # ===============================
+    # === Feature Extraction
+    # ===============================

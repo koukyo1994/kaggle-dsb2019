@@ -14,7 +14,7 @@ def timer(name: str, log: bool = False):
         logging.info(msg)
     yield
 
-    msg = f"[{name}] done in {time.time() - t0:.2d} s"
+    msg = f"[{name}] done in {time.time() - t0:.2f} s"
     if not log:
         print(msg)
     else:
