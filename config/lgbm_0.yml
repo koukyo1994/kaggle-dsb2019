@@ -1,5 +1,5 @@
 dataset:
-  dir: "../input"
+  dir: "../input/data-science-bowl-2019/"
   feature_dir: "../features"
   params:
 
