@@ -47,6 +47,15 @@ class Feature(metaclass=abc.ABCMeta):
         self.test.to_feather(str(self.test_path))
 
 
+class PartialFeature(metaclass=abc.ABCMeta):
+    def __init__(self):
+        self.df = pd.DataFrame
+
+    @abc.abstractmethod
+    def create_features(self, df: pd.DataFrame, test: bool = False):
+        raise NotImplementedError
+
+
 def is_feature(klass) -> bool:
     return "is_feature" in set(dir(klass))
 
