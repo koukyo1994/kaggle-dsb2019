@@ -1,61 +1,59 @@
 import yaml
 
 from pathlib import Path
-from typing import Optional, Union
-
-from easydict import EasyDict as edict
+from typing import Optional, Union, Dict, Any
 
 
-def _get_default() -> edict:
-    cfg = edict()
+def _get_default() -> dict:
+    cfg: Dict[str, Any] = dict()
 
     # dataset
-    cfg.dataset = edict()
-    cfg.dataset.dir = "../input"
-    cfg.dataset.feature_dir = "../features"
-    cfg.dataset.params = edict()
+    cfg["dataset"] = dict()
+    cfg["dataset"]["dir"] = "../input"
+    cfg["dataset"]["feature_dir"] = "../features"
+    cfg["dataset"]["params"] = dict()
 
     # adversarial validation
-    cfg.av = edict()
-    cfg.av.params = edict()
-    cfg.av.split_params = edict()
-    cfg.av.model_params = edict()
-    cfg.av.train_params = edict()
+    cfg["av"] = dict()
+    cfg["av"]["params"] = dict()
+    cfg["av"]["split_params"] = dict()
+    cfg["av"]["model_params"] = dict()
+    cfg["av"]["train_params"] = dict()
 
     # model
-    cfg.model = edict()
-    cfg.model.name = "lgbm"
-    cfg.model.model_params = edict()
-    cfg.model.train_params = edict()
+    cfg["model"] = dict()
+    cfg["model"]["name"] = "lgbm"
+    cfg["model"]["model_params"] = dict()
+    cfg["model"]["train_params"] = dict()
 
     # validation
-    cfg.val = edict()
-    cfg.val.name = "simple_split"
-    cfg.val.params = edict()
+    cfg["val"] = dict()
+    cfg["val"]["name"] = "simple_split"
+    cfg["val"]["params"] = dict()
 
     # others
-    cfg.output_dir = "../output"
+    cfg["output_dir"] = "../output"
 
     return cfg
 
 
-def _merge_config(src: Optional[edict], dst: edict):
-    if not isinstance(src, edict):
+def _merge_config(src: Optional[dict], dst: dict):
+    if not isinstance(src, dict):
         return
 
     for k, v in src.items():
-        if isinstance(v, edict):
+        if isinstance(v, dict):
             _merge_config(src[k], dst[k])
         else:
             dst[k] = v
 
 
-def load_config(cfg_path: Optional[Union[str, Path]] = None) -> edict:
+def load_config(cfg_path: Optional[Union[str, Path]] = None) -> dict:
     if cfg_path is None:
         config = _get_default()
     else:
         with open(cfg_path, "r") as f:
-            cfg = edict(yaml.load(f, Loader=yaml.SafeLoader))
+            cfg = dict(yaml.load(f, Loader=yaml.SafeLoader))
 
         config = _get_default()
         _merge_config(cfg, config)

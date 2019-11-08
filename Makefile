@@ -1,5 +1,6 @@
 IMG := dsb-2019
 TAG := latest
+USER := kaggle
 
 
 docker-build:
@@ -12,4 +13,9 @@ env:
 	--volume `pwd`:/app/dsb2019 \
 	-w /app/dsb2019 \
 	--user `id -u`:`id -g` \
+	--publish 9000:9000 \
 	${IMG}:${TAG} /bin/bash
+
+jupyter:
+	sudo chown ${USER}:${USER} /home/user/.jupyter
+	jupyter lab --port 9000 --ip 0.0.0.0 --NotebookApp.token=

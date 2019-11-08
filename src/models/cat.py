@@ -4,7 +4,6 @@ import pandas as pd
 from typing import Tuple, Union
 
 from catboost import CatBoostClassifier, CatBoostRegressor
-from easydict import EasyDict as edict
 
 from .base import BaseModel
 
@@ -14,9 +13,9 @@ CatModel = Union[CatBoostClassifier, CatBoostRegressor]
 class CatBoost(BaseModel):
     def fit(self, x_train: np.ndarray, y_train: np.ndarray,
             x_valid: np.ndarray, y_valid: np.ndarray,
-            config: edict) -> Tuple[CatModel, dict]:
-        model_params = config.model.model_params
-        mode = config.model.train_params.mode
+            config: dict) -> Tuple[CatModel, dict]:
+        model_params = config["model"]["model_params"]
+        mode = config["model"]["train_params"]["mode"]
         if mode == "regression":
             model = CatBoostRegressor(**model_params)
         else:
@@ -27,7 +26,7 @@ class CatBoost(BaseModel):
             y_train,
             eval_set=(x_valid, y_valid),
             use_best_model=True,
-            verbose=model_params.early_stopping_rounds)
+            verbose=model_params["early_stopping_rounds"])
         best_score = model.best_score_
         return model, best_score
 

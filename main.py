@@ -13,7 +13,6 @@ import seaborn as sns
 from pathlib import Path
 from typing import List
 
-from easydict import EasyDict as edict
 from sklearn.model_selection import train_test_split
 
 if __name__ == "__main__":
@@ -37,12 +36,12 @@ if __name__ == "__main__":
     logging.info(f"config: {args.config}")
     logging.info(f"debug: {args.debug}")
 
-    config.args = edict()
-    config.args.config = args.config
+    config["args"] = dict()
+    config["args"]["config"] = args.config
 
     # make output dir
-    output_root_dir = Path(config.output_dir)
-    feature_dir = Path(config.dataset.feature_dir)
+    output_root_dir = Path(config["output_dir"])
+    feature_dir = Path(config["dataset"]["feature_dir"])
 
     config_name: str = args.config.split("/")[-1].replace(".yml", "")
     output_dir = output_root_dir / config_name
@@ -50,14 +49,14 @@ if __name__ == "__main__":
 
     logging.info(f"model output dir: {str(output_dir)}")
 
-    config.model_output_dir = str(output_dir)
+    config["model_output_dir"] = str(output_dir)
 
     # ===============================
     # === Data/Feature Loading
     # ===============================
-    input_dir = Path(config.dataset.dir)
+    input_dir = Path(config["dataset"]["dir"])
 
-    if not feature_existence_checker(feature_dir, config.features):
+    if not feature_existence_checker(feature_dir, config["features"]):
         with timer(name="load data", log=True):
             train = pd.read_csv(input_dir / "train.csv")
             test = pd.read_csv(input_dir / "test.csv")
@@ -73,13 +72,13 @@ if __name__ == "__main__":
     with timer("feature laoding", log=True):
         x_train = pd.concat([
             pd.read_feather(feature_dir / (f + "_train.ftr"), nthreads=-1)
-            for f in config.features
+            for f in config["features"]
         ],
                             axis=1,
                             sort=False)
         x_test = pd.concat([
             pd.read_feather(feature_dir / (f + "_test.ftr"), nthreads=-1)
-            for f in config.features
+            for f in config["features"]
         ])
 
     groups = x_train["installation_id"].values
@@ -106,11 +105,11 @@ if __name__ == "__main__":
     train_test_adv = pd.concat([train_adv, test_adv], axis=0,
                                sort=False).reset_index(drop=True)
 
-    split_params: edict = config.av.split_params
+    split_params: dict = config["av"]["split_params"]
     train_set, val_set = train_test_split(
         train_test_adv,
-        random_state=split_params.random_state,
-        test_size=split_params.test_size)
+        random_state=split_params["random_state"],
+        test_size=split_params["test_size"])
     x_train_adv = train_set[cols]
     y_train_adv = train_set["target"]
     x_val_adv = val_set[cols]
@@ -122,8 +121,8 @@ if __name__ == "__main__":
     train_lgb = lgb.Dataset(x_train_adv, label=y_train_adv)
     valid_lgb = lgb.Dataset(x_val_adv, label=y_val_adv)
 
-    model_params = config.av.model_params
-    train_params = config.av.train_params
+    model_params = config["av"]["model_params"]
+    train_params = config["av"]["train_params"]
     clf = lgb.train(
         model_params,
         train_lgb,
@@ -145,9 +144,9 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig(output_dir / "feature_importance_adv.png")
 
-    config.av_result = edict()
-    config.av_result.score = clf.best_score
-    config.av_result.feature_importances = \
+    config["av_result"] = dict()
+    config["av_result"]["score"] = clf.best_score
+    config["av_result"]["feature_importances"] = \
         feature_imp.set_index("feature").sort_values(
             by="value",
             ascending=False
@@ -167,9 +166,9 @@ if __name__ == "__main__":
     models, oof_preds, test_preds, feature_importance, eval_results = model.cv(
         y_train, x_train, x_test, cols, splits, config, log=True)
 
-    config.eval_results = edict()
+    config["eval_results"] = dict()
     for k, v in eval_results.items():
-        config.eval_results[k] = v
+        config["eval_results"][k] = v
 
     feature_imp = feature_importance.reset_index().rename(columns={
         "index": "feature",

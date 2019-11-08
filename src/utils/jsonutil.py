@@ -5,8 +5,6 @@ import numpy as np
 
 from typing import Union
 
-from easydict import EasyDict as edict
-
 from pathlib import Path
 
 
@@ -22,7 +20,7 @@ class MyEncoder(json.JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 
-def save_json(config: edict, save_path: Union[str, Path]):
+def save_json(config: dict, save_path: Union[str, Path]):
     f = codecs.open(str(save_path), mode="w", encoding="utf-8")
     json.dump(config, f, indent=4, cls=MyEncoder, ensure_ascii=False)
     f.close()

@@ -8,8 +8,6 @@ import pandas as pd
 from abc import abstractmethod
 from typing import Union, Tuple, List
 
-from easydict import EasyDict as edict
-
 from src.evaluation import calc_metric
 
 # type alias
@@ -23,7 +21,7 @@ Model = Union[CatModel, LGBModel]
 class BaseModel(object):
     @abstractmethod
     def fit(self, x_train: AoD, y_train: AoS, x_valid: AoD, y_valid: AoS,
-            config: edict) -> Tuple[Model, dict]:
+            config: dict) -> Tuple[Model, dict]:
         raise NotImplementedError
 
     @abstractmethod
@@ -44,7 +42,7 @@ class BaseModel(object):
            test_features: AoD,
            feature_name: List[str],
            folds_ids: List[Tuple[np.ndarray, np.ndarray]],
-           config: edict,
+           config: dict,
            log: bool = True
            ) -> Tuple[List[Model], np.ndarray, np.ndarray, pd.DataFrame, dict]:
         # initialize

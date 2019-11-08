@@ -7,8 +7,6 @@ import pandas as pd
 from pathlib import Path
 from typing import Optional, Tuple
 
-from easydict import EasyDict as edict
-
 from src.utils import timer
 
 
@@ -83,19 +81,19 @@ def generate_features(train_df: pd.DataFrame,
             f.run(train_df, test_df, log).save()
 
 
-def load_features(config: edict) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    feather_path = config.dataset.feature_dir
+def load_features(config: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    feather_path = config["dataset"]["feature_dir"]
 
     dfs = [
         pd.read_feather(f"{feather_path}/{f}_train.ftr", nthreads=-1)
-        for f in config.features
+        for f in config["features"]
         if Path(f"{feather_path}/{f}_train.ftr").exists()
     ]
     x_train = pd.concat(dfs, axis=1)
 
     dfs = [
         pd.read_feather(f"{feather_path}/{f}_test.ftr", nthreads=-1)
-        for f in config.features
+        for f in config["features"]
         if Path(f"{feather_path}/{f}_test.ftr").exists()
     ]
     x_test = pd.concat(dfs, axis=1)
