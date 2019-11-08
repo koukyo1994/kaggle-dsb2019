@@ -27,7 +27,7 @@ class CatBoost(BaseModel):
             y_train,
             eval_set=(x_valid, y_valid),
             use_best_model=True,
-            verbose=True)
+            verbose=model_params.early_stopping_rounds)
         best_score = model.best_score_
         return model, best_score
 

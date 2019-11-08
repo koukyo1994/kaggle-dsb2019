@@ -74,8 +74,9 @@ class BaseModel(object):
             best_iteration += self.get_best_iteration(model) / len(folds_ids)
 
             # predict oof and test
-            oof_preds[val_idx] = self.predict(model, x_val)
-            test_preds += self.predict(model, test_features) / len(folds_ids)
+            oof_preds[val_idx] = self.predict(model, x_val).reshape(-1)
+            test_preds += self.predict(
+                model, test_features).reshape(-1) / len(folds_ids)
 
             # get feature importances
             importances_tmp = pd.DataFrame(
