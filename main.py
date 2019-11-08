@@ -15,6 +15,7 @@ if __name__ == "__main__":
 
     from src.utils import (get_preprocess_parser, load_config,
                            configure_logger, timer)
+    from src.features import Basic, generate_features
 
     parser = get_preprocess_parser()
     args = parser.parse_args()
@@ -53,3 +54,5 @@ if __name__ == "__main__":
     # ===============================
     # === Feature Extraction
     # ===============================
+    generate_features(
+        train, test, namespace=globals(), overwrite=args.force, log=True)

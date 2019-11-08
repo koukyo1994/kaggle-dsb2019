@@ -33,6 +33,8 @@ class Feature(metaclass=abc.ABCMeta):
             self.create_features(train_df, test_df)
             prefix = self.prefix + "_" if self.prefix else ""
             suffix = self.suffix + "_" if self.suffix else ""
+            self.train.columns = [str(c) for c in self.train.columns]
+            self.test.columns = [str(c) for c in self.test.columns]
             self.train.columns = prefix + self.train.columns + suffix
             self.test.columns = prefix + self.test.columns + suffix
         return self

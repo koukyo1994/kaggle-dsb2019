@@ -8,6 +8,7 @@ from tqdm import tqdm
 from src.features.base import Feature, PartialFeature
 
 IoF = Union[int, float]
+IoS = Union[int, str]
 
 
 class Basic(Feature):
@@ -27,23 +28,39 @@ class Basic(Feature):
         installation_ids_train = []
         installation_ids_test = []
 
+        train_df["title"] = train_df["title"].map(activities_map)
+        test_df["title"] = test_df["title"].map(activities_map)
+
+        train_df["timestamp"] = pd.to_datetime(train_df["timestamp"])
+        test_df["timestamp"] = pd.to_datetime(test_df["timestamp"])
+
         for ins_id, user_sample in tqdm(
                 train_df.groupby("installation_id", sort=False),
-                total=train_df["installation_id"].nunique()):
-            installation_ids_train.append(ins_id)
+                total=train_df["installation_id"].nunique(),
+                desc="train features"):
+            if "Assessment" not in user_sample["type"].unique():
+                continue
             feats = KernelFeatures(all_activities, all_event_codes,
                                    activities_map, inverse_activities_map)
-            compiled_data_train.extend(
-                feats.create_features(user_sample, test=False))
+            feat_df = feats.create_features(user_sample, test=False)
+            installation_ids_train.extend([ins_id] * len(feat_df))
+            compiled_data_train.append(feat_df)
+        self.train = pd.concat(compiled_data_train, axis=0, sort=False)
+        self.train["installation_id"] = installation_ids_train
+        self.train.reset_index(drop=True, inplace=True)
 
         for ins_id, user_sample in tqdm(
                 test_df.groupby("installation_id", sort=False),
-                total=test_df["installation_id"].nunique()):
-            installation_ids_test.append(ins_id)
+                total=test_df["installation_id"].nunique(),
+                desc="test features"):
             feats = KernelFeatures(all_activities, all_event_codes,
                                    activities_map, inverse_activities_map)
-            compiled_data_test.extend(
-                feats.create_features(user_sample, test=True))
+            feat_df = feats.create_features(user_sample, test=True)
+            installation_ids_test.extend([ins_id] * len(feat_df))
+            compiled_data_test.append(feat_df)
+        self.test = pd.concat(compiled_data_test, axis=0, sort=False)
+        self.test["installation_id"] = installation_ids_test
+        self.test.reset_index(drop=True, inplace=True)
 
 
 class KernelFeatures(PartialFeature):
@@ -55,10 +72,38 @@ class KernelFeatures(PartialFeature):
         self.activities_map = activities_map
         self.inverse_activities_map = inverse_activities_map
 
+        win_code = dict(
+            zip(activities_map.values(),
+                (4100 * np.ones(len(activities_map))).astype(int)))
+        win_code[activities_map["Bird Measurer (Assessment)"]] = 4110
+        self.win_code = win_code
+
         super().__init__()
 
     def create_features(self, df: pd.DataFrame, test: bool = False):
         time_spent_each_act = {act: 0 for act in self.all_activities}
+        event_code_count = {ev: 0 for ev in self.all_event_codes}
+        user_activities_count: Dict[IoS, IoF] = {
+            "Clip": 0,
+            "Activity": 0,
+            "Assessment": 0,
+            "Game": 0
+        }
+
+        all_assesments = []
+
+        accumulated_acc_groups = 0
+        accumulated_acc = 0
+        accumulated_correct_attempts = 0
+        accumulated_failed_attempts = 0
+        accumulated_actions = 0
+
+        counter = 0
+
+        accuracy_group: Dict[int, int] = {0: 0, 1: 0, 2: 0, 3: 0}
+
+        durations: List[float] = []
+        last_activity = ""
 
         for i, sess in df.groupby("game_session", sort=False):
             sess_type = sess["type"].iloc[0]
@@ -70,4 +115,75 @@ class KernelFeatures(PartialFeature):
                     self.inverse_activities_map[sess_title]] += time_spent
 
             if sess_type == "Assessment" and (test or len(sess) > 1):
-                raise NotImplementedError
+                all_attempts: pd.DataFrame = sess.query(
+                    f"event_code == {self.win_code[sess_title]}")
+                true_attempt = all_attempts["event_data"].str.contains(
+                    "true").sum()
+                false_attempt = all_attempts["event_data"].str.contains(
+                    "false").sum()
+
+                features = user_activities_count.copy()
+                features.update(time_spent_each_act.copy())
+                features.update(event_code_count.copy())
+
+                features["session_title"] = sess_title
+
+                features["accumulated_correct_attempts"] = \
+                    accumulated_correct_attempts
+                features["accumulated_failed_attempts"] = \
+                    accumulated_failed_attempts
+
+                accumulated_correct_attempts += true_attempt
+                accumulated_failed_attempts += false_attempt
+
+                features["duration_mean"] = np.mean(
+                    durations) if durations else 0
+                durations.append((sess.iloc[-1, 2] - sess.iloc[0, 2]).seconds)
+
+                features["accumulated_acc"] = \
+                    accumulated_acc / counter if counter > 0 else 0
+
+                acc = true_attempt / (true_attempt + false_attempt) \
+                    if (true_attempt + false_attempt) != 0 else 0
+                accumulated_acc += acc
+
+                if acc == 0:
+                    features["accuracy_group"] = 0
+                elif acc == 1:
+                    features["accuracy_group"] = 3
+                elif acc == 0.5:
+                    features["accuracy_group"] = 2
+                else:
+                    features["accuracy_group"] = 1
+
+                features.update(accuracy_group.copy())
+                accuracy_group[features["accuracy_group"]] += 1
+
+                features["accumulated_accuracy_group"] = \
+                    accumulated_acc_groups / counter if counter > 0 else 0
+                accumulated_acc_groups += features["accuracy_group"]
+
+                features["accumulated_actions"] = accumulated_actions
+
+                if test:
+                    all_assesments.append(features)
+                elif true_attempt + false_attempt > 0:
+                    all_assesments.append(features)
+
+                counter += 1
+
+            num_event_codes: dict = sess["event_code"].value_counts().to_dict()
+            for k in num_event_codes.keys():
+                event_code_count[k] += num_event_codes[k]
+
+            accumulated_actions += len(sess)
+            if last_activity != sess_type:
+                user_activities_count[sess_type] + +1
+                last_activity = sess_type
+
+        if test:
+            self.df = pd.DataFrame([all_assesments[-1]])
+        else:
+            self.df = pd.DataFrame(all_assesments)
+
+        return self.df
