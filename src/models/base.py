@@ -36,6 +36,10 @@ class BaseModel(object):
     def get_feature_importance(self, model: Model) -> np.ndarray:
         raise NotImplementedError
 
+    def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
+                     y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        return oof_preds, test_preds
+
     def cv(self,
            y_train: AoS,
            train_features: AoD,
@@ -85,6 +89,10 @@ class BaseModel(object):
 
         # summary of feature importance
         feature_importance = importances.mean(axis=1)
+
+        # post_process (if you have any)
+        oof_preds, test_preds = self.post_process(oof_preds, test_preds,
+                                                  y_train)
 
         # print oof score
         oof_score = calc_metric(y_train, oof_preds)

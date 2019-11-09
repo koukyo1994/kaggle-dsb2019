@@ -19,6 +19,9 @@ class LightGBM(BaseModel):
         model_params = config["model"]["model_params"]
         train_params = config["model"]["train_params"]
 
+        self.model_params = model_params
+        self.train_params = train_params
+
         model = lgb.train(
             params=model_params,
             train_set=d_train,

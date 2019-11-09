@@ -6,6 +6,7 @@ from typing import Tuple, Union
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 from .base import BaseModel
+from src.evaluation import CatBoostOptimizedQWKMetric, OptimizedRounder
 
 CatModel = Union[CatBoostClassifier, CatBoostRegressor]
 
@@ -16,8 +17,13 @@ class CatBoost(BaseModel):
             config: dict) -> Tuple[CatModel, dict]:
         model_params = config["model"]["model_params"]
         mode = config["model"]["train_params"]["mode"]
+        self.mode = mode
         if mode == "regression":
-            model = CatBoostRegressor(**model_params)
+            model = CatBoostRegressor(
+                eval_metric=CatBoostOptimizedQWKMetric(), **model_params)
+            self.denominator = y_train.max()
+            y_train = y_train / y_train.max()
+            y_valid = y_valid / y_valid.max()
         else:
             model = CatBoostClassifier(**model_params)
 
@@ -39,3 +45,12 @@ class CatBoost(BaseModel):
 
     def get_feature_importance(self, model: CatModel) -> np.ndarray:
         return model.feature_importances_
+
+    def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
+                     y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        # Override
+        OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+        OptR.fit(oof_preds, y)
+        oof_preds_ = OptR.predict(oof_preds)
+        test_preds_ = OptR.predict(test_preds)
+        return oof_preds_, test_preds_

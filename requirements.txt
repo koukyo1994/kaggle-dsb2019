@@ -57,6 +57,7 @@ nbconvert==5.4.1
 nbformat==4.4.0
 networkx==2.2
 notebook==5.7.6
+numba==0.45.1
 numpy==1.15.4
 olefile==0.46
 opencv-contrib-python-headless==4.1.0.25
@@ -80,7 +81,7 @@ pyrsistent==0.14.11
 PySocks==1.6.8
 PyYAML==5.1.2
 python-dateutil==2.8.0
-pytorch-lightning==0.4.8
+# pytorch-lightning==0.4.8
 pytz==2018.9
 PyWavelets==1.0.2
 pyzmq==17.1.2

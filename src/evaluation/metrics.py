@@ -3,25 +3,22 @@ import numpy as np
 
 from typing import Union, Tuple
 
-from numba import jit
 
-
-@jit
 def qwk(y_true: Union[np.ndarray, list],
         y_pred: Union[np.ndarray, list],
         max_rat: int = 3) -> float:
-    y_true_ = np.asarray(y_true, dtype=int)
-    y_pred_ = np.asarray(y_pred, dtype=int)
+    y_true_ = np.asarray(y_true)
+    y_pred_ = np.asarray(y_pred)
 
     hist1 = np.zeros((max_rat + 1, ))
     hist2 = np.zeros((max_rat + 1, ))
 
-    numerator = 0
-    for k in range(y_true_.shape[0]):
-        i, j = y_true_[k], y_pred_[k]
-        hist1[i] += 1
-        hist2[j] += 1
-        numerator += (i - j) * (i - j)
+    uniq_class = np.unique(y_true_)
+    for i in uniq_class:
+        hist1[int(i)] = len(np.argwhere(y_true_ == i))
+        hist2[int(i)] = len(np.argwhere(y_pred_ == i))
+
+    numerator = np.square(y_true_ - y_pred_).sum()
 
     denominator = 0
     for i in range(max_rat + 1):
@@ -42,3 +39,14 @@ def lgb_classification_qwk(y_pred: np.ndarray,
     y_true = data.get_label()
     y_pred = y_pred.reshape(len(np.unique(y_true)), -1).argmax(axis=0)
     return "qwk", qwk(y_true, y_pred), True
+
+
+if __name__ == "__main__":
+    import timeit
+
+    size = 1000000
+    a = np.random.randint(0, 4, size)
+    p = np.random.randint(0, 4, size)
+
+    nsec = timeit.timeit(lambda: qwk(a, p), number=1)
+    print(f"Elapsed: {nsec:.5f}")
