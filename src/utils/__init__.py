@@ -5,3 +5,4 @@ from .logger import configure_logger
 from .timer import timer
 from .tools import reduce_mem_usage
 from .checker import feature_existence_checker
+from .visualization import calc_and_plot_cm
