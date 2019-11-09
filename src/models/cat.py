@@ -49,8 +49,10 @@ class CatBoost(BaseModel):
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
                      y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         # Override
-        OptR = OptimizedRounder(n_overall=20, n_classwise=20)
-        OptR.fit(oof_preds, y)
-        oof_preds_ = OptR.predict(oof_preds)
-        test_preds_ = OptR.predict(test_preds)
-        return oof_preds_, test_preds_
+        if self.mode == "regression":
+            OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+            OptR.fit(oof_preds, y)
+            oof_preds_ = OptR.predict(oof_preds)
+            test_preds_ = OptR.predict(test_preds)
+            return oof_preds_, test_preds_
+        return oof_preds, test_preds

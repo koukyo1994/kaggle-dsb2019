@@ -1,7 +1,6 @@
-import lightgbm as lgb
 import numpy as np
 
-from typing import Union, Tuple
+from typing import Union
 
 
 def qwk(y_true: Union[np.ndarray, list],
@@ -32,13 +31,6 @@ def qwk(y_true: Union[np.ndarray, list],
 def calc_metric(y_true: Union[np.ndarray, list],
                 y_pred: Union[np.ndarray, list]) -> float:
     return qwk(y_true, y_pred)
-
-
-def lgb_classification_qwk(y_pred: np.ndarray,
-                           data: lgb.Dataset) -> Tuple[str, float, bool]:
-    y_true = data.get_label()
-    y_pred = y_pred.reshape(len(np.unique(y_true)), -1).argmax(axis=0)
-    return "qwk", qwk(y_true, y_pred), True
 
 
 if __name__ == "__main__":
