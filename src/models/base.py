@@ -90,6 +90,10 @@ class BaseModel(object):
         # summary of feature importance
         feature_importance = importances.mean(axis=1)
 
+        # save raw prediction
+        self.raw_oof_preds = oof_preds
+        self.raw_test_preds = test_preds
+
         # post_process (if you have any)
         oof_preds, test_preds = self.post_process(oof_preds, test_preds,
                                                   y_train)
