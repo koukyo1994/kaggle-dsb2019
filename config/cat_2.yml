@@ -33,34 +33,20 @@ av:
     verbose_eval: 100
 
 model:
-  name: "lgbm"
+  name: "catboost"
   model_params:
-    objective: "multiclass"
-    num_class: 4
-    boosting_type: "gbdt"
-    max_depth: -1
-    num_leaves: 256
-    tree_learner: "serial"
-    learning_rate: 0.01
-    subsample: 0.7
-    subsample_freq: 1
-    colsample_bytree: 0.5
-    max_bin: 255
-    seed: 71
-    bagging_seed: 71
-    feature_fraction_seed: 71
-    drop_seed: 71
-    verbose: -1
-    first_metric_only: False
+    loss_function: "RMSE"
+    task_type: "CPU"
+    iterations: 6000
+    early_stopping_rounds: 100
+    random_seed: 42
 
   train_params:
-    num_boost_round: 10000
-    early_stopping_rounds: 100
-    verbose_eval: 100
+    mode: "regression"
 
 post_process:
   params:
-    reverse: False
+    reverse: True
     n_overall: 20
     n_classwise: 20
 

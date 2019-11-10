@@ -4,10 +4,14 @@ from src.evaluation import calc_metric
 
 
 class OptimizedRounder(object):
-    def __init__(self, n_overall: int = 5, n_classwise: int = 5):
+    def __init__(self,
+                 n_overall: int = 5,
+                 n_classwise: int = 5,
+                 reverse: bool = False):
         self.n_overall = n_overall
         self.n_classwise = n_classwise
         self.coef = [0.25, 0.5, 0.75]
+        self.reverse = reverse
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         X_p = np.digitize(X, self.coef)
@@ -19,7 +23,11 @@ class OptimizedRounder(object):
         golden2 = 1 - golden1
         ab_start = [(0.01, 0.4), (0.4, 0.7), (0.7, 0.9)]
         for _ in range(self.n_overall):
-            for idx in range(3):
+            if self.reverse:
+                search = reversed(range(3))
+            else:
+                search = iter(range(3))
+            for idx in search:
                 # golden section search
                 a, b = ab_start[idx]
                 # calc losses

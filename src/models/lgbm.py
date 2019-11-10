@@ -61,10 +61,12 @@ class LightGBM(BaseModel):
         return model.feature_importance(importance_type="gain")
 
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
-                     y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+                     y: np.ndarray,
+                     config: dict) -> Tuple[np.ndarray, np.ndarray]:
         # Override
         if self.mode == "regression":
-            OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+            params = config["post_process"]["params"]
+            OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)
             oof_preds_ = OptR.predict(oof_preds)
             test_preds_ = OptR.predict(test_preds)

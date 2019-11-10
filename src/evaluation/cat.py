@@ -7,6 +7,14 @@ from .optimization import OptimizedRounder
 
 
 class CatBoostOptimizedQWKMetric(object):
+    def __init__(self,
+                 n_overall: int = 5,
+                 n_classwise: int = 5,
+                 reverse: bool = False):
+        self.n_overall = n_overall
+        self.n_classwise = n_classwise
+        self.reverse = reverse
+
     def get_final_error(self, error: float, weight: float) -> float:
         return error / (weight + 1e-38)
 
@@ -22,7 +30,10 @@ class CatBoostOptimizedQWKMetric(object):
         approx_np = np.array(approx)
         target_np = (np.array(target) * 3).astype(int)
 
-        OptR = OptimizedRounder(n_classwise=5, n_overall=5)
+        OptR = OptimizedRounder(
+            n_classwise=self.n_classwise,
+            n_overall=self.n_overall,
+            reverse=self.reverse)
         OptR.fit(approx_np, target_np)
 
         y_pred = OptR.predict(approx_np).astype(int)

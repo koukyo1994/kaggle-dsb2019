@@ -26,6 +26,10 @@ def _get_default() -> dict:
     cfg["model"]["model_params"] = dict()
     cfg["model"]["train_params"] = dict()
 
+    # post_process
+    cfg["post_process"] = dict()
+    cfg["post_process"]["params"] = dict()
+
     # validation
     cfg["val"] = dict()
     cfg["val"]["name"] = "simple_split"

@@ -20,7 +20,9 @@ class CatBoost(BaseModel):
         self.mode = mode
         if mode == "regression":
             model = CatBoostRegressor(
-                eval_metric=CatBoostOptimizedQWKMetric(), **model_params)
+                eval_metric=CatBoostOptimizedQWKMetric(
+                    reverse=config["post_process"]["params"]["reverse"]),
+                **model_params)
             self.denominator = y_train.max()
             y_train = y_train / y_train.max()
             y_valid = y_valid / y_valid.max()
@@ -47,10 +49,12 @@ class CatBoost(BaseModel):
         return model.feature_importances_
 
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
-                     y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+                     y: np.ndarray,
+                     config: dict) -> Tuple[np.ndarray, np.ndarray]:
         # Override
         if self.mode == "regression":
-            OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+            params = config["post_process"]["params"]
+            OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)
             oof_preds_ = OptR.predict(oof_preds)
             test_preds_ = OptR.predict(test_preds)

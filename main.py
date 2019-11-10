@@ -79,7 +79,9 @@ if __name__ == "__main__":
         x_test = pd.concat([
             pd.read_feather(feature_dir / (f + "_test.ftr"), nthreads=-1)
             for f in config["features"]
-        ])
+        ],
+                           axis=1,
+                           sort=False)
 
     groups = x_train["installation_id"].values
     y_train = x_train["accuracy_group"].values.reshape(-1)

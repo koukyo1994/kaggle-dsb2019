@@ -37,7 +37,8 @@ class BaseModel(object):
         raise NotImplementedError
 
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
-                     y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+                     y: np.ndarray,
+                     config: dict) -> Tuple[np.ndarray, np.ndarray]:
         return oof_preds, test_preds
 
     def cv(self,
@@ -96,7 +97,7 @@ class BaseModel(object):
 
         # post_process (if you have any)
         oof_preds, test_preds = self.post_process(oof_preds, test_preds,
-                                                  y_train)
+                                                  y_train, config)
 
         # print oof score
         oof_score = calc_metric(y_train, oof_preds)

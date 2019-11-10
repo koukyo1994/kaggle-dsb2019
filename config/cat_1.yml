@@ -44,6 +44,12 @@ model:
   train_params:
     mode: "regression"
 
+post_process:
+  params:
+    reverse: False
+    n_overall: 20
+    n_classwise: 20
+
 val:
   name: "group_kfold"
   params:
