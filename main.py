@@ -23,7 +23,7 @@ if __name__ == "__main__":
     from src.utils import (get_preprocess_parser, load_config,
                            configure_logger, timer, feature_existence_checker,
                            save_json, calc_and_plot_cm)
-    from src.features import Basic, generate_features
+    from src.features import Basic, generate_features, PastAssessment
     from src.validation import get_validation
     from src.models import get_model
 

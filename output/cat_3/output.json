@@ -1,14 +1,11 @@
 {
     "dataset": {
-        "dir": "../input/data-science-bowl-2019/",
-        "feature_dir": "../features",
+        "dir": "input/data-science-bowl-2019/",
+        "feature_dir": "features",
         "params": null
     },
-    "features": [
-        "Basic",
-        "PastAssessment"
-    ],
     "av": {
+        "params": {},
         "split_params": {
             "test_size": 0.33,
             "random_state": 42
@@ -48,6 +45,13 @@
             "mode": "regression"
         }
     },
+    "post_process": {
+        "params": {
+            "reverse": false,
+            "n_overall": 20,
+            "n_classwise": 20
+        }
+    },
     "val": {
         "name": "group_kfold",
         "params": {
@@ -55,10 +59,14 @@
         }
     },
     "output_dir": "output",
+    "features": [
+        "Basic",
+        "PastAssessment"
+    ],
     "args": {
-        "config": "../config/cat_0.yml"
+        "config": "config/cat_3.yml"
     },
-    "model_output_dir": "output/cat_0",
+    "model_output_dir": "output/cat_3",
     "av_result": {
         "score": {
             "train": {
