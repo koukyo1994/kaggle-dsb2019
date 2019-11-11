@@ -24,7 +24,7 @@ if __name__ == "__main__":
                            configure_logger, timer, feature_existence_checker,
                            save_json, calc_and_plot_cm, seed_everything)
     from src.features import Basic, generate_features, PastAssessment
-    from src.validation import get_validation
+    from src.validation import get_validation, select_features
     from src.models import get_model
 
     seed_everything(42)
@@ -179,9 +179,11 @@ if __name__ == "__main__":
     splits = get_validation(x_train, config)
     x_train.drop("group", axis=1, inplace=True)
 
+    cols = select_features(cols, feature_imp, config)
+
     model = get_model(config)
     models, oof_preds, test_preds, feature_importance, eval_results = model.cv(
-        y_train, x_train, x_test, cols, splits, config, log=True)
+        y_train, x_train[cols], x_test[cols], cols, splits, config, log=True)
 
     config["eval_results"] = dict()
     for k, v in eval_results.items():

@@ -87,7 +87,8 @@ def generate_features(train_df: pd.DataFrame,
             f.run(train_df, test_df, log).save()
 
 
-def load_features(config: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def load_features(
+        config: dict) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     feather_path = config["dataset"]["feature_dir"]
 
     dfs = [
