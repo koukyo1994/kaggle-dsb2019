@@ -22,10 +22,12 @@ if __name__ == "__main__":
 
     from src.utils import (get_preprocess_parser, load_config,
                            configure_logger, timer, feature_existence_checker,
-                           save_json, calc_and_plot_cm)
+                           save_json, calc_and_plot_cm, seed_everything)
     from src.features import Basic, generate_features, PastAssessment
     from src.validation import get_validation
     from src.models import get_model
+
+    seed_everything(42)
 
     parser = get_preprocess_parser()
     args = parser.parse_args()

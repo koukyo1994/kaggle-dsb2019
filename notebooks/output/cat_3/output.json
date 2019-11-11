@@ -1,0 +1,352 @@
+{
+    "dataset": {
+        "dir": "../input/data-science-bowl-2019/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "features": [
+        "Basic",
+        "PastAssessment"
+    ],
+    "av": {
+        "split_params": {
+            "test_size": 0.33,
+            "random_state": 42
+        },
+        "model_params": {
+            "objective": "binary",
+            "metric": "auc",
+            "boosting": "gbdt",
+            "max_depth": 7,
+            "num_leaves": 75,
+            "learning_rate": 0.01,
+            "colsample_bytree": 0.7,
+            "subsample": 0.1,
+            "subsample_freq": 1,
+            "seed": 111,
+            "feature_fraction_seed": 111,
+            "drop_seed": 111,
+            "verbose": -1,
+            "first_metric_only": true
+        },
+        "train_params": {
+            "num_boost_round": 1000,
+            "early_stopping_rounds": 100,
+            "verbose_eval": 100
+        }
+    },
+    "model": {
+        "name": "catboost",
+        "model_params": {
+            "loss_function": "RMSE",
+            "task_type": "CPU",
+            "iterations": 6000,
+            "early_stopping_rounds": 100,
+            "random_seed": 42
+        },
+        "train_params": {
+            "mode": "regression"
+        }
+    },
+    "val": {
+        "name": "group_kfold",
+        "params": {
+            "n_splits": 5
+        }
+    },
+    "output_dir": "output",
+    "args": {
+        "config": "../config/cat_3.yml"
+    },
+    "model_output_dir": "output/cat_3",
+    "av_result": {
+        "score": {
+            "train": {
+                "auc": 0.875642341083381
+            },
+            "valid": {
+                "auc": 0.7157111073078898
+            }
+        },
+        "feature_importances": {
+            "4070": 1497.956985618217,
+            "2000": 1476.7942669779002,
+            "memory_decay_coeff_from_last_assess": 1402.8683057142694,
+            "4025": 1353.4800455338284,
+            "duration_mean": 1315.1056874921187,
+            "4030": 1296.7036078753215,
+            "accumulated_actions": 1133.4730826020452,
+            "4035": 1086.5147601832157,
+            "All Star Sorting": 1062.084361204711,
+            "4020": 1020.7175185066349,
+            "4040": 1018.9613672284513,
+            "Chow Time": 1017.3787513953882,
+            "3110": 1004.1104744157565,
+            "Fireworks (Activity)": 989.6342927297628,
+            "3120": 952.6626237229348,
+            "2020": 937.7499248392444,
+            "3010": 932.4786193112957,
+            "Bottle Filler (Activity)": 905.3715929461819,
+            "4021": 844.8928430771192,
+            "Dino Dive": 836.2794980517663,
+            "Watering Hole (Activity)": 830.5230124337982,
+            "4100": 785.0882725529609,
+            "2030": 765.0930550325438,
+            "Sandcastle Builder (Activity)": 734.7499550835959,
+            "4022": 720.5717980009588,
+            "Bug Measurer (Activity)": 682.9208141551853,
+            "Flower Waterer (Activity)": 652.214760684674,
+            "Happy Camel": 635.4734466451923,
+            "Chicken Balancer (Activity)": 620.5311622677868,
+            "3121": 619.260098653397,
+            "accumulated_acc": 613.4403450095238,
+            "session_title": 612.137952767845,
+            "3020": 543.4997013181942,
+            "Bubble Bath": 538.4393947119084,
+            "accumulated_failed_attempts": 537.4413219389319,
+            "Scrub-A-Dub": 530.36399200288,
+            "Leaf Leader": 497.9482321102994,
+            "3021": 492.4397371406285,
+            "Air Show": 475.0187689792483,
+            "Dino Drink": 471.3209951012875,
+            "Pan Balance": 462.25283782315614,
+            "Egg Dropper (Activity)": 456.8063651651389,
+            "Crystals Rule": 450.36084835359225,
+            "4010": 440.60002937827664,
+            "4031": 422.09739478934785,
+            "accumulated_accuracy_group": 417.2845926203296,
+            "4220": 385.31684167371236,
+            "2081": 373.05184006109175,
+            "2080": 368.0549451702318,
+            "2025": 367.0780184033074,
+            "4090": 362.77882392348283,
+            "4045": 359.6454462240331,
+            "memory_decay_coeff_from_last_same_assess": 351.5385226701869,
+            "4095": 318.8540001796016,
+            "accumulated_correct_attempts": 316.72602378884255,
+            "0": 289.3355542952813,
+            "4110": 282.4001658728961,
+            "decayed_last_same_accuracy_group": 279.9778974520668,
+            "2060": 276.5715005117486,
+            "2010": 263.3520639219339,
+            "2040": 258.1837290982374,
+            "decayed_success_ratio_last_same_assess": 252.50158084698796,
+            "2083": 235.54295819661138,
+            "5000": 218.1293939262232,
+            "4230": 217.1594590192551,
+            "success_ratio_same_assess": 202.14173004866734,
+            "2075": 193.15253856050913,
+            "1": 189.89316295865973,
+            "2050": 173.54818754987787,
+            "5010": 160.60450630351443,
+            "2070": 159.86821458269446,
+            "4050": 156.40736179659416,
+            "2035": 147.15812502121594,
+            "decayed_n_failure_last_same_assess": 147.0553342103958,
+            "3": 130.60152758732102,
+            "2": 94.04871949532742,
+            "n_same_assessment_in_past": 84.35017091845631,
+            "4235": 84.23791102626728,
+            "n_failure_same_assess": 83.34311043079106,
+            "decayed_n_success_last_same_assess": 54.52127327965016,
+            "n_failure_last_same_assess": 53.21306908130646,
+            "has_same_assessment_in_past": 51.33056095314532,
+            "n_success_same_assess": 17.01549099143631,
+            "4080": 11.527820110321045,
+            "success_ratio_last_same_assess": 10.826893031597137,
+            "last_same_accuracy_group": 2.307616827383754,
+            "Game": 0.0,
+            "Chest Sorter (Assessment)": 0.0,
+            "Crystal Caves - Level 3": 0.0,
+            "Crystal Caves - Level 2": 0.0,
+            "Crystal Caves - Level 1": 0.0,
+            "Costume Box": 0.0,
+            "Clip": 0.0,
+            "Activity": 0.0,
+            "Cauldron Filler (Assessment)": 0.0,
+            "Cart Balancer (Assessment)": 0.0,
+            "Bird Measurer (Assessment)": 0.0,
+            "Balancing Act": 0.0,
+            "Assessment": 0.0,
+            "Honey Cake": 0.0
+        }
+    },
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 0.5951129322087412,
+            "cv_score": {
+                "cv1": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6487997687283694,
+                        "RMSE": 0.3132062628878577
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.6195000574430576,
+                        "RMSE": 0.32556924141754834
+                    }
+                },
+                "cv2": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6210445987191333,
+                        "RMSE": 0.3230444299022174
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.598475248454938,
+                        "RMSE": 0.3317733962963855
+                    }
+                },
+                "cv3": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6418361681952096,
+                        "RMSE": 0.3156748971800864
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.5907579782785108,
+                        "RMSE": 0.32910055020401097
+                    }
+                },
+                "cv4": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6478625175097156,
+                        "RMSE": 0.3121430456512914
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.5921754723166859,
+                        "RMSE": 0.33470769398383093
+                    }
+                },
+                "cv5": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6316115854882243,
+                        "RMSE": 0.31931499138452013
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.5699308493355042,
+                        "RMSE": 0.3396953317936759
+                    }
+                }
+            },
+            "n_data": 17690,
+            "best_iteration": 580.4,
+            "n_features": 116,
+            "feature_importance": {
+                "session_title": 45.65033018212292,
+                "success_ratio_same_assess": 7.079666057880812,
+                "accumulated_acc": 2.8166979765725895,
+                "4070": 2.6575594553621307,
+                "accumulated_accuracy_group": 2.5765498737508143,
+                "n_success_last_same_assess": 2.5197794707131207,
+                "decayed_success_ratio_last_same_assess": 2.0919803104697756,
+                "2000": 2.0739493800131275,
+                "success_ratio_last_same_assess": 1.8545133375885818,
+                "decayed_last_same_accuracy_group": 1.6009594097447377,
+                "decayed_n_failure_last_same_assess": 1.5190698639981932,
+                "3020": 1.213065898144519,
+                "3121": 1.1004640511822108,
+                "last_same_accuracy_group": 1.0519824250516023,
+                "3021": 1.017262380340281,
+                "n_failure_last_same_assess": 0.9987192417560184,
+                "n_success_same_assess": 0.9460435629666254,
+                "0": 0.8591764132067956,
+                "3120": 0.8271566777555757,
+                "4022": 0.7331390247340449,
+                "n_failure_same_assess": 0.7112817280537589,
+                "memory_decay_coeff_from_last_assess": 0.6309376316930186,
+                "Flower Waterer (Activity)": 0.6272956213442569,
+                "4035": 0.6212794275836226,
+                "4090": 0.6147897379092916,
+                "2030": 0.6097783380638897,
+                "3110": 0.6015850452699036,
+                "Sandcastle Builder (Activity)": 0.564366877569811,
+                "All Star Sorting": 0.5627038079771498,
+                "4020": 0.5625730274879668,
+                "4025": 0.5618059353183321,
+                "Chow Time": 0.5393365268821592,
+                "4030": 0.5308469940758942,
+                "accumulated_failed_attempts": 0.513453449134819,
+                "Fireworks (Activity)": 0.488029725081493,
+                "has_same_assessment_in_past": 0.4858626480227096,
+                "3010": 0.432721550325736,
+                "Pan Balance": 0.4151391692887308,
+                "2010": 0.37780526668787934,
+                "Happy Camel": 0.37759309442162603,
+                "Bottle Filler (Activity)": 0.36026074621665627,
+                "Leaf Leader": 0.3483601729440918,
+                "accumulated_actions": 0.3358918249246124,
+                "decayed_n_success_last_same_assess": 0.3307789882672015,
+                "Egg Dropper (Activity)": 0.30459080850000875,
+                "duration_mean": 0.2954635839187892,
+                "memory_decay_coeff_from_last_same_assess": 0.29392514275245923,
+                "Bug Measurer (Activity)": 0.28105672346400085,
+                "Scrub-A-Dub": 0.27890309500207405,
+                "Dino Drink": 0.2546117481811322,
+                "Air Show": 0.24932243466934517,
+                "4021": 0.24226568599387271,
+                "4031": 0.22125147455640595,
+                "3": 0.21836830913117158,
+                "4010": 0.21776076459650223,
+                "Chicken Balancer (Activity)": 0.21566538993733847,
+                "4100": 0.21494139317734282,
+                "Watering Hole (Activity)": 0.21402725017349064,
+                "2020": 0.21105743544016167,
+                "Dino Dive": 0.20368050240877333,
+                "4220": 0.1743725800352651,
+                "2050": 0.14989933808135233,
+                "2025": 0.14984722119799318,
+                "Crystals Rule": 0.1496591338206838,
+                "4230": 0.1431960116442514,
+                "4110": 0.13703916154810772,
+                "Bubble Bath": 0.12914250628668572,
+                "5000": 0.1249540977025724,
+                "4040": 0.1246194392177351,
+                "4235": 0.12150700288123825,
+                "accumulated_correct_attempts": 0.11924048311358633,
+                "2040": 0.10806338227205392,
+                "2075": 0.10379369557270364,
+                "n_same_assessment_in_past": 0.1024090246769668,
+                "4080": 0.10107627579040426,
+                "2080": 0.09214195789981267,
+                "2081": 0.08939115303134422,
+                "2": 0.08780669938656668,
+                "5010": 0.08737682399203803,
+                "4045": 0.0721160007707703,
+                "2083": 0.06420973069702755,
+                "4050": 0.05708807754423047,
+                "2035": 0.05639205794374831,
+                "2060": 0.05104436731972859,
+                "1": 0.04142786554453498,
+                "2070": 0.026525473319349922,
+                "4095": 0.02622636890728327,
+                "Clip": 0.0,
+                "Cauldron Filler (Assessment)": 0.0,
+                "Chest Sorter (Assessment)": 0.0,
+                "Crystal Caves - Level 1": 0.0,
+                "Cart Balancer (Assessment)": 0.0,
+                "Bird Measurer (Assessment)": 0.0,
+                "Balancing Act": 0.0,
+                "Assessment": 0.0,
+                "Activity": 0.0,
+                "Costume Box": 0.0,
+                "Treasure Map": 0.0,
+                "Crystal Caves - Level 2": 0.0,
+                "Crystal Caves - Level 3": 0.0,
+                "Tree Top City - Level 1": 0.0,
+                "Tree Top City - Level 2": 0.0,
+                "Rulers": 0.0,
+                "Pirate's Tale": 0.0,
+                "Tree Top City - Level 3": 0.0,
+                "Ordering Spheres": 0.0,
+                "Mushroom Sorter (Assessment)": 0.0,
+                "Magma Peak - Level 2": 0.0,
+                "Magma Peak - Level 1": 0.0,
+                "Lifting Heavy Things": 0.0,
+                "Welcome to Lost Lagoon!": 0.0,
+                "Honey Cake": 0.0,
+                "Heavy, Heavier, Heaviest": 0.0,
+                "Game": 0.0,
+                "Slop Problem": 0.0,
+                "12 Monkeys": 0.0
+            }
+        }
+    }
+}

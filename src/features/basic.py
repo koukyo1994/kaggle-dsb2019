@@ -12,7 +12,9 @@ IoS = Union[int, str]
 
 
 class Basic(Feature):
-    def create_features(self, train_df: pd.DataFrame, test_df: pd.DataFrame):
+    def create_features(self, train: pd.DataFrame, test: pd.DataFrame):
+        train_df = train.copy()
+        test_df = test.copy()
         all_activities = set(train_df["title"].unique()).union(
             set(test_df["title"].unique()))
         all_event_codes = set(train_df["event_code"].unique()).union(
@@ -43,6 +45,7 @@ class Basic(Feature):
             feats = KernelFeatures(all_activities, all_event_codes,
                                    activities_map, inverse_activities_map)
             feat_df = feats.create_features(user_sample, test=False)
+
             installation_ids_train.extend([ins_id] * len(feat_df))
             compiled_data_train.append(feat_df)
         self.train = pd.concat(compiled_data_train, axis=0, sort=False)

@@ -11,7 +11,9 @@ IoF = Union[int, float]
 
 
 class PastAssessment(Feature):
-    def create_features(self, train_df: pd.DataFrame, test_df: pd.DataFrame):
+    def create_features(self, train: pd.DataFrame, test: pd.DataFrame):
+        train_df = train.copy()
+        test_df = test.copy()
         train_df["timestamp"] = pd.to_datetime(train_df["timestamp"])
         test_df["timestamp"] = pd.to_datetime(test_df["timestamp"])
 
