@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple, Optional
 
 from tqdm import tqdm
 
@@ -18,6 +18,7 @@ class PastAssessment(Feature):
         test_df["timestamp"] = pd.to_datetime(test_df["timestamp"])
 
         compiled_data_train: List[pd.DataFrame] = []
+        compiled_data_valid: List[pd.DataFrame] = []
         compiled_data_test: List[pd.DataFrame] = []
 
         for ins_id, user_sample in tqdm(
@@ -26,7 +27,7 @@ class PastAssessment(Feature):
                 desc="train past assessment"):
             if "Assessment" not in user_sample["type"].unique():
                 continue
-            feat_df = past_assess_features(user_sample, test=False)
+            feat_df, _ = past_assess_features(user_sample, test=False)
 
             compiled_data_train.append(feat_df)
         self.train = pd.concat(compiled_data_train, axis=0, sort=False)
@@ -36,14 +37,17 @@ class PastAssessment(Feature):
                 test_df.groupby("installation_id", sort=False),
                 total=test_df["installation_id"].nunique(),
                 desc="test past assessment"):
-            feat_df = past_assess_features(user_sample, test=True)
+            feat_df, valid_df = past_assess_features(user_sample, test=True)
+            compiled_data_valid.append(valid_df)
             compiled_data_test.append(feat_df)
+        self.valid = pd.concat(compiled_data_valid, axis=0, sort=False)
+        self.valid.reset_index(drop=True, inplace=True)
         self.test = pd.concat(compiled_data_test, axis=0, sort=False)
         self.test.reset_index(drop=True, inplace=True)
 
 
-def past_assess_features(user_sample: pd.DataFrame,
-                         test: bool = False) -> pd.DataFrame:
+def past_assess_features(user_sample: pd.DataFrame, test: bool = False
+                         ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
     all_assesments = []
     for sess_id, sess in user_sample.groupby("game_session", sort=False):
         if sess["type"].iloc[0] != "Assessment":
@@ -138,15 +142,16 @@ def past_assess_features(user_sample: pd.DataFrame,
 
             attempt_code = 4110 if (
                 sess_title == "Bird Measurer (Assessment)") else 4100
-            all_attempts: pd.DataFrame = sess.query(
-                f"event_code == {attempt_code}")
-            if test:
+            all_attempts = sess.query(f"event_code == {attempt_code}")
+            if len(sess) == 1:
                 all_assesments.append(features)
             elif len(all_attempts) > 0:
                 all_assesments.append(features)
 
     if test:
         all_assess_df = pd.DataFrame([all_assesments[-1]])
+        valid_df = pd.DataFrame(all_assesments[:-1])
+        return all_assess_df, valid_df
     else:
         all_assess_df = pd.DataFrame(all_assesments)
-    return all_assess_df
+        return all_assess_df, None

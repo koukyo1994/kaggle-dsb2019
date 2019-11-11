@@ -8,6 +8,8 @@ def feature_existence_checker(feature_path: Path,
     for f in feature_names:
         if f + "_train.ftr" not in features:
             return False
+        if f + "_valid.ftr" not in features:
+            return False
         if f + "_test.ftr" not in features:
             return False
     return True

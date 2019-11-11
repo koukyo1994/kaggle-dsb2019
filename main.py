@@ -13,7 +13,7 @@ import seaborn as sns
 from pathlib import Path
 from typing import List
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 
 if __name__ == "__main__":
     sys.path.append("./")
@@ -78,6 +78,12 @@ if __name__ == "__main__":
         ],
                             axis=1,
                             sort=False)
+        x_valid = pd.concat([
+            pd.read_feather(feature_dir / (f + "_valid.ftr"), nthreads=-1)
+            for f in config["features"]
+        ],
+                            axis=1,
+                            sort=False)
         x_test = pd.concat([
             pd.read_feather(feature_dir / (f + "_test.ftr"), nthreads=-1)
             for f in config["features"]
@@ -90,7 +96,7 @@ if __name__ == "__main__":
     cols: List[str] = x_train.columns.tolist()
     cols.remove("installation_id")
     cols.remove("accuracy_group")
-    x_train, x_test = x_train[cols], x_test[cols]
+    x_train, x_valid, x_test = x_train[cols], x_valid[cols], x_test[cols]
 
     assert len(x_train) == len(y_train)
     logging.debug(f"number of features: {len(cols)}")
@@ -102,7 +108,7 @@ if __name__ == "__main__":
     # ===============================
     logging.info("Adversarial Validation")
     train_adv = x_train.copy()
-    test_adv = x_test.copy()
+    test_adv = x_valid.copy()
 
     train_adv["target"] = 0
     test_adv["target"] = 1
@@ -110,34 +116,38 @@ if __name__ == "__main__":
                                sort=False).reset_index(drop=True)
 
     split_params: dict = config["av"]["split_params"]
-    train_set, val_set = train_test_split(
-        train_test_adv,
+    kf = KFold(
         random_state=split_params["random_state"],
-        test_size=split_params["test_size"])
-    x_train_adv = train_set[cols]
-    y_train_adv = train_set["target"]
-    x_val_adv = val_set[cols]
-    y_val_adv = val_set["target"]
+        n_splits=split_params["n_splits"],
+        shuffle=True)
+    splits = list(kf.split(train_test_adv))
+    aucs = []
+    importance = np.zeros(len(cols))
+    for trn_idx, val_idx in splits:
+        x_train_adv = train_test_adv.loc[trn_idx, cols]
+        y_train_adv = train_test_adv.loc[trn_idx, "target"]
+        x_val_adv = train_test_adv.loc[val_idx, cols]
+        y_val_adv = train_test_adv.loc[val_idx, "target"]
 
-    logging.debug(f"The number of train set: {len(x_train_adv)}")
-    logging.debug(f"The number of valid set: {len(x_val_adv)}")
+        train_lgb = lgb.Dataset(x_train_adv, label=y_train_adv)
+        valid_lgb = lgb.Dataset(x_val_adv, label=y_val_adv)
 
-    train_lgb = lgb.Dataset(x_train_adv, label=y_train_adv)
-    valid_lgb = lgb.Dataset(x_val_adv, label=y_val_adv)
+        model_params = config["av"]["model_params"]
+        train_params = config["av"]["train_params"]
+        clf = lgb.train(
+            model_params,
+            train_lgb,
+            valid_sets=[train_lgb, valid_lgb],
+            valid_names=["train", "valid"],
+            **train_params)
 
-    model_params = config["av"]["model_params"]
-    train_params = config["av"]["train_params"]
-    clf = lgb.train(
-        model_params,
-        train_lgb,
-        valid_sets=[train_lgb, valid_lgb],
-        valid_names=["train", "valid"],
-        **train_params)
+        aucs.append(clf.best_score)
+        importance += clf.feature_importance(
+            importance_type="gain") / len(splits)
 
     # Check the feature importance
     feature_imp = pd.DataFrame(
-        sorted(zip(clf.feature_importance(importance_type="gain"), cols)),
-        columns=["value", "feature"])
+        sorted(zip(importance, cols)), columns=["value", "feature"])
 
     plt.figure(figsize=(20, 10))
     sns.barplot(
@@ -149,7 +159,10 @@ if __name__ == "__main__":
     plt.savefig(output_dir / "feature_importance_adv.png")
 
     config["av_result"] = dict()
-    config["av_result"]["score"] = clf.best_score
+    config["av_result"]["score"] = dict()
+    for i, auc in enumerate(aucs):
+        config["av_result"]["score"][f"fold{i}"] = auc
+
     config["av_result"]["feature_importances"] = \
         feature_imp.set_index("feature").sort_values(
             by="value",

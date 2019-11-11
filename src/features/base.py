@@ -19,8 +19,10 @@ class Feature(metaclass=abc.ABCMeta):
     def __init__(self):
         self.name = self.__class__.__name__
         self.train = pd.DataFrame()
+        self.valid = pd.DataFrame()
         self.test = pd.DataFrame()
         self.train_path = Path(self.save_dir) / f"{self.name}_train.ftr"
+        self.valid_path = Path(self.save_dir) / f"{self.name}_valid.ftr"
         self.test_path = Path(self.save_dir) / f"{self.name}_test.ftr"
 
     def run(self,
@@ -31,9 +33,11 @@ class Feature(metaclass=abc.ABCMeta):
             self.create_features(train_df, test_df)
             prefix = self.prefix + "_" if self.prefix else ""
             suffix = self.suffix + "_" if self.suffix else ""
-            self.train.columns = [str(c) for c in self.train.columns]
-            self.test.columns = [str(c) for c in self.test.columns]
+            self.train.columns = pd.Index([str(c) for c in self.train.columns])
+            self.valid.columns = pd.Index([str(c) for c in self.valid.columns])
+            self.test.columns = pd.Index([str(c) for c in self.test.columns])
             self.train.columns = prefix + self.train.columns + suffix
+            self.valid.columns = prefix + self.valid.columns + suffix
             self.test.columns = prefix + self.test.columns + suffix
         return self
 
@@ -44,6 +48,7 @@ class Feature(metaclass=abc.ABCMeta):
 
     def save(self):
         self.train.to_feather(str(self.train_path))
+        self.valid.to_feather(str(self.valid_path))
         self.test.to_feather(str(self.test_path))
 
 
@@ -72,7 +77,8 @@ def generate_features(train_df: pd.DataFrame,
                       overwrite: bool,
                       log: bool = False):
     for f in get_features(namespace):
-        if f.train_path.exists() and f.test_path.exists() and not overwrite:
+        if (f.train_path.exists() and f.valid_path.exists()
+                and f.test_path.exists() and not overwrite):
             if not log:
                 print(f.name, "was skipped")
             else:
@@ -92,9 +98,16 @@ def load_features(config: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
     x_train = pd.concat(dfs, axis=1)
 
     dfs = [
+        pd.read_feather(f"{feather_path}/{f}_valid.ftr", nthreads=-1)
+        for f in config["features"]
+        if Path(f"{feather_path}/{f}_valid.ftr").exists()
+    ]
+    x_valid = pd.concat(dfs, axis=1)
+
+    dfs = [
         pd.read_feather(f"{feather_path}/{f}_test.ftr", nthreads=-1)
         for f in config["features"]
         if Path(f"{feather_path}/{f}_test.ftr").exists()
     ]
     x_test = pd.concat(dfs, axis=1)
-    return x_train, x_test
+    return x_train, x_valid, x_test

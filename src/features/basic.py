@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Optional, Tuple
 
 from tqdm import tqdm
 
@@ -24,10 +24,12 @@ class Basic(Feature):
         inverse_activities_map = dict(
             zip(np.arange(len(all_activities)), all_activities))
 
-        compiled_data_train: List[List[IoF]] = []
-        compiled_data_test: List[List[IoF]] = []
+        compiled_data_train: List[pd.DataFrame] = []
+        compiled_data_valid: List[pd.DataFrame] = []
+        compiled_data_test: List[pd.DataFrame] = []
 
         installation_ids_train = []
+        installation_ids_valid = []
         installation_ids_test = []
 
         train_df["title"] = train_df["title"].map(activities_map)
@@ -44,7 +46,7 @@ class Basic(Feature):
                 continue
             feats = KernelFeatures(all_activities, all_event_codes,
                                    activities_map, inverse_activities_map)
-            feat_df = feats.create_features(user_sample, test=False)
+            feat_df, _ = feats.create_features(user_sample, test=False)
 
             installation_ids_train.extend([ins_id] * len(feat_df))
             compiled_data_train.append(feat_df)
@@ -58,9 +60,16 @@ class Basic(Feature):
                 desc="test features"):
             feats = KernelFeatures(all_activities, all_event_codes,
                                    activities_map, inverse_activities_map)
-            feat_df = feats.create_features(user_sample, test=True)
+            feat_df, valid_df = feats.create_features(user_sample, test=True)
+            installation_ids_valid.extend(
+                [ins_id] * len(valid_df))  # type: ignore
             installation_ids_test.extend([ins_id] * len(feat_df))
+            compiled_data_valid.append(valid_df)
             compiled_data_test.append(feat_df)
+        self.valid = pd.concat(compiled_data_valid, axis=0, sort=False)
+        self.valid["installation_id"] = installation_ids_valid
+        self.valid.reset_index(drop=True, inplace=True)
+
         self.test = pd.concat(compiled_data_test, axis=0, sort=False)
         self.test["installation_id"] = installation_ids_test
         self.test.reset_index(drop=True, inplace=True)
@@ -83,7 +92,8 @@ class KernelFeatures(PartialFeature):
 
         super().__init__()
 
-    def create_features(self, df: pd.DataFrame, test: bool = False):
+    def create_features(self, df: pd.DataFrame, test: bool = False
+                        ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
         time_spent_each_act = {act: 0 for act in self.all_activities}
         event_code_count = {ev: 0 for ev in self.all_event_codes}
         user_activities_count: Dict[IoS, IoF] = {
@@ -168,7 +178,7 @@ class KernelFeatures(PartialFeature):
 
                 features["accumulated_actions"] = accumulated_actions
 
-                if test:
+                if len(sess) == 1:
                     all_assesments.append(features)
                 elif true_attempt + false_attempt > 0:
                     all_assesments.append(features)
@@ -185,8 +195,9 @@ class KernelFeatures(PartialFeature):
                 last_activity = sess_type
 
         if test:
-            self.df = pd.DataFrame([all_assesments[-1]])
+            df = pd.DataFrame([all_assesments[-1]])
+            valid_df = pd.DataFrame(all_assesments[:-1])
+            return df, valid_df
         else:
-            self.df = pd.DataFrame(all_assesments)
-
-        return self.df
+            df = pd.DataFrame(all_assesments)
+            return df, None
