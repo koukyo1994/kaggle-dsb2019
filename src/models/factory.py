@@ -1,4 +1,4 @@
-from .cat import CatBoost
+from .cat import CatBoostModel
 from .lgbm import LightGBM
 
 
@@ -6,8 +6,8 @@ def lgbm() -> LightGBM:
     return LightGBM()
 
 
-def catboost() -> CatBoost:
-    return CatBoost()
+def catboost() -> CatBoostModel:
+    return CatBoostModel()
 
 
 def get_model(config: dict):

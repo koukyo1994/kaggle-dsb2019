@@ -11,7 +11,7 @@ from src.evaluation import CatBoostOptimizedQWKMetric, OptimizedRounder
 CatModel = Union[CatBoostClassifier, CatBoostRegressor]
 
 
-class CatBoost(BaseModel):
+class CatBoostModel(BaseModel):
     def fit(self, x_train: np.ndarray, y_train: np.ndarray,
             x_valid: np.ndarray, y_valid: np.ndarray,
             config: dict) -> Tuple[CatModel, dict]:

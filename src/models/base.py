@@ -9,6 +9,7 @@ from abc import abstractmethod
 from typing import Union, Tuple, List
 
 from src.evaluation import calc_metric
+from src.sampling import get_sampling
 
 # type alias
 AoD = Union[np.ndarray, pd.DataFrame]
@@ -69,6 +70,8 @@ class BaseModel(object):
             y_trn = y[trn_idx]
             x_val = X[val_idx]
             y_val = y[val_idx]
+
+            x_trn, y_trn = get_sampling(x_trn, y_trn, config)
 
             # train model
             model, best_score = self.fit(x_trn, y_trn, x_val, y_val, config)

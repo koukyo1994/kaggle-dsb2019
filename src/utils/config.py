@@ -23,6 +23,9 @@ def _get_default() -> dict:
     # model
     cfg["model"] = dict()
     cfg["model"]["name"] = "lgbm"
+    cfg["model"]["sampling"] = dict()
+    cfg["model"]["sampling"]["name"] = "none"
+    cfg["model"]["sampling"]["params"] = dict()
     cfg["model"]["model_params"] = dict()
     cfg["model"]["train_params"] = dict()
 
