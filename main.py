@@ -202,8 +202,6 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.savefig(output_dir / "feature_importance_model.png")
 
-    import pdb
-    pdb.set_trace()
     # Confusion Matrix
     plot_confusion_matrix(
         y_train,

@@ -47,7 +47,7 @@ ENV CONDA_AUTO_UPDATE_CONDA=false
 # Create a Python 3.6 environment
 RUN /home/user/miniconda/bin/conda update -n base -c defaults conda -y && \
     /home/user/miniconda/bin/conda install conda-build -y \
-    && /home/user/miniconda/bin/conda create -y --name py36 python=3.6.5 \
+    && /home/user/miniconda/bin/conda create -y --name py36 python=3.6.6 \
     && /home/user/miniconda/bin/conda clean -ya
 ENV CONDA_DEFAULT_ENV=py36
 ENV CONDA_PREFIX=/home/user/miniconda/envs/$CONDA_DEFAULT_ENV
