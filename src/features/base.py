@@ -18,6 +18,7 @@ class Feature(metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.name = self.__class__.__name__
+        Path(self.save_dir).mkdir(exist_ok=True, parents=True)
         self.train = pd.DataFrame()
         self.valid = pd.DataFrame()
         self.test = pd.DataFrame()
