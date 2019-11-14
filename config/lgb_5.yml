@@ -1,0 +1,88 @@
+dataset:
+  dir: "input/data-science-bowl-2019/"
+  feature_dir: "features"
+  params:
+
+features:
+  - Basic
+  - PastAssessment
+
+av:
+  split_params:
+    n_splits: 5
+    random_state: 42
+
+  model_params:
+    objective: "binary"
+    metric: "auc"
+    boosting: "gbdt"
+    max_depth: 7
+    num_leaves: 75
+    learning_rate: 0.01
+    colsample_bytree: 0.7
+    subsample: 0.1
+    subsample_freq: 1
+    seed: 111
+    feature_fraction_seed: 111
+    drop_seed: 111
+    verbose: -1
+    n_jobs: -1
+    first_metric_only: True
+
+  train_params:
+    num_boost_round: 50000
+    early_stopping_rounds: 200
+    verbose_eval: 200
+
+model:
+  name: "lgbm"
+  sampling:
+    name: "none"
+    params:
+      k_neighbors: 7
+      n_jobs: 4
+      random_state: 42
+      acc_0_coef: 1.0
+      acc_1_coef: 1.0
+      acc_2_coef: 1.0
+      acc_3_coef: 1.0
+
+  model_params:
+    objective: "regression"
+    metric: "rmse"
+    boosting_type: "gbdt"
+    max_depth: -1
+    num_leaves: 256
+    tree_learner: "serial"
+    learning_rate: 0.01
+    subsample: 0.7
+    subsample_freq: 1
+    colsample_bytree: 0.5
+    max_bin: 255
+    seed: 71
+    bagging_seed: 71
+    feature_fraction_seed: 71
+    drop_seed: 71
+    verbose: -1
+    n_jobs: -1
+    first_metric_only: False
+
+  train_params:
+    num_boost_round: 10000
+    early_stopping_rounds: 100
+    verbose_eval: 100
+
+post_process:
+  params:
+    reverse: False
+    n_overall: 20
+    n_classwise: 20
+
+val:
+  name: "group_kfold"
+  n_delete:
+  params:
+    n_splits: 5
+    random_state: 111
+
+output_dir: "output"

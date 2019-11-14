@@ -1,0 +1,362 @@
+{
+    "dataset": {
+        "dir": "input/data-science-bowl-2019/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "av": {
+        "params": {},
+        "split_params": {
+            "n_splits": 5,
+            "random_state": 42
+        },
+        "model_params": {
+            "objective": "binary",
+            "metric": "auc",
+            "boosting": "gbdt",
+            "max_depth": 7,
+            "num_leaves": 75,
+            "learning_rate": 0.01,
+            "colsample_bytree": 0.7,
+            "subsample": 0.1,
+            "subsample_freq": 1,
+            "seed": 111,
+            "feature_fraction_seed": 111,
+            "drop_seed": 111,
+            "verbose": -1,
+            "n_jobs": -1,
+            "first_metric_only": true
+        },
+        "train_params": {
+            "num_boost_round": 50000,
+            "early_stopping_rounds": 200,
+            "verbose_eval": 200
+        }
+    },
+    "model": {
+        "name": "lgbm",
+        "sampling": {
+            "name": "none",
+            "params": {
+                "k_neighbors": 7,
+                "n_jobs": 4,
+                "random_state": 42,
+                "acc_0_coef": 1.0,
+                "acc_1_coef": 1.0,
+                "acc_2_coef": 1.0,
+                "acc_3_coef": 1.0
+            }
+        },
+        "model_params": {
+            "objective": "regression",
+            "metric": "rmse",
+            "boosting_type": "gbdt",
+            "max_depth": -1,
+            "num_leaves": 256,
+            "tree_learner": "serial",
+            "learning_rate": 0.01,
+            "subsample": 0.7,
+            "subsample_freq": 1,
+            "colsample_bytree": 0.5,
+            "max_bin": 255,
+            "seed": 71,
+            "bagging_seed": 71,
+            "feature_fraction_seed": 71,
+            "drop_seed": 71,
+            "verbose": -1,
+            "n_jobs": -1,
+            "first_metric_only": false
+        },
+        "train_params": {
+            "num_boost_round": 10000,
+            "early_stopping_rounds": 100,
+            "verbose_eval": 100
+        }
+    },
+    "post_process": {
+        "params": {
+            "reverse": false,
+            "n_overall": 20,
+            "n_classwise": 20
+        }
+    },
+    "val": {
+        "name": "group_kfold",
+        "params": {
+            "n_splits": 5,
+            "random_state": 111
+        },
+        "n_delete": null
+    },
+    "output_dir": "output",
+    "features": [
+        "Basic",
+        "PastAssessment"
+    ],
+    "args": {
+        "config": "config/lgb_5.yml"
+    },
+    "model_output_dir": "output/lgb_5",
+    "av_result": {
+        "score": {
+            "fold0": {
+                "train": {
+                    "auc": 0.9951791018831815
+                },
+                "valid": {
+                    "auc": 0.8786583988434084
+                }
+            },
+            "fold1": {
+                "train": {
+                    "auc": 0.9960073440601689
+                },
+                "valid": {
+                    "auc": 0.8927999246065403
+                }
+            },
+            "fold2": {
+                "train": {
+                    "auc": 0.9980804941933746
+                },
+                "valid": {
+                    "auc": 0.9040003206669873
+                }
+            },
+            "fold3": {
+                "train": {
+                    "auc": 0.9964328696083655
+                },
+                "valid": {
+                    "auc": 0.8918074877250409
+                }
+            },
+            "fold4": {
+                "train": {
+                    "auc": 0.9995627954118381
+                },
+                "valid": {
+                    "auc": 0.8991815947824907
+                }
+            }
+        },
+        "feature_importances": {
+            "installation_event_code_count_mean": 20520.333097970284,
+            "installation_duration_mean": 20220.14136378756,
+            "4070": 13356.294703872978,
+            "2000": 11129.616353335465,
+            "4030": 10520.908159149625,
+            "4020": 10431.540661409064,
+            "4035": 10110.369107967646,
+            "installation_session_count": 9734.057911956123,
+            "accumulated_actions": 9475.227337479011,
+            "3110": 9378.356030424704,
+            "memory_decay_coeff_from_last_assess": 8932.642314765912,
+            "4025": 8873.18421000232,
+            "duration_mean": 8512.946447805192,
+            "4021": 7870.2631534613865,
+            "3120": 7690.941895671362,
+            "4040": 7353.683397768883,
+            "3010": 6844.788083825653,
+            "2020": 6765.580475744548,
+            "3121": 6553.295404607559,
+            "2030": 6552.531177290623,
+            "4022": 6255.074146002338,
+            "4100": 5205.981748229993,
+            "3020": 5007.833993981898,
+            "session_title": 4869.703546141243,
+            "accumulated_acc": 4675.392704789641,
+            "3021": 4644.55596975349,
+            "4031": 4460.67126802301,
+            "installation_title_nunique": 3819.050750311939,
+            "4010": 3786.2392717863395,
+            "4090": 3663.0699396578593,
+            "accumulated_accuracy_group": 3442.694399972509,
+            "2025": 3372.999121532288,
+            "4095": 3336.3950706799415,
+            "4045": 3262.9521038340404,
+            "accumulated_failed_attempts": 3223.8906201802347,
+            "2080": 3219.6378330066013,
+            "sum_event_code_count": 2782.374132940974,
+            "5000": 2764.7834872849016,
+            "2083": 2637.9151567594013,
+            "memory_decay_coeff_from_last_same_assess": 2592.0225306910293,
+            "4110": 2591.0875631868585,
+            "2040": 2454.199468989003,
+            "2060": 2352.2701639300813,
+            "4220": 2333.9532745072165,
+            "2081": 2221.3990343692467,
+            "2035": 2095.411333527234,
+            "2050": 2014.4122287801188,
+            "2070": 1826.77665372261,
+            "4230": 1824.766261412481,
+            "5010": 1807.7997406082193,
+            "0": 1674.683609893418,
+            "2075": 1664.4437428118408,
+            "decayed_last_same_accuracy_group": 1638.7394553367185,
+            "accumulated_correct_attempts": 1552.6700966456278,
+            "decayed_n_success_last_same_assess": 1520.5091721261429,
+            "2010": 1498.165473622178,
+            "3": 1493.8570456987088,
+            "4050": 1087.0626706804205,
+            "decayed_n_failure_last_same_assess": 994.2156091935564,
+            "decayed_success_ratio_last_same_assess": 926.3706515786321,
+            "success_ratio_same_assess": 904.1244376399923,
+            "2": 900.1270754819881,
+            "1": 810.2387022832415,
+            "n_failure_same_assess": 763.6436380025905,
+            "4235": 499.04524920761764,
+            "n_same_assessment_in_past": 440.5152384296654,
+            "n_success_same_assess": 317.2152127531747,
+            "n_failure_last_same_assess": 257.30809303708793,
+            "last_same_accuracy_group": 254.89508993130104,
+            "has_same_assessment_in_past": 191.08335066530782,
+            "success_ratio_last_same_assess": 135.18304934483118,
+            "4080": 74.4295978392991,
+            "n_success_last_same_assess": 8.902482610287551,
+            "Clip": 0.0,
+            "Assessment": 0.0,
+            "Game": 0.0,
+            "Activity": 0.0
+        }
+    },
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 0.6010964939575754,
+            "cv_score": {
+                "cv1": {
+                    "train": {
+                        "rmse": 0.2475880489408009,
+                        "qwk": 0.8311801204468755
+                    },
+                    "valid": {
+                        "rmse": 0.33133099491287266,
+                        "qwk": 0.6321048897700611
+                    }
+                },
+                "cv2": {
+                    "train": {
+                        "rmse": 0.24969769454727345,
+                        "qwk": 0.8294980233112065
+                    },
+                    "valid": {
+                        "rmse": 0.3325875788076418,
+                        "qwk": 0.6169102972375744
+                    }
+                },
+                "cv3": {
+                    "train": {
+                        "rmse": 0.2278525245028057,
+                        "qwk": 0.8622250398735738
+                    },
+                    "valid": {
+                        "rmse": 0.32542837297739885,
+                        "qwk": 0.5987140821051025
+                    }
+                },
+                "cv4": {
+                    "train": {
+                        "rmse": 0.22930055218305986,
+                        "qwk": 0.8583701508201
+                    },
+                    "valid": {
+                        "rmse": 0.33787766325788093,
+                        "qwk": 0.5771791900803644
+                    }
+                },
+                "cv5": {
+                    "train": {
+                        "rmse": 0.21531343758669075,
+                        "qwk": 0.8779906179665405
+                    },
+                    "valid": {
+                        "rmse": 0.3312580891670893,
+                        "qwk": 0.5813203260029176
+                    }
+                }
+            },
+            "n_data": 17690,
+            "best_iteration": 315.6,
+            "n_features": 77,
+            "feature_importance": {
+                "session_title": 10968.03975946009,
+                "success_ratio_same_assess": 4813.6957370966675,
+                "installation_duration_mean": 2692.1818697780373,
+                "0": 2496.6694716587663,
+                "2000": 2120.3393084794284,
+                "4070": 1972.6547672092915,
+                "installation_event_code_count_mean": 1837.884164851904,
+                "last_same_accuracy_group": 1723.3406872153282,
+                "3120": 1596.3519789010286,
+                "accumulated_acc": 1594.348851338029,
+                "memory_decay_coeff_from_last_assess": 1510.074808999896,
+                "4035": 1464.878577899933,
+                "4030": 1358.1403614461422,
+                "success_ratio_last_same_assess": 1350.4029432535172,
+                "duration_mean": 1333.8941971242427,
+                "4025": 1275.2106494516133,
+                "3121": 1226.9565778493882,
+                "3020": 1205.7044704973698,
+                "accumulated_accuracy_group": 1202.3842549562455,
+                "3110": 1138.0141230672598,
+                "decayed_last_same_accuracy_group": 1137.0563850283622,
+                "4020": 1064.1570908963681,
+                "n_failure_same_assess": 1029.5844614237546,
+                "2030": 1023.8327171862126,
+                "accumulated_actions": 1020.7053753644228,
+                "4040": 1008.6222422480583,
+                "4100": 991.4865898698569,
+                "installation_session_count": 982.2220004856587,
+                "2020": 974.1334384828806,
+                "4022": 912.823396012187,
+                "3010": 910.184522753954,
+                "3021": 892.036241748929,
+                "4021": 891.240076994896,
+                "accumulated_failed_attempts": 760.0168119490147,
+                "memory_decay_coeff_from_last_same_assess": 735.9060113310813,
+                "decayed_n_failure_last_same_assess": 710.109257119894,
+                "4010": 655.5842658162117,
+                "decayed_success_ratio_last_same_assess": 643.5743261873722,
+                "installation_title_nunique": 637.8651649564505,
+                "4090": 593.1484828174114,
+                "4031": 588.0761634588241,
+                "2025": 578.5884843707084,
+                "sum_event_code_count": 530.7002070367337,
+                "4110": 513.1616919338703,
+                "n_success_same_assess": 500.3713978409767,
+                "4045": 477.06161902844906,
+                "2010": 442.7464884147048,
+                "2080": 441.0201030761003,
+                "decayed_n_success_last_same_assess": 402.6894063025713,
+                "5000": 379.0037813782692,
+                "2083": 374.4983649015427,
+                "3": 371.8314041852951,
+                "4095": 358.15332164466383,
+                "2035": 353.01862860918044,
+                "2040": 344.86816953122616,
+                "accumulated_correct_attempts": 311.6471667528152,
+                "2050": 308.53231880962846,
+                "2060": 307.870282176137,
+                "2075": 294.71674708425996,
+                "2081": 291.2121616959572,
+                "4220": 285.42777789533136,
+                "5010": 262.9210287064314,
+                "n_failure_last_same_assess": 257.4660084635019,
+                "4230": 252.15531201958657,
+                "2070": 250.48839237093927,
+                "n_same_assessment_in_past": 190.7224232286215,
+                "1": 172.4635243445635,
+                "has_same_assessment_in_past": 160.0463764488697,
+                "2": 140.83946894705295,
+                "4235": 113.05945335328579,
+                "4050": 61.136468172073364,
+                "4080": 36.489911660552025,
+                "n_success_last_same_assess": 8.183876743912696,
+                "Game": 0.0,
+                "Clip": 0.0,
+                "Assessment": 0.0,
+                "Activity": 0.0
+            }
+        }
+    }
+}
