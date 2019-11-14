@@ -18,7 +18,7 @@ class LightGBM(BaseModel):
         model_params = config["model"]["model_params"]
         train_params = config["model"]["train_params"]
 
-        mode = model_params["objective"]
+        mode = config["model"]["mode"]
         self.mode = mode
         if mode == "regression":
             self.denominator = y_train.max()

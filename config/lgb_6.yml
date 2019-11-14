@@ -5,6 +5,7 @@ dataset:
 
 features:
   - Basic
+  - PastAssessment
 
 av:
   split_params:
@@ -25,6 +26,7 @@ av:
     feature_fraction_seed: 111
     drop_seed: 111
     verbose: -1
+    n_jobs: -1
     first_metric_only: True
 
   train_params:
@@ -35,9 +37,20 @@ av:
 model:
   name: "lgbm"
   mode: "regression"
+  sampling:
+    name: "none"
+    params:
+      k_neighbors: 7
+      n_jobs: 4
+      random_state: 42
+      acc_0_coef: 1.0
+      acc_1_coef: 1.0
+      acc_2_coef: 1.0
+      acc_3_coef: 1.0
+
   model_params:
-    objective: "regression"
-    metric: "rmse"
+    objective: "huber"
+    metric: "mape"
     boosting_type: "gbdt"
     max_depth: -1
     num_leaves: 256
@@ -52,6 +65,7 @@ model:
     feature_fraction_seed: 71
     drop_seed: 71
     verbose: -1
+    n_jobs: -1
     first_metric_only: False
 
   train_params:
@@ -59,8 +73,15 @@ model:
     early_stopping_rounds: 100
     verbose_eval: 100
 
+post_process:
+  params:
+    reverse: False
+    n_overall: 20
+    n_classwise: 20
+
 val:
   name: "group_kfold"
+  n_delete:
   params:
     n_splits: 5
     random_state: 111

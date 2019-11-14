@@ -35,6 +35,7 @@ av:
 
 model:
   name: "lgbm"
+  mode: "regression"
   sampling:
     name: "random_under_sample_and_smote"
     params:

@@ -36,6 +36,7 @@ av:
 
 model:
   name: "lgbm"
+  mode: "regression"
   sampling:
     name: "none"
     params:

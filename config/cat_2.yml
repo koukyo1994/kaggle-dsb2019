@@ -34,6 +34,7 @@ av:
 
 model:
   name: "catboost"
+  mode: "regression"
   model_params:
     loss_function: "RMSE"
     task_type: "CPU"

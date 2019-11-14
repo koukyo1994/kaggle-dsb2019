@@ -16,7 +16,7 @@ class CatBoostModel(BaseModel):
             x_valid: np.ndarray, y_valid: np.ndarray,
             config: dict) -> Tuple[CatModel, dict]:
         model_params = config["model"]["model_params"]
-        mode = config["model"]["train_params"]["mode"]
+        mode = config["model"]["mode"]
         self.mode = mode
         if mode == "regression":
             model = CatBoostRegressor(

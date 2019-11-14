@@ -35,6 +35,7 @@ av:
 
 model:
   name: "lgbm"
+  mode: "regression"
   model_params:
     objective: "regression"
     metric: "rmse"
