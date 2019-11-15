@@ -74,22 +74,22 @@ class Basic(Feature):
         self.test["installation_id"] = installation_ids_test
         self.test.reset_index(drop=True, inplace=True)
 
-        for df in [self.train, self.valid, self.test]:
-            df["installation_session_count"] = df.groupby(
-                "installation_id")["Clip"].transform("count")
-            df["installation_duration_mean"] = df.groupby(
-                "installation_id")["duration_mean"].transform("mean")
-            df["installation_title_nunique"] = df.groupby(
-                "installation_id")["session_title"].transform("nunique")
-            df['sum_event_code_count'] = df[[
-                2050, 4100, 4230, 5000, 4235, 2060, 4110, 5010, 2070, 2075,
-                2080, 2081, 2083, 3110, 4010, 3120, 3121, 4020, 4021, 4022,
-                4025, 4030, 4031, 3010, 4035, 4040, 3020, 3021, 4045, 2000,
-                4050, 2010, 2020, 4070, 2025, 2030, 4080, 2035, 2040, 4090,
-                4220, 4095
-            ]].sum(axis=1)
-            df['installation_event_code_count_mean'] = df.groupby(
-                ['installation_id'])['sum_event_code_count'].transform('mean')
+        # for df in [self.train, self.valid, self.test]:
+        #     df["installation_session_count"] = df.groupby(
+        #         "installation_id")["Clip"].transform("count")
+        #     df["installation_duration_mean"] = df.groupby(
+        #         "installation_id")["duration_mean"].transform("mean")
+        #     df["installation_title_nunique"] = df.groupby(
+        #         "installation_id")["session_title"].transform("nunique")
+        #     df['sum_event_code_count'] = df[[
+        #         2050, 4100, 4230, 5000, 4235, 2060, 4110, 5010, 2070, 2075,
+        #         2080, 2081, 2083, 3110, 4010, 3120, 3121, 4020, 4021, 4022,
+        #         4025, 4030, 4031, 3010, 4035, 4040, 3020, 3021, 4045, 2000,
+        #         4050, 2010, 2020, 4070, 2025, 2030, 4080, 2035, 2040, 4090,
+        #         4220, 4095
+        #     ]].sum(axis=1)
+        #     df['installation_event_code_count_mean'] = df.groupby(
+        #         ['installation_id'])['sum_event_code_count'].transform('mean')
 
 
 class KernelFeatures(PartialFeature):
@@ -153,7 +153,7 @@ class KernelFeatures(PartialFeature):
                     "false").sum()
 
                 features = user_activities_count.copy()
-                # features.update(time_spent_each_act.copy())
+                features.update(time_spent_each_act.copy())
                 features.update(event_code_count.copy())
 
                 features["session_title"] = sess_title

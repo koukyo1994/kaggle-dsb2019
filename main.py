@@ -23,7 +23,8 @@ if __name__ == "__main__":
     from src.utils import (get_preprocess_parser, load_config,
                            configure_logger, timer, feature_existence_checker,
                            save_json, plot_confusion_matrix, seed_everything)
-    from src.features import Basic, generate_features, PastAssessment, PastClip
+    from src.features import (Basic, generate_features, PastAssessment,
+                              PastClip, PastGame)
     from src.validation import get_validation, select_features
     from src.models import get_model
 
