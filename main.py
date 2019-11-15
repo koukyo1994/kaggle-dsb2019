@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
     groups = x_train["installation_id"].values
     y_train = x_train["accuracy_group"].values.reshape(-1)
+    y_valid = x_valid["accuracy_group"].values.reshape(-1)
     cols: List[str] = x_train.columns.tolist()
     cols.remove("installation_id")
     cols.remove("accuracy_group")
@@ -173,7 +174,7 @@ if __name__ == "__main__":
         feature_imp.set_index("feature").sort_values(
             by="value",
             ascending=False
-        ).head(100).to_dict()["value"]
+        ).to_dict()["value"]
 
     # ===============================
     # === Train model
@@ -188,8 +189,16 @@ if __name__ == "__main__":
     cols = select_features(cols, feature_imp, config)
 
     model = get_model(config)
-    models, oof_preds, test_preds, feature_importance, eval_results = model.cv(
-        y_train, x_train[cols], x_test[cols], cols, splits, config, log=True)
+    models, oof_preds, test_preds, valid_preds, feature_importance, eval_results = model.cv(
+        y_train,
+        x_train[cols],
+        x_test[cols],
+        y_valid,
+        x_valid[cols],
+        feature_name=cols,
+        folds_ids=splits,
+        config=config,
+        log=True)
 
     config["eval_results"] = dict()
     for k, v in eval_results.items():
@@ -214,7 +223,13 @@ if __name__ == "__main__":
         oof_preds,
         classes=np.array(["acc_0", "acc_1", "acc_2", "acc_3"]),
         normalize=True,
-        save_path=output_dir / "confusion_matrix.png")
+        save_path=output_dir / "confusion_matrix_oof.png")
+    plot_confusion_matrix(
+        y_valid,
+        valid_preds,
+        classes=np.array(["acc_0", "acc_1", "acc_2", "acc_3"]),
+        normalize=True,
+        save_path=output_dir / "confusion_matrix_valid.png")
 
     # ===============================
     # === Save

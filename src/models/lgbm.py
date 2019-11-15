@@ -2,7 +2,7 @@ import lightgbm as lgb
 import numpy as np
 import pandas as pd
 
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional, List
 
 from .base import BaseModel
 from src.evaluation import (OptimizedRounder, lgb_classification_qwk,
@@ -14,6 +14,7 @@ LGBMModel = Union[lgb.LGBMClassifier, lgb.LGBMRegressor]
 class LightGBM(BaseModel):
     def fit(self, x_train: np.ndarray, y_train: np.ndarray,
             x_valid: np.ndarray, y_valid: np.ndarray,
+            x_valid2: Optional[np.ndarray], y_valid2: Optional[np.ndarray],
             config: dict) -> Tuple[LGBMModel, dict]:
         model_params = config["model"]["model_params"]
         train_params = config["model"]["train_params"]
@@ -24,24 +25,36 @@ class LightGBM(BaseModel):
             self.denominator = y_train.max()
             y_train = y_train / self.denominator
             y_valid = y_valid / self.denominator
+            if y_valid2 is not None:
+                y_valid2 = y_valid2 / self.denominator
 
         d_train = lgb.Dataset(x_train, label=y_train)
         d_valid = lgb.Dataset(x_valid, label=y_valid)
+
+        valid_sets: List[lgb.Dataset] = []
+        valid_names: List[str] = []
+        if x_valid2 is not None:
+            d_valid2 = lgb.Dataset(x_valid2, label=y_valid2)
+            valid_sets += [d_valid2, d_valid]
+            valid_names += ["data_from_test", "data_from_train"]
+        else:
+            valid_sets.append(d_valid)
+            valid_names.append("valid")
 
         if mode == "regression":
             model = lgb.train(
                 params=model_params,
                 train_set=d_train,
-                valid_sets=[d_valid, d_train],
-                valid_names=["valid", "train"],
+                valid_sets=valid_sets,
+                valid_names=valid_names,
                 feval=lgb_regression_qwk,
                 **train_params)
         else:
             model = lgb.train(
                 params=model_params,
                 train_set=d_train,
-                valid_sets=[d_valid, d_train],
-                valid_names=["valid", "train"],
+                valid_sets=valid_sets,
+                valid_names=valid_names,
                 feval=lgb_classification_qwk,
                 **train_params)
         best_score = dict(model.best_score)
@@ -61,8 +74,9 @@ class LightGBM(BaseModel):
         return model.feature_importance(importance_type="gain")
 
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
-                     y: np.ndarray,
-                     config: dict) -> Tuple[np.ndarray, np.ndarray]:
+                     valid_preds: Optional[np.ndarray], y: np.ndarray,
+                     y_valid: Optional[np.ndarray], config: dict
+                     ) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
         # Override
         if self.mode == "regression":
             params = config["post_process"]["params"]
@@ -70,5 +84,7 @@ class LightGBM(BaseModel):
             OptR.fit(oof_preds, y)
             oof_preds_ = OptR.predict(oof_preds)
             test_preds_ = OptR.predict(test_preds)
-            return oof_preds_, test_preds_
-        return oof_preds, test_preds
+            if valid_preds is not None:
+                valid_preds = OptR.predict(valid_preds)
+            return oof_preds_, test_preds_, valid_preds
+        return oof_preds, test_preds, valid_preds

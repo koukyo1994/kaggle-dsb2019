@@ -19,8 +19,6 @@ class Unified(Feature):
         train_df = train.copy()
         test_df = test.copy()
 
-        all_activities = set(train_df["title"].unique()).union(
-            set(test_df["title"].unique()))
         all_event_codes = set(train_df["event_code"].unique()).union(
             set(test_df["event_code"].unique()))
 
@@ -42,7 +40,7 @@ class Unified(Feature):
             if "Assessment" not in user_sample["type"].unique():
                 continue
             feats, _ = unified_features(
-                user_sample, all_activities, all_event_codes, test=False)
+                user_sample, all_event_codes, test=False)
             inst_ids_train.extend([inst_id] * len(feats))
             dfs_train.append(feats)
 
@@ -58,7 +56,7 @@ class Unified(Feature):
                 total=test_df["installation_id"].nunique(),
                 desc="test features"):
             feats, valid_feats = unified_features(
-                user_sample, all_activities, all_event_codes, test=True)
+                user_sample, all_event_codes, test=True)
 
             inst_ids_valid.extend([inst_id] * len(valid_feats))  # type: ignore
             inst_ids_test.extend([inst_id] * len(feats))
@@ -76,12 +74,10 @@ class Unified(Feature):
         self.test.reset_index(drop=True, inplace=True)
 
 
-def unified_features(
-        user_sample: pd.DataFrame,
-        all_activities: set,
-        all_event_codes: set,
-        test: bool = False) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
-    time_spent_each_act = {act: 0 for act in all_activities}
+def unified_features(user_sample: pd.DataFrame,
+                     all_event_codes: set,
+                     test: bool = False
+                     ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
     event_code_count = {ev: 0 for ev in all_event_codes}
     user_activities_count: Dict[IoS, IoF] = {
         "Clip": 0,
@@ -132,8 +128,7 @@ def unified_features(
     for sess_id, sess in user_sample.groupby("game_session", sort=False):
         sess_type = sess["type"].iloc[0]
         if ((sess_type != "Assessment") and (sess_type != "Game")):
-            time_spent = int(sess["game_time"].iloc[-1] / 1000)
-            time_spent_each_act[sess["title"].iloc[0]] += time_spent
+            pass
 
         if sess_type == "Game":
             game_title = sess["title"].iloc[0]
@@ -177,7 +172,6 @@ def unified_features(
 
             # Basic Features
             features = user_activities_count.copy()
-            features.update(time_spent_each_act.copy())
             features.update(event_code_count.copy())
 
             features["session_title"] = sess_title
