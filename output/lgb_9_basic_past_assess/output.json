@@ -1,0 +1,441 @@
+{
+    "dataset": {
+        "dir": "input/data-science-bowl-2019/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "av": {
+        "params": {},
+        "split_params": {
+            "n_splits": 5,
+            "random_state": 42
+        },
+        "model_params": {
+            "objective": "binary",
+            "metric": "auc",
+            "boosting": "gbdt",
+            "max_depth": 7,
+            "num_leaves": 75,
+            "learning_rate": 0.01,
+            "colsample_bytree": 0.7,
+            "subsample": 0.1,
+            "subsample_freq": 1,
+            "seed": 111,
+            "feature_fraction_seed": 111,
+            "drop_seed": 111,
+            "verbose": -1,
+            "n_jobs": -1,
+            "first_metric_only": true
+        },
+        "train_params": {
+            "num_boost_round": 50000,
+            "early_stopping_rounds": 200,
+            "verbose_eval": 200
+        }
+    },
+    "model": {
+        "name": "lgbm",
+        "sampling": {
+            "name": "none",
+            "params": {
+                "k_neighbors": 7,
+                "n_jobs": 4,
+                "random_state": 42,
+                "acc_0_coef": 1.0,
+                "acc_1_coef": 1.0,
+                "acc_2_coef": 1.0,
+                "acc_3_coef": 1.0
+            }
+        },
+        "model_params": {
+            "objective": "regression",
+            "boosting_type": "gbdt",
+            "max_depth": -1,
+            "num_leaves": 256,
+            "tree_learner": "serial",
+            "learning_rate": 0.01,
+            "subsample": 0.7,
+            "subsample_freq": 1,
+            "colsample_bytree": 0.5,
+            "max_bin": 255,
+            "seed": 71,
+            "bagging_seed": 71,
+            "feature_fraction_seed": 71,
+            "drop_seed": 71,
+            "verbose": -1,
+            "n_jobs": -1,
+            "first_metric_only": true
+        },
+        "train_params": {
+            "num_boost_round": 10000,
+            "early_stopping_rounds": 100,
+            "verbose_eval": 100
+        },
+        "mode": "regression"
+    },
+    "post_process": {
+        "params": {
+            "reverse": false,
+            "n_overall": 20,
+            "n_classwise": 20
+        }
+    },
+    "val": {
+        "name": "group_kfold",
+        "params": {
+            "n_splits": 5,
+            "random_state": 111
+        },
+        "n_delete": null
+    },
+    "output_dir": "output",
+    "features": [
+        "Basic",
+        "PastAssessment"
+    ],
+    "args": {
+        "config": "config/lgb_9_basic_past_assess.yml"
+    },
+    "model_output_dir": "output/lgb_9_basic_past_assess",
+    "av_result": {
+        "score": {
+            "fold0": {
+                "train": {
+                    "auc": 0.9968251431059586
+                },
+                "valid": {
+                    "auc": 0.9050344869130448
+                }
+            },
+            "fold1": {
+                "train": {
+                    "auc": 0.9973735356702451
+                },
+                "valid": {
+                    "auc": 0.8856260274976702
+                }
+            },
+            "fold2": {
+                "train": {
+                    "auc": 0.9952464189886837
+                },
+                "valid": {
+                    "auc": 0.8837945890415027
+                }
+            },
+            "fold3": {
+                "train": {
+                    "auc": 0.9978508156720796
+                },
+                "valid": {
+                    "auc": 0.8802826650300054
+                }
+            },
+            "fold4": {
+                "train": {
+                    "auc": 0.9986322699807496
+                },
+                "valid": {
+                    "auc": 0.8957016758674826
+                }
+            }
+        },
+        "feature_importances": {
+            "4070": 15343.501948846822,
+            "2000": 13973.878130308884,
+            "accumulated_actions": 12357.049380268749,
+            "4030": 12226.412862911578,
+            "4020": 11717.81510995339,
+            "3110": 10718.878434158227,
+            "4035": 10545.363230502338,
+            "duration_mean": 10011.661421029661,
+            "memory_decay_coeff_from_last_assess": 9476.649554813164,
+            "4025": 9299.247520767858,
+            "3010": 8356.704149019497,
+            "Sandcastle Builder (Activity)": 7831.734991147144,
+            "3120": 7764.93452784084,
+            "Fireworks (Activity)": 7495.886835086091,
+            "All Star Sorting": 7378.837949755419,
+            "Chow Time": 7351.941703152907,
+            "2020": 7200.478755420047,
+            "4040": 6910.996554076225,
+            "3121": 6699.812529863732,
+            "4021": 6640.736004470585,
+            "2030": 6549.381009838051,
+            "Bottle Filler (Activity)": 6516.8316240058975,
+            "Flower Waterer (Activity)": 6034.702807022824,
+            "Happy Camel": 5497.147804121127,
+            "3021": 5417.17158728998,
+            "4022": 5412.833042847959,
+            "session_title": 5295.203885168937,
+            "3020": 5118.758151388935,
+            "Dino Dive": 5060.856705650561,
+            "Watering Hole (Activity)": 4942.9966880593865,
+            "4100": 4857.532333774708,
+            "accumulated_acc": 4797.33603923501,
+            "Chicken Balancer (Activity)": 4774.535776952177,
+            "Dino Drink": 4496.698811453022,
+            "Bug Measurer (Activity)": 4465.425473058444,
+            "4010": 4082.1849954846707,
+            "Scrub-A-Dub": 4064.9129934230086,
+            "Air Show": 3964.8699348277396,
+            "Egg Dropper (Activity)": 3954.5546975814027,
+            "4090": 3612.167268416252,
+            "accumulated_failed_attempts": 3505.5010719463476,
+            "Bubble Bath": 3473.360522401802,
+            "Pan Balance": 3421.5672367681673,
+            "accumulated_accuracy_group": 3328.3617414845417,
+            "Crystals Rule": 3205.1509603849863,
+            "Leaf Leader": 3099.3475224310923,
+            "2025": 3059.4557265878548,
+            "4031": 2976.7352608988563,
+            "4045": 2866.7428739832594,
+            "4095": 2745.780908008288,
+            "2080": 2716.6641101624673,
+            "memory_decay_coeff_from_last_same_assess": 2660.4170680662132,
+            "2083": 2264.5733103950743,
+            "4110": 2244.089646846668,
+            "2081": 2219.3737003423084,
+            "4220": 2084.9807025122154,
+            "5000": 1867.842347724973,
+            "2060": 1775.0779389410889,
+            "2035": 1723.8965733385417,
+            "0": 1712.3118813237702,
+            "decayed_last_same_accuracy_group": 1699.2986714368762,
+            "3": 1692.6492390606484,
+            "accumulated_correct_attempts": 1685.1202839758112,
+            "2010": 1572.2013412983742,
+            "decayed_n_success_last_same_assess": 1565.2855212573438,
+            "2075": 1561.9976887468995,
+            "2040": 1558.3273320900416,
+            "2070": 1510.8515535799656,
+            "2050": 1409.4226611563813,
+            "4230": 1390.6875259812282,
+            "5010": 1239.0875077603616,
+            "success_ratio_same_assess": 973.9155616045565,
+            "decayed_n_failure_last_same_assess": 969.6670704379883,
+            "decayed_success_ratio_last_same_assess": 964.4532569511634,
+            "4050": 956.9004788360945,
+            "2": 792.1189125623561,
+            "1": 777.3021328076771,
+            "n_failure_same_assess": 728.0736786197289,
+            "n_same_assessment_in_past": 484.28258486211774,
+            "4235": 445.0423351637869,
+            "n_success_same_assess": 317.438859835574,
+            "n_failure_last_same_assess": 268.31997678270034,
+            "last_same_accuracy_group": 213.59056941570063,
+            "has_same_assessment_in_past": 200.49050198054337,
+            "success_ratio_last_same_assess": 139.5435586794336,
+            "4080": 77.03962983412401,
+            "n_success_last_same_assess": 9.978256545541807,
+            "Honey Cake": 0.0,
+            "Assessment": 0.0,
+            "Balancing Act": 0.0,
+            "Bird Measurer (Assessment)": 0.0,
+            "Cart Balancer (Assessment)": 0.0,
+            "Cauldron Filler (Assessment)": 0.0,
+            "Chest Sorter (Assessment)": 0.0,
+            "Clip": 0.0,
+            "Costume Box": 0.0,
+            "Crystal Caves - Level 1": 0.0,
+            "Crystal Caves - Level 2": 0.0,
+            "Crystal Caves - Level 3": 0.0,
+            "Game": 0.0,
+            "Heavy, Heavier, Heaviest": 0.0,
+            "Activity": 0.0,
+            "Lifting Heavy Things": 0.0,
+            "Magma Peak - Level 1": 0.0,
+            "Magma Peak - Level 2": 0.0,
+            "Mushroom Sorter (Assessment)": 0.0,
+            "Ordering Spheres": 0.0,
+            "Pirate's Tale": 0.0,
+            "Rulers": 0.0,
+            "Slop Problem": 0.0,
+            "Treasure Map": 0.0,
+            "Tree Top City - Level 1": 0.0,
+            "Tree Top City - Level 2": 0.0,
+            "Tree Top City - Level 3": 0.0,
+            "Welcome to Lost Lagoon!": 0.0,
+            "12 Monkeys": 0.0
+        }
+    },
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 0.5934426590974815,
+            "cv_score": {
+                "cv1": {
+                    "data_from_test": {
+                        "l2": 0.11246878690932256,
+                        "qwk": 0.5563340513168779
+                    },
+                    "data_from_train": {
+                        "l2": 0.11067823926722892,
+                        "qwk": 0.6141352092541063
+                    }
+                },
+                "cv2": {
+                    "data_from_test": {
+                        "l2": 0.11043744038778053,
+                        "qwk": 0.5664256056115535
+                    },
+                    "data_from_train": {
+                        "l2": 0.11025882193750422,
+                        "qwk": 0.6100745988384456
+                    }
+                },
+                "cv3": {
+                    "data_from_test": {
+                        "l2": 0.11130074318151548,
+                        "qwk": 0.5684210178638962
+                    },
+                    "data_from_train": {
+                        "l2": 0.10695200573743781,
+                        "qwk": 0.5923149157468217
+                    }
+                },
+                "cv4": {
+                    "data_from_test": {
+                        "l2": 0.11219871687039337,
+                        "qwk": 0.5517913195644368
+                    },
+                    "data_from_train": {
+                        "l2": 0.11547374172515462,
+                        "qwk": 0.5652847178689986
+                    }
+                },
+                "cv5": {
+                    "data_from_test": {
+                        "l2": 0.10965237289627362,
+                        "qwk": 0.5668896927960325
+                    },
+                    "data_from_train": {
+                        "l2": 0.11077937246265064,
+                        "qwk": 0.5771116012217683
+                    }
+                }
+            },
+            "n_data": 17690,
+            "best_iteration": 402.59999999999997,
+            "n_features": 116,
+            "feature_importance": {
+                "session_title": 12844.67418475747,
+                "success_ratio_same_assess": 3258.103641396761,
+                "2000": 2661.40377689898,
+                "4070": 2459.688573260605,
+                "accumulated_acc": 1838.2633062899113,
+                "accumulated_accuracy_group": 1753.593364161253,
+                "memory_decay_coeff_from_last_assess": 1703.906882469356,
+                "duration_mean": 1599.7228309154511,
+                "3120": 1565.080744484067,
+                "3020": 1514.1104791626335,
+                "4035": 1445.2561064764857,
+                "0": 1366.3101829230786,
+                "last_same_accuracy_group": 1337.1285345792771,
+                "4020": 1336.4158833920956,
+                "4030": 1308.1354630738497,
+                "4025": 1302.311053624749,
+                "3110": 1197.9612280219794,
+                "3121": 1131.1663772031666,
+                "2030": 1082.6929479435087,
+                "Chow Time": 1074.5432087674737,
+                "accumulated_actions": 1057.3229515329003,
+                "Sandcastle Builder (Activity)": 1056.3806401580573,
+                "3021": 1012.6925860315562,
+                "Egg Dropper (Activity)": 991.4644296109676,
+                "decayed_n_failure_last_same_assess": 945.8371445447207,
+                "All Star Sorting": 931.1692996844649,
+                "2020": 905.5519978255033,
+                "Flower Waterer (Activity)": 904.5975170910358,
+                "Fireworks (Activity)": 892.7150133982301,
+                "4040": 888.9732141822576,
+                "success_ratio_last_same_assess": 868.1701866000891,
+                "3010": 864.864773184061,
+                "decayed_success_ratio_last_same_assess": 858.7385678842663,
+                "4021": 838.1615290939808,
+                "Pan Balance": 832.5509832620621,
+                "Bottle Filler (Activity)": 825.5601494178176,
+                "4100": 810.0268344014883,
+                "decayed_last_same_accuracy_group": 775.7379152297974,
+                "n_failure_same_assess": 735.0412443429232,
+                "accumulated_failed_attempts": 732.3639004275203,
+                "memory_decay_coeff_from_last_same_assess": 730.4530736997724,
+                "4022": 724.0626923024654,
+                "Happy Camel": 688.51138240695,
+                "Bug Measurer (Activity)": 679.720485650003,
+                "Dino Drink": 629.761838504672,
+                "Dino Dive": 623.667876496911,
+                "Watering Hole (Activity)": 621.3758861064911,
+                "Leaf Leader": 619.7490775465965,
+                "n_success_same_assess": 617.8235752537846,
+                "Chicken Balancer (Activity)": 604.1020065397024,
+                "Scrub-A-Dub": 588.7549768105149,
+                "4090": 574.6532727822662,
+                "decayed_n_success_last_same_assess": 569.0631182014943,
+                "4010": 561.5487004086375,
+                "Crystals Rule": 560.5868731677532,
+                "Air Show": 544.7893562376499,
+                "2010": 517.3345388486981,
+                "2025": 489.9868897989392,
+                "4045": 446.68709119856356,
+                "Bubble Bath": 419.7240517139435,
+                "4031": 415.9065351292491,
+                "2080": 403.0892420336604,
+                "4110": 393.90978969931604,
+                "3": 375.486848577857,
+                "2083": 344.27563414424657,
+                "4095": 312.69117164611816,
+                "accumulated_correct_attempts": 295.1305359646678,
+                "2060": 281.3921288669109,
+                "2035": 275.77650261372327,
+                "4220": 274.53857928961514,
+                "5000": 273.2361707553267,
+                "2081": 261.8959790572524,
+                "2040": 260.37347259819506,
+                "2075": 256.25388501882554,
+                "n_failure_last_same_assess": 246.2911276832223,
+                "2050": 243.4866732299328,
+                "5010": 225.48472524285316,
+                "4230": 225.26051096618176,
+                "2070": 202.72513253092765,
+                "n_same_assessment_in_past": 202.03024893552066,
+                "1": 143.85314129441977,
+                "2": 134.83833505511285,
+                "has_same_assessment_in_past": 133.7924696356058,
+                "4235": 83.81906701922416,
+                "4050": 49.31236118972301,
+                "4080": 35.6612402766943,
+                "n_success_last_same_assess": 6.92912235558033,
+                "Clip": 0.0,
+                "Cart Balancer (Assessment)": 0.0,
+                "Chest Sorter (Assessment)": 0.0,
+                "Cauldron Filler (Assessment)": 0.0,
+                "Crystal Caves - Level 1": 0.0,
+                "Bird Measurer (Assessment)": 0.0,
+                "Balancing Act": 0.0,
+                "Assessment": 0.0,
+                "Activity": 0.0,
+                "Costume Box": 0.0,
+                "Slop Problem": 0.0,
+                "Crystal Caves - Level 2": 0.0,
+                "Crystal Caves - Level 3": 0.0,
+                "Tree Top City - Level 1": 0.0,
+                "Rulers": 0.0,
+                "Pirate's Tale": 0.0,
+                "Tree Top City - Level 2": 0.0,
+                "Ordering Spheres": 0.0,
+                "Mushroom Sorter (Assessment)": 0.0,
+                "Magma Peak - Level 2": 0.0,
+                "Magma Peak - Level 1": 0.0,
+                "Lifting Heavy Things": 0.0,
+                "Tree Top City - Level 3": 0.0,
+                "Honey Cake": 0.0,
+                "Heavy, Heavier, Heaviest": 0.0,
+                "Welcome to Lost Lagoon!": 0.0,
+                "Game": 0.0,
+                "Treasure Map": 0.0,
+                "12 Monkeys": 0.0
+            }
+        },
+        "valid_score": 0.5652802013143872
+    }
+}
