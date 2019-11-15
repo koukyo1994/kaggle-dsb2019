@@ -75,11 +75,14 @@ def get_features(namespace: dict):
 def generate_features(train_df: pd.DataFrame,
                       test_df: pd.DataFrame,
                       namespace: dict,
+                      required: list,
                       overwrite: bool,
                       log: bool = False):
     for f in get_features(namespace):
-        if (f.train_path.exists() and f.valid_path.exists()
-                and f.test_path.exists() and not overwrite):
+        if (f.name not in required) or (f.train_path.exists()
+                                        and f.valid_path.exists()
+                                        and f.test_path.exists()
+                                        and not overwrite):
             if not log:
                 print(f.name, "was skipped")
             else:

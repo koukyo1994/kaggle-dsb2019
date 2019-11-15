@@ -122,7 +122,7 @@ class KernelFeatures(PartialFeature):
 
         all_assesments = []
 
-        accumulated_acc_groups = 0
+        accumulated_acc_groups = 0.0
         accumulated_acc = 0
         accumulated_correct_attempts = 0
         accumulated_failed_attempts = 0
@@ -130,7 +130,7 @@ class KernelFeatures(PartialFeature):
 
         counter = 0
 
-        accuracy_group: Dict[int, int] = {0: 0, 1: 0, 2: 0, 3: 0}
+        accuracy_group: Dict[IoS, IoF] = {0: 0, 1: 0, 2: 0, 3: 0}
 
         durations: List[float] = []
         last_activity = ""
@@ -187,7 +187,7 @@ class KernelFeatures(PartialFeature):
                     features["accuracy_group"] = 1
 
                 features.update(accuracy_group.copy())
-                accuracy_group[features["accuracy_group"]] += 1
+                accuracy_group[features["accuracy_group"]] += 1  # type: ignore
 
                 features["accumulated_accuracy_group"] = \
                     accumulated_acc_groups / counter if counter > 0 else 0

@@ -1,0 +1,521 @@
+{
+    "dataset": {
+        "dir": "input/data-science-bowl-2019/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "av": {
+        "params": {},
+        "split_params": {
+            "test_size": 0.33,
+            "random_state": 42,
+            "n_splits": 5
+        },
+        "model_params": {
+            "objective": "binary",
+            "metric": "auc",
+            "boosting": "gbdt",
+            "max_depth": 7,
+            "num_leaves": 75,
+            "learning_rate": 0.01,
+            "colsample_bytree": 0.7,
+            "subsample": 0.1,
+            "subsample_freq": 1,
+            "seed": 111,
+            "feature_fraction_seed": 111,
+            "drop_seed": 111,
+            "verbose": -1,
+            "first_metric_only": true
+        },
+        "train_params": {
+            "num_boost_round": 10000,
+            "early_stopping_rounds": 200,
+            "verbose_eval": 200
+        }
+    },
+    "model": {
+        "name": "catboost",
+        "sampling": {
+            "name": "none",
+            "params": {}
+        },
+        "model_params": {
+            "loss_function": "RMSE",
+            "task_type": "CPU",
+            "iterations": 6000,
+            "early_stopping_rounds": 100,
+            "random_seed": 42
+        },
+        "train_params": {
+            "mode": "regression"
+        },
+        "mode": "regression"
+    },
+    "post_process": {
+        "params": {
+            "reverse": false,
+            "n_overall": 20,
+            "n_classwise": 20
+        }
+    },
+    "val": {
+        "name": "group_kfold",
+        "params": {
+            "n_splits": 5,
+            "random_state": 111
+        }
+    },
+    "output_dir": "output",
+    "features": [
+        "Unified"
+    ],
+    "args": {
+        "config": "config/cat_5.yml"
+    },
+    "model_output_dir": "output/cat_5",
+    "av_result": {
+        "score": {
+            "fold0": {
+                "train": {
+                    "auc": 0.9977952173523935
+                },
+                "valid": {
+                    "auc": 0.9167125990181019
+                }
+            },
+            "fold1": {
+                "train": {
+                    "auc": 0.9956624944056385
+                },
+                "valid": {
+                    "auc": 0.8888993602027246
+                }
+            },
+            "fold2": {
+                "train": {
+                    "auc": 0.9965540535873998
+                },
+                "valid": {
+                    "auc": 0.9015956894043314
+                }
+            },
+            "fold3": {
+                "train": {
+                    "auc": 0.9944962901561893
+                },
+                "valid": {
+                    "auc": 0.8818081696672122
+                }
+            },
+            "fold4": {
+                "train": {
+                    "auc": 0.992245060917636
+                },
+                "valid": {
+                    "auc": 0.8896622397744167
+                }
+            }
+        },
+        "feature_importances": {
+            "4070": 9985.411743508688,
+            "accumulated_actions": 8315.600463663173,
+            "2000": 8197.780751921404,
+            "4030": 8004.705038500493,
+            "4020": 7687.657645093784,
+            "3110": 7091.860857833376,
+            "duration_mean": 7045.943122081864,
+            "4035": 6564.945543549444,
+            "memory_decay_coeff_from_last_assess": 6410.45266092823,
+            "4025": 6140.724653043759,
+            "3010": 5336.366963033031,
+            "Sandcastle Builder (Activity)": 5196.9371945284065,
+            "Fireworks (Activity)": 5142.9139549699585,
+            "2020": 4808.589111778099,
+            "3120": 4654.64715976085,
+            "4040": 4392.950147972577,
+            "3121": 4327.696299429778,
+            "4021": 4326.28574561151,
+            "Bottle Filler (Activity)": 4313.964806092092,
+            "2030": 4178.046934669426,
+            "Flower Waterer (Activity)": 4088.756756429906,
+            "session_title": 3607.856278768838,
+            "4022": 3490.3166321210538,
+            "3021": 3485.9060530380757,
+            "accumulated_acc": 3304.0708056456806,
+            "Clip": 3235.079899542971,
+            "success_ratio_Chow Time": 3173.0853456182263,
+            "mean_incorrect_Chow Time": 3151.897555355991,
+            "Watering Hole (Activity)": 3090.8974378500193,
+            "3020": 3081.852886269079,
+            "4100": 2975.774126006038,
+            "Chicken Balancer (Activity)": 2891.3815893280616,
+            "Bug Measurer (Activity)": 2859.7643274477227,
+            "n_last_incorrect_Chow Time": 2535.185431536438,
+            "Egg Dropper (Activity)": 2478.4274364661565,
+            "n_incorrect_Chow Time": 2396.8019304254767,
+            "4090": 2303.9157189809575,
+            "accumulated_failed_attempts": 2289.6812924041,
+            "accumulated_accuracy_group": 2277.125769433842,
+            "Activity": 2140.4419240622083,
+            "4010": 2125.5681938743364,
+            "last_success_ratio_Chow Time": 2111.790011870251,
+            "success_ratio_All Star Sorting": 1991.8943853444757,
+            "success_ratio_Dino Dive": 1899.1839745450952,
+            "Game": 1882.162048336766,
+            "mean_incorrect_Scrub-A-Dub": 1820.697409008165,
+            "mean_incorrect_All Star Sorting": 1814.0875485386537,
+            "memory_decay_coeff_from_last_same_assess": 1778.9599657252843,
+            "mean_correct_All Star Sorting": 1692.8900892010802,
+            "4045": 1687.7528970947358,
+            "2025": 1681.1414878300316,
+            "success_ratio_Scrub-A-Dub": 1610.32907036239,
+            "2080": 1576.4996960716396,
+            "mean_correct_Dino Dive": 1573.5482519572292,
+            "success_ratio_Happy Camel": 1565.4034804551247,
+            "mean_incorrect_Dino Dive": 1534.1611965267343,
+            "4095": 1476.344061931966,
+            "mean_incorrect_Happy Camel": 1459.3914547855613,
+            "mean_correct_Chow Time": 1400.9736324486976,
+            "2083": 1392.5646703361551,
+            "last_success_ratio_Scrub-A-Dub": 1355.4058069009834,
+            "4110": 1351.2571411150943,
+            "4031": 1342.3788962146423,
+            "mean_correct_Bubble Bath": 1329.23190167836,
+            "success_ratio_Dino Drink": 1322.471954449454,
+            "2081": 1295.9384598623994,
+            "4220": 1261.374448756691,
+            "mean_correct_Scrub-A-Dub": 1238.5908516410466,
+            "n_max_round_Scrub-A-Dub": 1225.6286955184569,
+            "mean_incorrect_Bubble Bath": 1176.041156108388,
+            "Assessment": 1174.5314660435383,
+            "mean_incorrect_Pan Balance": 1171.2482202878723,
+            "last_success_ratio_Dino Dive": 1170.6359082436875,
+            "0": 1138.2441502563465,
+            "mean_incorrect_Leaf Leader": 1115.9406118227585,
+            "5000": 1114.14461230568,
+            "last_success_ratio_All Star Sorting": 1106.017986848178,
+            "success_ratio_Bubble Bath": 1103.855161483329,
+            "n_correct_Chow Time": 1092.2253683078875,
+            "2060": 1079.2273035189999,
+            "n_max_round_Chow Time": 1069.835760332138,
+            "2035": 1067.7316815313063,
+            "success_ratio_Crystals Rule": 1053.1453224100787,
+            "mean_incorrect_Dino Drink": 1025.897677916878,
+            "decayed_last_same_accuracy_group": 1021.32406888698,
+            "accumulated_correct_attempts": 1002.2168391969892,
+            "3": 993.9260413812808,
+            "mean_correct_Dino Drink": 993.6961306186391,
+            "n_incorrect_Scrub-A-Dub": 991.0013568535207,
+            "2010": 955.575143874835,
+            "decayed_n_success_last_same_assess": 953.5051535179322,
+            "2075": 936.2996232378073,
+            "last_success_ratio_Happy Camel": 921.0826382921821,
+            "last_success_ratio_Dino Drink": 906.6527118011311,
+            "n_last_round_Scrub-A-Dub": 904.3144947723533,
+            "success_ratio_Leaf Leader": 903.8348828749813,
+            "n_max_round_All Star Sorting": 855.9968636729748,
+            "n_correct_All Star Sorting": 836.4500516435046,
+            "n_last_round_All Star Sorting": 822.2940694911895,
+            "mean_incorrect_Crystals Rule": 821.7978496570911
+        }
+    },
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 0.5985978349574792,
+            "cv_score": {
+                "cv1": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6303809709070836,
+                        "RMSE": 0.31832964897284843
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.6215803910245042,
+                        "RMSE": 0.3281947621345112
+                    }
+                },
+                "cv2": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6399245748125097,
+                        "RMSE": 0.31374917784591716
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.6185967472928333,
+                        "RMSE": 0.32942413322009556
+                    }
+                },
+                "cv3": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.661086504605561,
+                        "RMSE": 0.3090163143153321
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.6055212750475997,
+                        "RMSE": 0.32181994796981334
+                    }
+                },
+                "cv4": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6449360500708406,
+                        "RMSE": 0.31396646341796364
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.5703155102169725,
+                        "RMSE": 0.3381881169365585
+                    }
+                },
+                "cv5": {
+                    "learn": {
+                        "CatBoostOptimizedQWKMetric": 0.6489135357668165,
+                        "RMSE": 0.312675382658058
+                    },
+                    "validation_0": {
+                        "CatBoostOptimizedQWKMetric": 0.5840498118287796,
+                        "RMSE": 0.3312165723153516
+                    }
+                }
+            },
+            "n_data": 17690,
+            "best_iteration": 562.6,
+            "n_features": 237,
+            "feature_importance": {
+                "session_title": 42.83963996638447,
+                "success_ratio_same_assess": 7.921656030004767,
+                "success_ratio_last_same_assess": 2.8249612238565467,
+                "last_same_accuracy_group": 2.6807225211121177,
+                "decayed_last_same_accuracy_group": 1.8836336318219833,
+                "decayed_success_ratio_last_same_assess": 1.8722636537177535,
+                "4070": 1.8115646162615433,
+                "accumulated_accuracy_group": 1.7543337246755422,
+                "2000": 1.6098060108347436,
+                "n_success_last_same_assess": 1.5944568145117064,
+                "decayed_n_failure_last_same_assess": 1.3504076793352184,
+                "decayed_n_success_last_same_assess": 1.3148554416809746,
+                "accumulated_acc": 1.2680616394227298,
+                "mean_incorrect_Pan Balance": 1.0197969661206003,
+                "n_success_same_assess": 0.976084141830827,
+                "n_failure_same_assess": 0.9220044807658597,
+                "3020": 0.9219086450254579,
+                "n_failure_last_same_assess": 0.9079317383173047,
+                "0": 0.8269100237595189,
+                "has_same_assessment_in_past": 0.7645342607304794,
+                "mean_correct_Chow Time": 0.7142353783021359,
+                "3120": 0.6436117152603462,
+                "memory_decay_coeff_from_last_assess": 0.5978216097254172,
+                "success_ratio_Happy Camel": 0.5768654396147472,
+                "last_success_ratio_Happy Camel": 0.5722024522464675,
+                "4035": 0.5583068373581288,
+                "success_ratio_All Star Sorting": 0.5178609492154178,
+                "3121": 0.4481994698340873,
+                "last_success_ratio_All Star Sorting": 0.4421221722581753,
+                "4030": 0.43392883192768855,
+                "mean_incorrect_All Star Sorting": 0.4132646818659082,
+                "success_ratio_Scrub-A-Dub": 0.4101439387817356,
+                "4025": 0.3768876353002045,
+                "memory_decay_coeff_from_last_same_assess": 0.36932206616202523,
+                "accumulated_actions": 0.36761531698385097,
+                "Sandcastle Builder (Activity)": 0.36275952375144416,
+                "3021": 0.3469992020952611,
+                "4020": 0.3314633854811574,
+                "4090": 0.3205493966080563,
+                "mean_incorrect_Chow Time": 0.3163596779234163,
+                "2010": 0.31552075934046186,
+                "success_ratio_Pan Balance": 0.30281584128840233,
+                "last_success_ratio_Pan Balance": 0.26904053817599066,
+                "3010": 0.26377517924555355,
+                "mean_incorrect_Crystals Rule": 0.25704699178202006,
+                "3110": 0.24268712469009887,
+                "2030": 0.2369563247975029,
+                "Game": 0.22595391238750304,
+                "mean_correct_Leaf Leader": 0.22342273172881746,
+                "4010": 0.21387719562238408,
+                "4022": 0.21126678294611687,
+                "Clip": 0.21124052583791314,
+                "duration_mean": 0.21080669008976954,
+                "Flower Waterer (Activity)": 0.20898214277400137,
+                "success_ratio_Air Show": 0.20224588833156232,
+                "n_last_correct_Dino Dive": 0.19911659057315662,
+                "accumulated_failed_attempts": 0.19536795302666682,
+                "4100": 0.19121892525585055,
+                "Assessment": 0.1817672515259427,
+                "last_success_ratio_Crystals Rule": 0.18140010322635416,
+                "success_ratio_Chow Time": 0.17366838462353673,
+                "mean_correct_All Star Sorting": 0.17303980149060072,
+                "last_success_ratio_Air Show": 0.1639619490070086,
+                "Bug Measurer (Activity)": 0.15392363870475828,
+                "n_incorrect_All Star Sorting": 0.15202323783504945,
+                "Egg Dropper (Activity)": 0.1498616429784138,
+                "4110": 0.148333228595696,
+                "last_success_ratio_Chow Time": 0.14644113385908225,
+                "n_last_correct_Chow Time": 0.1430381130666714,
+                "success_ratio_Dino Dive": 0.1348312293103605,
+                "mean_correct_Bubble Bath": 0.13410599587218042,
+                "mean_correct_Air Show": 0.1300817079752499,
+                "mean_incorrect_Dino Dive": 0.12887592341267792,
+                "n_incorrect_Pan Balance": 0.12635943441525663,
+                "mean_correct_Pan Balance": 0.12520445198677727,
+                "mean_correct_Dino Dive": 0.12052287233982098,
+                "Fireworks (Activity)": 0.12012724754180266,
+                "last_success_ratio_Leaf Leader": 0.11964518150389325,
+                "success_ratio_Leaf Leader": 0.11898127027021546,
+                "3": 0.1148668886262622,
+                "2020": 0.11364053726796486,
+                "mean_incorrect_Air Show": 0.11313883427237445,
+                "mean_correct_Scrub-A-Dub": 0.11297822897212954,
+                "n_max_round_Scrub-A-Dub": 0.11199307501688656,
+                "last_success_ratio_Dino Drink": 0.10980961917261822,
+                "last_success_ratio_Scrub-A-Dub": 0.10947716243084915,
+                "n_last_correct_Leaf Leader": 0.10933666885980733,
+                "4021": 0.10654285626522493,
+                "n_same_assessment_in_past": 0.10559048656482539,
+                "success_ratio_Crystals Rule": 0.10456158625121474,
+                "n_last_incorrect_Chow Time": 0.10247775484826101,
+                "Watering Hole (Activity)": 0.10224069642685626,
+                "n_last_incorrect_Pan Balance": 0.1021312400997634,
+                "mean_incorrect_Scrub-A-Dub": 0.1001350196693807,
+                "n_trial_Pan Balance": 0.09867831849859934,
+                "n_last_round_Pan Balance": 0.09760322264077773,
+                "n_last_correct_Pan Balance": 0.09583626938026235,
+                "last_success_ratio_Bubble Bath": 0.09326748217637278,
+                "success_ratio_Bubble Bath": 0.09114500239665474,
+                "n_trial_Scrub-A-Dub": 0.09079454427921861,
+                "2080": 0.08892844743603044,
+                "success_ratio_Dino Drink": 0.08882983698333895,
+                "n_last_round_Dino Dive": 0.08882213555694397,
+                "accumulated_correct_attempts": 0.08423788619387296,
+                "n_last_incorrect_Dino Dive": 0.08265003420093853,
+                "4031": 0.08112644012076932,
+                "last_success_ratio_Dino Dive": 0.07820645342433483,
+                "Bottle Filler (Activity)": 0.0752688318711175,
+                "n_last_correct_Air Show": 0.07442702263476328,
+                "mean_incorrect_Happy Camel": 0.07237319725509697,
+                "mean_correct_Happy Camel": 0.07186485332195185,
+                "2060": 0.0693611674462265,
+                "Chicken Balancer (Activity)": 0.06912068310290928,
+                "n_correct_Dino Drink": 0.06840212531442055,
+                "4220": 0.06797349699934115,
+                "2040": 0.06778668070514667,
+                "mean_incorrect_Leaf Leader": 0.06605168960134516,
+                "Activity": 0.06423840244037801,
+                "4080": 0.06400752440406232,
+                "n_max_round_Pan Balance": 0.06392654473966185,
+                "n_correct_Pan Balance": 0.0636141090621671,
+                "n_last_round_Air Show": 0.06194950908159419,
+                "n_last_correct_Scrub-A-Dub": 0.0617719602012068,
+                "1": 0.06105083933130713,
+                "n_last_incorrect_All Star Sorting": 0.061039598488091075,
+                "n_incorrect_Chow Time": 0.061031792169269225,
+                "2025": 0.06101992333971974,
+                "n_last_round_Happy Camel": 0.058062813667461036,
+                "n_incorrect_Happy Camel": 0.056374563164095504,
+                "n_last_incorrect_Crystals Rule": 0.05620474492097396,
+                "2035": 0.05581684433265528,
+                "mean_correct_Crystals Rule": 0.055238793900578606,
+                "n_correct_Chow Time": 0.05523490119870097,
+                "n_max_round_Leaf Leader": 0.05326128999565895,
+                "4040": 0.05278180195845106,
+                "n_last_correct_Happy Camel": 0.052752692348273976,
+                "n_last_round_Chow Time": 0.05257773235584486,
+                "n_last_correct_Dino Drink": 0.05157412002052268,
+                "2050": 0.04998594749346853,
+                "mean_incorrect_Bubble Bath": 0.0496221914698836,
+                "n_trial_Bubble Bath": 0.04936492466668402,
+                "n_trial_Happy Camel": 0.04926991648333521,
+                "n_correct_Scrub-A-Dub": 0.04857975421244709,
+                "n_last_round_Scrub-A-Dub": 0.0473834571376646,
+                "n_incorrect_Dino Dive": 0.044798523433057486,
+                "n_incorrect_Crystals Rule": 0.04449682873974485,
+                "n_last_incorrect_Happy Camel": 0.04413936673399306,
+                "n_last_correct_All Star Sorting": 0.04390332265349142,
+                "n_max_round_Dino Dive": 0.04309906715812253,
+                "4230": 0.04281020888802102,
+                "5010": 0.042751772958361536,
+                "n_max_round_Happy Camel": 0.042163905314488506,
+                "mean_incorrect_Dino Drink": 0.042041581374433,
+                "n_max_round_Dino Drink": 0.041827296715874394,
+                "4235": 0.040475171486482456,
+                "n_max_round_Chow Time": 0.040167891175482494,
+                "n_trial_Leaf Leader": 0.03934843335370232,
+                "n_max_round_Air Show": 0.03861989971008016,
+                "n_last_round_All Star Sorting": 0.03780271176402,
+                "5000": 0.036756611322116065,
+                "2083": 0.03577274356600436,
+                "n_incorrect_Dino Drink": 0.03533669357452423,
+                "n_last_incorrect_Dino Drink": 0.03478167781363124,
+                "mean_correct_Dino Drink": 0.034025339280233054,
+                "2075": 0.03391215918113019,
+                "n_incorrect_Scrub-A-Dub": 0.03348914560742548,
+                "n_trial_Dino Dive": 0.033019830562924825,
+                "4045": 0.03241361688167811,
+                "n_last_round_Leaf Leader": 0.03226689566118883,
+                "2070": 0.03076249319184906,
+                "n_trial_All Star Sorting": 0.030599351362854865,
+                "n_trial_Dino Drink": 0.029997502816080678,
+                "n_correct_Dino Dive": 0.029959974562045112,
+                "n_correct_Leaf Leader": 0.029193227500670278,
+                "2081": 0.028557200389037668,
+                "n_last_incorrect_Leaf Leader": 0.028543909821928632,
+                "n_max_round_All Star Sorting": 0.02732766384193016,
+                "n_last_round_Dino Drink": 0.026940828738877202,
+                "n_incorrect_Leaf Leader": 0.025851617482553674,
+                "2": 0.021707906521517457,
+                "n_correct_Crystals Rule": 0.021334296691960963,
+                "n_last_round_Crystals Rule": 0.021101690128536705,
+                "4050": 0.02075107054766739,
+                "n_last_incorrect_Scrub-A-Dub": 0.02018798747529415,
+                "n_trial_Chow Time": 0.019692690055160233,
+                "n_last_incorrect_Air Show": 0.019243308232351784,
+                "n_last_correct_Crystals Rule": 0.018810257680360612,
+                "n_correct_Bubble Bath": 0.018715996710491494,
+                "n_max_round_Bubble Bath": 0.016694729722597102,
+                "n_correct_All Star Sorting": 0.016083484477639735,
+                "n_max_round_Crystals Rule": 0.01604061906291717,
+                "n_last_correct_Bubble Bath": 0.015440609325916507,
+                "n_incorrect_Bubble Bath": 0.015111507842366482,
+                "4095": 0.015032966272754893,
+                "n_incorrect_Air Show": 0.014904622119988758,
+                "n_correct_Happy Camel": 0.01399167375977634,
+                "n_trial_Air Show": 0.011451503071111363,
+                "n_last_round_Bubble Bath": 0.01062904088091476,
+                "n_correct_Air Show": 0.008886412569469388,
+                "n_last_incorrect_Bubble Bath": 0.008762313696699048,
+                "n_trial_Crystals Rule": 0.004468891366485498,
+                "Crystal Caves - Level 2": 0.0,
+                "Crystal Caves - Level 1": 0.0,
+                "Costume Box": 0.0,
+                "Balancing Act": 0.0,
+                "Chow Time": 0.0,
+                "Chest Sorter (Assessment)": 0.0,
+                "Cauldron Filler (Assessment)": 0.0,
+                "Cart Balancer (Assessment)": 0.0,
+                "Bubble Bath": 0.0,
+                "Bird Measurer (Assessment)": 0.0,
+                "Crystals Rule": 0.0,
+                "All Star Sorting": 0.0,
+                "Air Show": 0.0,
+                "Crystal Caves - Level 3": 0.0,
+                "Lifting Heavy Things": 0.0,
+                "Dino Dive": 0.0,
+                "Pirate's Tale": 0.0,
+                "Welcome to Lost Lagoon!": 0.0,
+                "Tree Top City - Level 3": 0.0,
+                "Tree Top City - Level 2": 0.0,
+                "Tree Top City - Level 1": 0.0,
+                "Treasure Map": 0.0,
+                "Slop Problem": 0.0,
+                "Scrub-A-Dub": 0.0,
+                "Rulers": 0.0,
+                "Pan Balance": 0.0,
+                "Dino Drink": 0.0,
+                "Ordering Spheres": 0.0,
+                "Mushroom Sorter (Assessment)": 0.0,
+                "Magma Peak - Level 2": 0.0,
+                "Magma Peak - Level 1": 0.0,
+                "Leaf Leader": 0.0,
+                "Honey Cake": 0.0,
+                "Heavy, Heavier, Heaviest": 0.0,
+                "Happy Camel": 0.0,
+                "12 Monkeys": 0.0
+            }
+        }
+    }
+}
