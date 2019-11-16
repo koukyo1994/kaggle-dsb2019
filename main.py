@@ -13,8 +13,6 @@ import seaborn as sns
 from pathlib import Path
 from typing import List
 
-from sklearn.model_selection import KFold
-
 if __name__ == "__main__":
     sys.path.append("./")
 
@@ -97,6 +95,7 @@ if __name__ == "__main__":
                            sort=False)
 
     groups = x_train["installation_id"].values
+    groups_valid = x_valid["installation_id"].values
     y_train = x_train["accuracy_group"].values.reshape(-1)
     y_valid = x_valid["accuracy_group"].values.reshape(-1)
     cols: List[str] = x_train.columns.tolist()
@@ -118,15 +117,14 @@ if __name__ == "__main__":
 
     train_adv["target"] = 0
     test_adv["target"] = 1
+    groups_adv = np.concatenate([groups, groups_valid])
     train_test_adv = pd.concat([train_adv, test_adv], axis=0,
                                sort=False).reset_index(drop=True)
 
-    split_params: dict = config["av"]["split_params"]
-    kf = KFold(
-        random_state=split_params["random_state"],
-        n_splits=split_params["n_splits"],
-        shuffle=True)
-    splits = list(kf.split(train_test_adv))
+    train_test_adv["group"] = groups_adv
+    splits = get_validation(train_test_adv, config)
+    train_test_adv.drop("group", axis=1, inplace=True)
+
     aucs = []
     importance = np.zeros(len(cols))
     for trn_idx, val_idx in splits:

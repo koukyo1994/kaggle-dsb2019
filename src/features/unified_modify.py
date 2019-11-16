@@ -9,6 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
 
 from src.features.base import Feature
+from src.features.modules import TargetEncoder
 
 IoF = Union[int, float]
 IoS = Union[int, str]
@@ -74,19 +75,11 @@ class ModifiedUnified(Feature):
         self.test.reset_index(drop=True, inplace=True)
 
         # pseudo target
-        target_train_valid = pd.concat([
-            self.train[["accuracy_group", "session_title"]].copy(),
-            self.valid[["accuracy_group", "session_title"]].copy()
-        ],
-                                       axis=0,
-                                       sort=False).reset_index(drop=True)
-        mean_target = target_train_valid.groupby(
-            "session_title")["accuracy_group"].mean().to_dict()
-        self.train["mean_target"] = self.train["session_title"].map(
-            mean_target)
-        self.valid["mean_target"] = self.valid["session_title"].map(
-            mean_target)
-        self.test["mean_target"] = self.test["session_title"].map(mean_target)
+        te = TargetEncoder(n_splits=10, random_state=4222)
+        self.train["mean_target"] = te.fit_transform(
+            self.train, self.train["accuracy_group"], column="session_title")
+        self.valid["mean_target"] = te.transform(self.valid)
+        self.test["mean_target"] = te.transform(self.test)
 
 
 def unified_features(user_sample: pd.DataFrame,
