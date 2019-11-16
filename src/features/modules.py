@@ -1,8 +1,12 @@
 import itertools
 import numpy as np
 import pandas as pd
+
+from typing import Union, List, Dict
+
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.model_selection import StratifiedKFold, KFold
 """https://github.com/okotaku/pet_finder/blob/master/code/all_tools.py
 """
 
@@ -234,3 +238,53 @@ class Frequency():
             new_cols.append(fname)
 
         return df, new_cols
+
+
+class TargetEncoder():
+    def __init__(self, n_splits: int = 5, random_state: int = 128):
+        self.class_dict: Dict[str, List[float]] = {}
+        self.column = ""
+        self.n_splits = n_splits
+        self.random_state = random_state
+
+    def transform(self, X_: pd.DataFrame) -> np.ndarray:
+        kf = KFold(
+            n_splits=self.n_splits,
+            random_state=self.random_state,
+            shuffle=True)
+        X = X_.copy()
+        X = X.reset_index(drop=True)
+        converted = np.zeros(len(X))
+        for i, (_, v_idx) in enumerate(kf.split(X)):
+            converted[v_idx] = X.loc[v_idx, self.column].map(
+                lambda x: self.class_dict[x][i])
+        return converted
+
+    def fit_transform(self, X_: pd.DataFrame, y: Union[pd.Series, np.ndarray],
+                      column: str) -> np.ndarray:
+        self.column = column
+        uniq_class = X_[column].unique()
+        for c in uniq_class:
+            self.class_dict[c] = []
+        kf = StratifiedKFold(
+            n_splits=self.n_splits,
+            shuffle=True,
+            random_state=self.random_state)
+        X = X_.copy()
+        X = X.reset_index(drop=True)
+        yy = y.values if isinstance(y, pd.Series) else y
+        converted = np.zeros(len(X))
+        # import pdb
+        # pdb.set_trace()
+        for t_idx, v_idx in kf.split(X, y):
+            X_t = X.loc[t_idx, column]
+            y_t = yy[t_idx]
+            X_v = X.loc[v_idx, column]
+            cvtd = converted[v_idx]
+
+            for c in uniq_class:
+                target_mean = y_t[X_t == c].mean()
+                self.class_dict[c].append(target_mean)
+                cvtd[X_v == c] = target_mean
+            converted[v_idx] = cvtd
+        return converted

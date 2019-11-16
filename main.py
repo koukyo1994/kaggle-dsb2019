@@ -24,7 +24,7 @@ if __name__ == "__main__":
                            configure_logger, timer, feature_existence_checker,
                            save_json, plot_confusion_matrix, seed_everything)
     from src.features import (Basic, generate_features, PastAssessment,
-                              PastClip, PastGame, Unified)
+                              PastClip, PastGame, Unified, ModifiedUnified)
     from src.validation import get_validation, select_features
     from src.models import get_model
 
@@ -63,7 +63,6 @@ if __name__ == "__main__":
         with timer(name="load data", log=True):
             train = pd.read_csv(input_dir / "train.csv")
             test = pd.read_csv(input_dir / "test.csv")
-            specs = pd.read_csv(input_dir / "specs.csv")
             sample_submission = pd.read_csv(
                 input_dir / "sample_submission.csv")
         generate_features(

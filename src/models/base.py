@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from abc import abstractmethod
-from typing import Union, Tuple, List, Optional
+from typing import Dict, Union, Tuple, List, Optional
 
 from src.evaluation import calc_metric
 from src.sampling import get_sampling
@@ -68,6 +68,23 @@ class BaseModel(object):
         cv_score_list: List[dict] = []
         models: List[Model] = []
 
+        if config["model"]["mode"] == "residual":
+            self.mean_targets: Dict[str, List[np.ndarray]] = {
+                "train": [],
+                "valid": [],
+                "valid2": [valid_features["mean_target"].values],
+                "test": [test_features["mean_target"].values]
+            }
+            valid_features.drop("mean_target", axis=1, inplace=True)
+            test_features.drop("mean_target", axis=1, inplace=True)
+            for t_idx, v_idx in folds_ids:
+                self.mean_targets["train"].append(
+                    train_features.loc[t_idx, "mean_target"].values)
+                self.mean_targets["valid"].append(
+                    train_features.loc[v_idx, "mean_target"].values)
+            train_features.drop("mean_target", axis=1, inplace=True)
+            feature_name.remove("mean_target")
+
         X = train_features.values if isinstance(train_features, pd.DataFrame) \
             else train_features
         y = y_train.values if isinstance(y_train, pd.Series) \
@@ -79,6 +96,7 @@ class BaseModel(object):
             else y_valid
 
         for i_fold, (trn_idx, val_idx) in enumerate(folds_ids):
+            self.fold = i_fold
             # get train data and valid data
             x_trn = X[trn_idx]
             y_trn = y[trn_idx]
@@ -102,6 +120,11 @@ class BaseModel(object):
             if valid_features is not None:
                 valid_preds += self.predict(
                     model, valid_features).reshape(-1) / len(folds_ids)
+
+            if config["model"]["mode"] == "residual":
+                oof_preds[val_idx] += self.mean_targets["valid"][self.fold]
+                test_preds += self.mean_targets["test"][0]
+                valid_preds += self.mean_targets["valid2"][0]
 
             # get feature importances
             importances_tmp = pd.DataFrame(

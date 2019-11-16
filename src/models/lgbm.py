@@ -27,6 +27,10 @@ class LightGBM(BaseModel):
             y_valid = y_valid / self.denominator
             if y_valid2 is not None:
                 y_valid2 = y_valid2 / self.denominator
+        elif mode == "residual":
+            y_train = y_train - self.mean_targets["train"][self.fold]
+            y_valid = y_valid - self.mean_targets["valid"][self.fold]
+            y_valid2 = y_valid2 - self.mean_targets["valid2"][0]
 
         d_train = lgb.Dataset(x_train, label=y_train)
         d_valid = lgb.Dataset(x_valid, label=y_valid)
@@ -41,13 +45,14 @@ class LightGBM(BaseModel):
             valid_sets.append(d_valid)
             valid_names.append("valid")
 
-        if mode == "regression":
+        if mode == "regression" or mode == "residual":
+            feval = lgb_regression_qwk if (mode == "regression") else None
             model = lgb.train(
                 params=model_params,
                 train_set=d_train,
                 valid_sets=valid_sets,
                 valid_names=valid_names,
-                feval=lgb_regression_qwk,
+                feval=feval,  # FIXME: support for residual
                 **train_params)
         else:
             model = lgb.train(
@@ -65,7 +70,7 @@ class LightGBM(BaseModel):
 
     def predict(self, model: LGBMModel,
                 features: Union[pd.DataFrame, np.ndarray]) -> np.ndarray:
-        if self.mode == "regression":
+        if self.mode == "regression" or self.mode == "residual":
             return model.predict(features)
         else:
             return model.predict(features).reshape(4, -1).argmax(axis=0)
@@ -78,7 +83,7 @@ class LightGBM(BaseModel):
                      y_valid: Optional[np.ndarray], config: dict
                      ) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
         # Override
-        if self.mode == "regression":
+        if self.mode == "regression" or self.mode == "residual":
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)
