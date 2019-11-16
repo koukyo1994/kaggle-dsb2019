@@ -27,13 +27,20 @@ class CatBoostModel(BaseModel):
             self.denominator = y_train.max()
             y_train = y_train / y_train.max()
             y_valid = y_valid / self.denominator
+            if y_valid2 is not None:
+                y_valid2 = y_valid2 / self.denominator
         else:
             model = CatBoostClassifier(**model_params)
+
+        if x_valid2 is not None:
+            eval_sets = [(x_valid2, y_valid2)]
+        else:
+            eval_sets = [(x_valid, y_valid)]
 
         model.fit(
             x_train,
             y_train,
-            eval_set=(x_valid, y_valid),
+            eval_set=eval_sets,
             use_best_model=True,
             verbose=model_params["early_stopping_rounds"])
         best_score = model.best_score_
