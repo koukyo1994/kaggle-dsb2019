@@ -6,3 +6,4 @@ from .past_game import PastGame
 from .unified import Unified
 from .unified_modify import ModifiedUnified
 from .installation_id_stats import UnifiedWithInstallationIDStats
+from .renewal import RenewedFeatures
