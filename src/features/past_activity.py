@@ -51,30 +51,27 @@ def past_activity_features(user_sample: pd.DataFrame, test: bool = False
                            ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame]]:
     activity_codes_map = {
         "Bottle Filler (Activity)": [
-            2020, 3010, 4030, 3110, 4020, 4035,
-            2030, 4070, 2010],
+            4030, 4020, 4035, 4070],
         "Bug Measurer (Activity)": [
-            3010, 4030, 3110, 4035, 4025, 4070
+            4030, 4035, 4070
         ],
         "Chicken Balancer (Activity)": [
-            3010, 3110, 4070, 4030, 4020, 4035, 4022
+            4070, 4030, 4020
         ],
         "Egg Dropper (Activity)": [
-            3010, 2020, 3110, 4025, 4020, 4070
+            4025, 4020, 4070
         ],
         "Fireworks (Activity)": [
-            3010, 4030, 4020, 3110, 4070
+            4030, 4020, 4070
         ],
         "Flower Waterer (Activity)": [
-            3010, 4070, 3110, 4030, 4020, 4025, 4022
+            4070, 4030, 4020, 4025
         ],
         "Sandcastle Builder (Activity)": [
-            3010, 3110, 4070, 4090, 4030,
-            4035, 4021, 4020
+            4070, 4030, 4035, 4020
         ],
         "Watering Hole (Activity)": [
-            3010, 3110, 4021, 4020, 4025, 4070,
-            5000, 5010
+            4021, 4070
         ]
     }
 
@@ -91,69 +88,56 @@ def past_activity_features(user_sample: pd.DataFrame, test: bool = False
         "Bottle Filler (Activity)": {
             "round": "max",
             "identifier": [
-                "addToYourCollection", "Dot_AllDoneTapThis",
-                "ifYouWantToTry", "niceJob", "thatLooksSoCool",
-                "oohStripes", "wowSoCool", "Dot_TrySomethingNew",
-                "andItsFull", "ohWow", "dragABottle"],
+                "niceJob", "thatLooksSoCool",
+                "oohStripes", "wowSoCool",
+                "andItsFull", "ohWow"],
             "jar_filled": [True, False]
         },
         "Bug Measurer (Activity)": {
             "identifier": [
                 "sid_bugtank_line22",
-                "sid_bugtank_line21", "sid_bugtank_line8_ALT",
-                "sid_1", "sid_2", "sid_3", "sid_4", "sid_5",
-                "sid_6", "sid_7", "sid_bugtank_line20",
-                "sid_bugtank_line3", "Dot_TrySomethingNew"]
+                "sid_bugtank_line21",
+                "sid_bugtank_line20"]
         },
         "Chicken Balancer (Activity)": {
             "identifier": [
                 'morechicksheavier',
-                'Dot_AllDoneTapThis',
-                'dragchicks',
-                'Dot_TrySomethingNew'],
+                'dragchicks'],
             "layout.left.pig": [True, False],
             "layout.right.pig": [True, False]
         },
         "Egg Dropper (Activity)": {
             "identifier": [
-                "Buddy_Incoming", "Buddy_MoreThanOneEgg",
-                "Buddy_TapDino", "Buddy_TryDifferentNest",
+                "Buddy_Incoming",
+                "Buddy_TryDifferentNest",
                 "Buddy_EggsWentToOtherNest"
             ]
         },
         "Fireworks (Activity)": {
             "identifier": [
-                "Dot_GreatJob", "Dot_SoHigh",
-                "Dot_Wow", "Dot_Amazing", "Dot_AllDoneTapThis",
+                "Dot_SoHigh",
+                "Dot_Wow", "Dot_Amazing",
                 "Dot_SoLow", "Dot_WhoaSoCool", "Dot_GoLower",
-                "Dot_TrySomethingNew", "Dot_UseFinger", "Dot_GoHigher"
+                "Dot_UseFinger"
             ],
             "launched": [True, False]
         },
         "Flower Waterer (Activity)": {
             "identifier": [
-                "Dot_AllDoneTapThis", "basket",
-                "tallflower", "plantastic", "leangreen",
-                "greenthumb", "Dot_TrySomethingNew"
+                "tallflower", "plantastic", "greenthumb"
             ]
         },
         "Sandcastle Builder (Activity)": {
             "identifier": [
-                "Dot_DragShovel", "Dot_AllDoneTapThis",
-                "Dot_DragMoldPlace", "Dot_SoCool", "Dot_TryWall",
-                "Dot_MoldSmall", "Dot_TrySomethingNew",
-                "Dot_GreatJob", "Dot_FillItUp", "Dot_TryTower",
+                "Dot_DragShovel",
+                "Dot_SoCool", "Dot_TryWall",
+                "Dot_GreatJob", "Dot_FillItUp",
                 "Dot_MoldBig"
             ],
             "filled": [True, False]
         },
         "Watering Hole (Activity)": {
-            "identifier": [
-                "Buddy_TaptoStartShower",
-                "Dot_AllDoneTapThis", "Buddy_BigCloud",
-                "Buddy_SmallCloud", "Buddy_KeepMakingItRain",
-                "Dot_TrySomethingNew"
-            ],
+            "identifier": [],
             "filled": [True, False]
         }
     }
@@ -202,8 +186,6 @@ def past_activity_features(user_sample: pd.DataFrame, test: bool = False
                         features["max_round"] = 0
                         features[key + "_duration"] = 0
                         features["mean_" + key + "_duration"] = 0
-                        features["n_jar_filled_True"] = 0
-                        features["n_jar_filled_False"] = 0
                         features["n_jar_filled_ratio"] = 0
                         for ident in activity_columns_map[key]["identifier"]:
                             features[key + "_" + str(ident) + "_count"] = 0
@@ -216,14 +198,13 @@ def past_activity_features(user_sample: pd.DataFrame, test: bool = False
                             collect(summs, "duration"))
                         features["mean_" + key + "_duration"] = \
                             features[key + "_duration"] / features["max_round"]
-                        features["n_jar_filled_True"] = sum(
+                        n_jar_filled_True = sum(
                             collect(summs, "jar_filled_eq_True"))
-                        features["n_jar_filled_False"] = sum(
+                        n_jar_filled_False = sum(
                             collect(summs, "jar_filled_eq_False"))
-                        total = features["n_jar_filled_False"] + \
-                            features["n_jar_filled_True"]
+                        total = n_jar_filled_False + n_jar_filled_True
                         features["n_jar_filled_ratio"] = \
-                            features["n_jar_filled_True"] / total \
+                            n_jar_filled_True / total \
                             if total > 0 else 0
                         for ident in activity_columns_map[key]["identifier"]:
                             features[key + "_" + str(ident) + "_count"] = \
@@ -302,22 +283,19 @@ def past_activity_features(user_sample: pd.DataFrame, test: bool = False
 
                 elif key == "Sandcastle Builder (Activity)":
                     if len(summs) == 0:
-                        features["n_sand_filled_True"] = 0
-                        features["n_sand_filled_False"] = 0
                         features["sand_filled_ratio"] = 0.0
                         for ident in activity_columns_map[key]["identifier"]:
                             features[key + "_" + str(ident) + "_count"] = 0
                         for code in activity_codes_map[key]:
                             features[key + "_" + str(code)] = 0
                     else:
-                        features["n_sand_filled_True"] = sum(
+                        n_sand_filled_True = sum(
                             collect(summs, "filled_eq_True"))
-                        features["n_sand_filled_False"] = sum(
+                        n_sand_filled_False = sum(
                             collect(summs, "filled_eq_False"))
-                        total = features["n_sand_filled_False"] + \
-                            features["n_sand_filled_True"]
+                        total = n_sand_filled_False + n_sand_filled_True
                         features["sand_filled_ratio"] = \
-                            features["n_sand_filled_True"] / total \
+                            n_sand_filled_True / total \
                             if total > 0 else 0
                         for ident in activity_columns_map[key]["identifier"]:
                             features[key + "_" + str(ident) + "_count"] = \
@@ -329,22 +307,19 @@ def past_activity_features(user_sample: pd.DataFrame, test: bool = False
                             )
                 elif key == "Watering Hole (Activity)":
                     if len(summs) == 0:
-                        features["n_water_filled_True"] = 0
-                        features["n_water_filled_False"] = 0
                         features["water_filled_ratio"] = 0.0
                         for ident in activity_columns_map[key]["identifier"]:
                             features[key + "_" + str(ident) + "_count"] = 0
                         for code in activity_codes_map[key]:
                             features[key + "_" + str(code)] = 0
                     else:
-                        features["n_water_filled_True"] = sum(
+                        n_water_filled_True = sum(
                             collect(summs, "filled_eq_True"))
-                        features["n_water_filled_False"] = sum(
+                        n_water_filled_False = sum(
                             collect(summs, "filled_eq_False"))
-                        total = features["n_water_filled_False"] + \
-                            features["n_water_filled_True"]
+                        total = n_water_filled_False + n_water_filled_True
                         features["water_filled_ratio"] = \
-                            features["n_water_filled_True"] / total \
+                            n_water_filled_True / total \
                             if total > 0 else 0
                         for ident in activity_columns_map[key]["identifier"]:
                             features[key + "_" + str(ident) + "_count"] = \
