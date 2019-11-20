@@ -23,7 +23,8 @@ if __name__ == "__main__":
                            save_json, plot_confusion_matrix, seed_everything)
     from src.features import (Basic, generate_features, PastAssessment,
                               PastClip, PastGame, Unified, ModifiedUnified,
-                              UnifiedWithInstallationIDStats, RenewedFeatures)
+                              UnifiedWithInstallationIDStats, RenewedFeatures,
+                              PastActivity)
     from src.validation import get_validation, select_features
     from src.models import get_model
 
