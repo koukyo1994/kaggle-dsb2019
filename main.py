@@ -21,10 +21,10 @@ if __name__ == "__main__":
     from src.utils import (get_preprocess_parser, load_config,
                            configure_logger, timer, feature_existence_checker,
                            save_json, plot_confusion_matrix, seed_everything)
-    from src.features import (Basic, generate_features, PastAssessment,
-                              PastClip, PastGame, Unified, ModifiedUnified,
-                              UnifiedWithInstallationIDStats, RenewedFeatures,
-                              PastActivity)
+    from src.features import (
+        Basic, generate_features, PastAssessment, PastClip, PastGame, Unified,
+        ModifiedUnified, UnifiedWithInstallationIDStats, RenewedFeatures,
+        PastActivity, ImprovedBasic, ImprovedPastAssessment)
     from src.validation import get_validation, select_features
     from src.models import get_model
 
@@ -61,8 +61,12 @@ if __name__ == "__main__":
 
     if not feature_existence_checker(feature_dir, config["features"]):
         with timer(name="load data", log=True):
-            train = pd.read_csv(input_dir / "train.csv")
-            test = pd.read_csv(input_dir / "test.csv")
+            if args.dryrun:
+                train = pd.read_csv(input_dir / "train.csv", nrows=50000)
+                test = pd.read_csv(input_dir / "test.csv", nrows=50000)
+            else:
+                train = pd.read_csv(input_dir / "train.csv")
+                test = pd.read_csv(input_dir / "test.csv")
             sample_submission = pd.read_csv(
                 input_dir / "sample_submission.csv")
         generate_features(
@@ -75,6 +79,9 @@ if __name__ == "__main__":
 
         del train, test
         gc.collect()
+
+    if args.dryrun:
+        exit(0)
 
     with timer("feature laoding", log=True):
         x_train = pd.concat([

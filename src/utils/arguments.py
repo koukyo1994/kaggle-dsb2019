@@ -21,4 +21,8 @@ def get_preprocess_parser() -> argparse.ArgumentParser:
         "--force",
         action="store_true",
         help="Overwrite existing feature files")
+    parser.add_argument(
+        "--dryrun",
+        action="store_true",
+        help="Use subset of train.csv to calculate the feature")
     return parser

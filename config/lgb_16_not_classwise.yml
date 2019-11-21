@@ -38,7 +38,7 @@ av:
     verbose_eval: 200
 
 model:
-  name: "classwise_lgbm"
+  name: "lgbm"
   mode: "regression"
   sampling:
     name: "none"
