@@ -6,7 +6,7 @@ dataset:
 features:
   - ImprovedBasic
   - ImprovedPastAssessment
-  - PastGame
+  - ImprovedPastGame
   - PastClip
   - PastActivity
 
