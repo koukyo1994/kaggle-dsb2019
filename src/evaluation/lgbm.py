@@ -4,7 +4,7 @@ import numpy as np
 from typing import Tuple
 
 from .metrics import calc_metric
-from .optimization import OptimizedRounder
+from .optimization import OptimizedRounder, OptimizedRounderNotScaled
 
 
 def lgb_classification_qwk(y_pred: np.ndarray,
@@ -23,6 +23,22 @@ def lgb_regression_qwk(y_pred: np.ndarray,
     OptR.fit(y_pred, y_true)
 
     y_pred = OptR.predict(y_pred).astype(int)
+    qwk = calc_metric(y_true, y_pred)
+
+    return "qwk", qwk, True
+
+
+def lgb_regression_qwk_not_scaled(
+        y_pred: np.ndarray, data: lgb.Dataset) -> Tuple[str, float, bool]:
+    y_true = data.get_label().astype(int)
+    y_pred = y_pred.reshape(-1)
+
+    OptR = OptimizedRounderNotScaled()
+    OptR.fit(y_pred, y_true)
+
+    coef = OptR.coefficients()
+
+    y_pred = OptR.predict(y_pred, coef).astype(int)
     qwk = calc_metric(y_true, y_pred)
 
     return "qwk", qwk, True

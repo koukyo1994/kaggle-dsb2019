@@ -2,6 +2,8 @@ from .cat import CatBoostModel
 from .lgbm import LightGBM
 from .classwise_cat import ClassWiseCatBoost
 from .classwise_lgbm import ClassWiseLightGBM
+from .cat_not_scaled import CatBoostNotScaledModel
+from .lgbm_not_scaled import LightGBMNotScaled
 
 
 def lgbm() -> LightGBM:
@@ -18,6 +20,14 @@ def classwise_cat() -> ClassWiseCatBoost:
 
 def classwise_lgbm() -> ClassWiseLightGBM:
     return ClassWiseLightGBM()
+
+
+def catboost_not_scaled() -> CatBoostNotScaledModel:
+    return CatBoostNotScaledModel()
+
+
+def lgbm_not_scaled() -> LightGBMNotScaled:
+    return LightGBMNotScaled()
 
 
 def get_model(config: dict):

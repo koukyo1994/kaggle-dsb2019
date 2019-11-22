@@ -1,4 +1,8 @@
 import numpy as np
+import pandas as pd
+import scipy as sp
+
+from functools import partial
 
 from src.evaluation import calc_metric
 
@@ -49,3 +53,27 @@ class OptimizedRounder(object):
     def predict(self, X: np.ndarray) -> np.ndarray:
         X_p = np.digitize(X, self.coef)
         return X_p
+
+
+class OptimizedRounderNotScaled(object):
+    def __init__(self):
+        self.coef_ = 0
+
+    def _kappa_loss(self, coef, X, y):
+        X_p = pd.cut(
+            X, [-np.inf] + list(np.sort(coef)) + [np.inf], labels=[0, 1, 2, 3])
+
+        return -calc_metric(y, X_p)
+
+    def fit(self, X, y):
+        loss_partial = partial(self._kappa_loss, X=X, y=y)
+        initial_coef = [0.5, 1.5, 2.5]
+        self.coef_ = sp.optimize.minimize(
+            loss_partial, initial_coef, method='nelder-mead')
+
+    def predict(self, X, coef):
+        return pd.cut(
+            X, [-np.inf] + list(np.sort(coef)) + [np.inf], labels=[0, 1, 2, 3])
+
+    def coefficients(self):
+        return self.coef_['x']
