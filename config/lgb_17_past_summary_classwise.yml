@@ -4,10 +4,7 @@ dataset:
   params:
 
 features:
-  - ImprovedBasic
-  - ImprovedPastAssessment
-  - ImprovedPastGame
-  - PastActivity
+  - PastSummary
 
 av:
   split_params:
@@ -53,7 +50,7 @@ model:
   model_params:
     objective: "regression"
     boosting_type: "gbdt"
-    eval_metric: "qwk"
+    metric: "qwk"
     max_depth: -1
     num_leaves: 256
     tree_learner: "serial"

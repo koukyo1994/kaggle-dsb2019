@@ -24,7 +24,8 @@ if __name__ == "__main__":
     from src.features import (
         Basic, generate_features, PastAssessment, PastClip, PastGame, Unified,
         ModifiedUnified, UnifiedWithInstallationIDStats, RenewedFeatures,
-        PastActivity, ImprovedBasic, ImprovedPastAssessment, ImprovedPastGame)
+        PastActivity, ImprovedBasic, ImprovedPastAssessment, ImprovedPastGame,
+        PastSummary)
     from src.validation import get_validation, select_features
     from src.models import get_model
 
