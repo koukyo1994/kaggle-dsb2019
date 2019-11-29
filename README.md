@@ -45,3 +45,54 @@ This code also only appears in `Game` and `Assessment`. If the player make a cor
 * `4070`: Some action
 
 Moving slider, Click?
+
+## Event path
+
+* Cauldron Filler (Assessment)
+    1. Magma Peak - Level 1
+    2. Sandcastle Builder (Activity)
+    3. Slop Problem
+    4. Scrub-A-Dub
+    5. Watering Hole (Activity)
+    6. Magma Peak - Level2
+    7. Dino Drink
+    8. Bubble Bath
+    9. Bottle Filler (Activity)
+    10. Dino Dive
+    11. Cauldron Filler (Assessment)
+
+* Tree Top City
+    1. Tree Top City - Level 1
+    2. Ordering Spheres
+    3. All Star Sorting
+    4. Costume Box
+    5. Fireworks (Activity)
+    6. 12 Monkeys
+    7. Tree Top City - Level 2
+    8. Flower Waterer (Activity)
+    9. Pirate's Tale
+    10. Mushroom Sorter (Assessment)
+    11. Air Show
+    12. Treasure Map
+    13. Tree Top City - Level 3
+    14. Crystals Rule
+    15. Rulers
+    16. Bug Measurer (Activity)
+    17. Bird Measurer (Assessment)
+
+* Crystal Caves
+    1. Crystal Caves - Level 1
+    2. Chow Time
+    3. Balancing Act
+    4. Chicken Balancer (Activity)
+    5. Lifting Heavy Things
+    6. Crystal Caves - Level 2
+    7. Honey Cake
+    8. Happy Camel
+    9. Cart Balancer (Assessment)
+    10. Leaf Leader
+    11. Crystal Caves - Level 3
+    12. Heavy, Heavier, Heaviest
+    13. Pan Balance
+    14. Egg Dropper (Activity)
+    15. Chest Sorter (Assessment)
