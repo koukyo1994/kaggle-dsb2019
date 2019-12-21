@@ -6,7 +6,7 @@ from typing import Union, Tuple, Optional, List
 
 from .base import BaseModel
 from src.evaluation import (OptimizedRounder, lgb_classification_qwk,
-                            lgb_regression_qwk)
+                            lgb_multiclass_qwk, lgb_regression_qwk)
 
 LGBMModel = Union[lgb.LGBMClassifier, lgb.LGBMRegressor]
 
@@ -54,6 +54,14 @@ class LightGBM(BaseModel):
                 valid_names=valid_names,
                 feval=feval,  # FIXME: support for residual
                 **train_params)
+        elif mode == "multiclass":
+            model = lgb.train(
+                params=model_params,
+                train_set=d_train,
+                valid_sets=valid_sets,
+                valid_names=valid_names,
+                feval=lgb_multiclass_qwk,
+                **train_params)
         else:
             model = lgb.train(
                 params=model_params,
@@ -72,6 +80,9 @@ class LightGBM(BaseModel):
                 features: Union[pd.DataFrame, np.ndarray]) -> np.ndarray:
         if self.mode == "regression" or self.mode == "residual":
             return model.predict(features)
+        elif self.mode == "multiclass":
+            pred = model.predict(features) @ np.arange(4) / 3
+            return pred
         else:
             return model.predict(features).reshape(4, -1).argmax(axis=0)
 
@@ -83,7 +94,8 @@ class LightGBM(BaseModel):
                      y_valid: Optional[np.ndarray], config: dict
                      ) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
         # Override
-        if self.mode == "regression" or self.mode == "residual":
+        if (self.mode == "regression" or self.mode == "residual"
+                or self.mode == "multiclass"):
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)
