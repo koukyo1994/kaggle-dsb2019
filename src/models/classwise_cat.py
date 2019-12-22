@@ -35,6 +35,7 @@ class ClassWiseCatBoost(ClassWiseBase):
                 eval_metric=CatBoostMulticlassOptimizedQWK(
                     reverse=config["post_process"]["params"]["reverse"]),
                 **model_params)
+            eval_sets = valid_sets
         else:
             model = CatBoostClassifier(**model_params)
             eval_sets = valid_sets
