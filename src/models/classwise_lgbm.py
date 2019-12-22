@@ -6,7 +6,7 @@ from typing import Union, Tuple, List
 
 from .classwise import ClassWiseBase
 from src.evaluation import (OptimizedRounder, lgb_classification_qwk,
-                            lgb_regression_qwk)
+                            lgb_regression_qwk, lgb_multiclass_qwk)
 
 LGBMModel = Union[lgb.LGBMClassifier, lgb.LGBMRegressor]
 
@@ -26,11 +26,20 @@ class ClassWiseLightGBM(ClassWiseBase):
             eval_sets = []
             for x, y in valid_sets:
                 eval_sets.append(lgb.Dataset(x, label=y / self.denominator))
+        elif mode == "multiclass":
+            eval_sets = []
+            for x, y in valid_sets:
+                eval_sets.append(lgb.Dataset(x, label=y))
 
         d_train = lgb.Dataset(x_train, label=y_train)
 
-        feval = lgb_regression_qwk if (
-            mode == "regression") else lgb_classification_qwk
+        if mode == "regression":
+            feval = lgb_regression_qwk
+        elif mode == "multiclass":
+            feval = lgb_multiclass_qwk
+        else:
+            feval = lgb_classification_qwk
+
         model = lgb.train(
             params=model_params,
             train_set=d_train,
@@ -47,6 +56,9 @@ class ClassWiseLightGBM(ClassWiseBase):
                 features: Union[pd.DataFrame, np.ndarray]) -> np.ndarray:
         if self.mode == "regression":
             return model.predict(features)
+        elif self.mode == "multiclass":
+            pred = model.predict(features) @ np.arange(4) / 3
+            return pred
         else:
             return model.predict(features).reshape(4, -1).argmax(axis=0)
 
@@ -58,7 +70,7 @@ class ClassWiseLightGBM(ClassWiseBase):
             test_preds: np.ndarray, config: dict
     ) -> Tuple[List[Tuple[np.ndarray, np.ndarray]], np.ndarray]:
         # Override
-        if self.mode == "regression":
+        if self.mode == "regression" or self.mode == "multiclass":
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(preds_set[0][0], preds_set[0][1])
