@@ -6,7 +6,8 @@ from typing import Tuple, Union, Optional
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 from .base import BaseModel
-from src.evaluation import CatBoostOptimizedQWKMetric, OptimizedRounder
+from src.evaluation import (CatBoostOptimizedQWKMetric, OptimizedRounder,
+                            CatBoostMulticlassOptimizedQWK)
 
 CatModel = Union[CatBoostClassifier, CatBoostRegressor]
 
@@ -29,6 +30,11 @@ class CatBoostModel(BaseModel):
             y_valid = y_valid / self.denominator
             if y_valid2 is not None:
                 y_valid2 = y_valid2 / self.denominator
+        elif mode == "multiclass":
+            model = CatBoostClassifier(
+                eval_metric=CatBoostMulticlassOptimizedQWK(
+                    reverse=config["post_process"]["params"]["reverse"]),
+                **model_params)
         else:
             model = CatBoostClassifier(**model_params)
 
@@ -51,7 +57,11 @@ class CatBoostModel(BaseModel):
 
     def predict(self, model: CatModel,
                 features: Union[pd.DataFrame, np.ndarray]) -> np.ndarray:
-        return model.predict(features)
+        if self.mode != "multiclass":
+            return model.predict(features)
+        else:
+            preds = model.predict_proba(features)
+            return preds @ np.arange(4) / 3
 
     def get_feature_importance(self, model: CatModel) -> np.ndarray:
         return model.feature_importances_
@@ -61,7 +71,7 @@ class CatBoostModel(BaseModel):
                      y_valid: Optional[np.ndarray], config: dict
                      ) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
         # Override
-        if self.mode == "regression":
+        if self.mode == "regression" or self.mode == "multiclass":
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)

@@ -6,6 +6,44 @@ from .metrics import calc_metric
 from .optimization import OptimizedRounder, OptimizedRounderNotScaled
 
 
+class CatBoostMulticlassOptimizedQWK(object):
+    def __init__(self,
+                 n_overall: int = 5,
+                 n_classwise: int = 5,
+                 reverse: bool = False):
+        self.n_overall = n_overall
+        self.n_classwise = n_classwise
+        self.reverse = reverse
+
+    def get_final_error(self, error: float, weight: float) -> float:
+        return error / (weight + 1e-38)
+
+    def is_max_optimal(self):
+        return True
+
+    def evaluate(self, approxes, target,
+                 weight: Optional[Sequence[float]]) -> Tuple[float, float]:
+        approx_np = np.array(approxes)
+        target_np = np.array(target)
+
+        exponent = np.exp(approx_np)
+        softmax = exponent / np.sum(exponent, axis=0)
+        y_pred = np.arange(4) @ softmax / 3
+
+        OptR = OptimizedRounder(
+            n_classwise=self.n_classwise,
+            n_overall=self.n_overall,
+            reverse=self.reverse)
+        OptR.fit(y_pred, target_np)
+
+        y_pred = OptR.predict(y_pred).astype(int)
+        y_true = target_np.astype(int)
+
+        weight_sum = 1.0
+        qwk = calc_metric(y_true, y_pred)
+        return qwk, weight_sum
+
+
 class CatBoostOptimizedQWKMetric(object):
     def __init__(self,
                  n_overall: int = 5,

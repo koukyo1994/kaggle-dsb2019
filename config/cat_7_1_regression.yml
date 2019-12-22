@@ -1,0 +1,60 @@
+dataset:
+  dir: "input/data-science-bowl-2019/"
+  feature_dir: "features"
+  params:
+
+features:
+  - PastSummary
+
+av:
+  split_params:
+    random_state: 42
+    n_splits: 5
+
+  model_params:
+    objective: "binary"
+    metric: "auc"
+    boosting: "gbdt"
+    max_depth: 7
+    num_leaves: 75
+    learning_rate: 0.01
+    colsample_bytree: 0.7
+    subsample: 0.1
+    subsample_freq: 1
+    seed: 111
+    feature_fraction_seed: 111
+    drop_seed: 111
+    verbose: -1
+    first_metric_only: True
+
+  train_params:
+    num_boost_round: 10000
+    early_stopping_rounds: 200
+    verbose_eval: 200
+
+model:
+  name: "catboost"
+  mode: "regression"
+  model_params:
+    loss_function: "RMSE"
+    task_type: "CPU"
+    iterations: 6000
+    early_stopping_rounds: 100
+    random_seed: 42
+
+  train_params:
+    mode: "regression"
+
+post_process:
+  params:
+    reverse: False
+    n_overall: 20
+    n_classwise: 20
+
+val:
+  name: "group_kfold"
+  params:
+    n_splits: 5
+    random_state: 111
+
+output_dir: "output"
