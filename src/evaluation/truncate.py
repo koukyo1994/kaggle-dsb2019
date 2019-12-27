@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from typing import Dict, List, Union
 
@@ -14,17 +15,23 @@ def eval_with_truncated_data(
     trials: List[float] = []
 
     index = np.arange(len(y_pred))
-    for _ in range(n_trials):
-        idx_choice = []
-        for group in np.unique(groups):
-            grp_idx = index[groups == group]
-            idx_choice.append(np.random.choice(grp_idx))
-        y_pred_choice = y_pred[idx_choice]
-        y_true_choice = y_true[idx_choice]
+    gp_idx_df = pd.DataFrame({"groups": groups, "index": index})
+    dice_results = []
+    for _, df in gp_idx_df.groupby("groups"):
+        dice_result = np.random.choice(df["index"], size=n_trials)
+        dice_results.append(dice_result)
 
-        score = calc_metric(y_true_choice, y_pred_choice)
-        trials.append(score)
+    idx_choice = np.vstack(dice_results)
+    for i in range(n_trials):
+        y_pred_choice = y_pred[idx_choice[:, i]]
+        y_true_choice = y_true[idx_choice[:, i]]
+        trials.append(calc_metric(y_true_choice, y_pred_choice))
+
     mean_score = np.mean(trials)
+    std = np.std(trials)
     eval_result["mean"] = mean_score
     eval_result["all_trials"] = trials
+    eval_result["0.95lower_bound"] = mean_score - 2 * std
+    eval_result["0.95upper_bound"] = mean_score + 2 * std
+    eval_result["std"] = std
     return eval_result
