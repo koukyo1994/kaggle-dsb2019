@@ -6,8 +6,7 @@ from typing import Tuple, Union, List
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 from .classwise import ClassWiseBase
-from src.evaluation import (CatBoostOptimizedQWKMetric, OptimizedRounder,
-                            CatBoostMulticlassOptimizedQWK)
+from src.evaluation import (CatBoostOptimizedQWKMetric, OptimizedRounder)
 
 CatModel = Union[CatBoostClassifier, CatBoostRegressor]
 
@@ -31,10 +30,7 @@ class ClassWiseCatBoost(ClassWiseBase):
             for x, y in valid_sets:
                 eval_sets.append((x, y / self.denominator))
         elif mode == "multiclass":
-            model = CatBoostClassifier(
-                eval_metric=CatBoostMulticlassOptimizedQWK(
-                    reverse=config["post_process"]["params"]["reverse"]),
-                **model_params)
+            model = CatBoostClassifier(**model_params)
             eval_sets = valid_sets
         else:
             model = CatBoostClassifier(**model_params)
