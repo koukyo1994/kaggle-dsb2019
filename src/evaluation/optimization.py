@@ -7,6 +7,30 @@ from functools import partial
 from src.evaluation import calc_metric
 
 
+class GroupWiseOptimizer(object):
+    def __init__(self, n_overall: int = 5, n_classwise: int = 5):
+        self.n_overall = n_overall
+        self.n_classwise = n_classwise
+
+    def fit(self, X: np.ndarray, y: np.ndarray, group: np.ndarray):
+        self.rounders = {
+            gp: OptimizedRounder(
+                n_overall=self.n_overall, n_classwise=self.n_classwise)
+            for gp in np.unique(group)
+        }
+        for gp in self.rounders.keys():
+            X_gp = X[group == gp]
+            y_gp = y[group == gp]
+            self.rounders[gp].fit(X_gp, y_gp)
+
+    def predict(self, X: np.ndarray, group: np.ndarray) -> np.ndarray:
+        result = np.zeros_like(X)
+        for gp in self.rounders.keys():
+            X_gp = X[group == gp]
+            result[group == gp] = self.rounders[gp].predict(X_gp)
+        return result
+
+
 class OptimizedRounder(object):
     def __init__(self,
                  n_overall: int = 5,

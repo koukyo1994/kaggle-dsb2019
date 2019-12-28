@@ -6,7 +6,7 @@ from typing import Tuple, Union, List
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 from .classwise import ClassWiseBase
-from src.evaluation import (CatBoostOptimizedQWKMetric, OptimizedRounder)
+from src.evaluation import OptimizedRounder
 
 CatModel = Union[CatBoostClassifier, CatBoostRegressor]
 
@@ -20,10 +20,7 @@ class ClassWiseCatBoost(ClassWiseBase):
         self.mode = mode
 
         if mode == "regression":
-            model = CatBoostRegressor(
-                eval_metric=CatBoostOptimizedQWKMetric(
-                    reverse=config["post_process"]["params"]["reverse"]),
-                **model_params)
+            model = CatBoostRegressor(**model_params)
             self.denominator = y_train.max()
             y_train = y_train / y_train.max()
             eval_sets = []

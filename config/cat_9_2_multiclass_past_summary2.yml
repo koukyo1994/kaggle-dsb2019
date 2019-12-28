@@ -39,6 +39,7 @@ model:
     loss_function: "MultiClass"
     task_type: "CPU"
     iterations: 6000
+    thread_count: 8
     early_stopping_rounds: 100
     random_seed: 42
 

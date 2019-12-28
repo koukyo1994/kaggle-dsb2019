@@ -4,7 +4,7 @@ dataset:
   params:
 
 features:
-  - PastSummary
+  - PastSummary2
 
 av:
   split_params:
@@ -33,13 +33,12 @@ av:
     verbose_eval: 200
 
 model:
-  name: "classwise_cat"
+  name: "catboost"
   mode: "regression"
   model_params:
     loss_function: "RMSE"
     eval_metric: "RMSE"
     task_type: "CPU"
-    thread_count: 8
     iterations: 6000
     early_stopping_rounds: 100
     random_seed: 42

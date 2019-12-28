@@ -6,8 +6,7 @@ from typing import Tuple, Union, Optional
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 from .base import BaseModel
-from src.evaluation import (CatBoostOptimizedQWKMetric, OptimizedRounder,
-                            CatBoostMulticlassOptimizedQWK)
+from src.evaluation import OptimizedRounder
 
 CatModel = Union[CatBoostClassifier, CatBoostRegressor]
 
@@ -21,20 +20,14 @@ class CatBoostModel(BaseModel):
         mode = config["model"]["mode"]
         self.mode = mode
         if mode == "regression":
-            model = CatBoostRegressor(
-                eval_metric=CatBoostOptimizedQWKMetric(
-                    reverse=config["post_process"]["params"]["reverse"]),
-                **model_params)
+            model = CatBoostRegressor(**model_params)
             self.denominator = y_train.max()
             y_train = y_train / y_train.max()
             y_valid = y_valid / self.denominator
             if y_valid2 is not None:
                 y_valid2 = y_valid2 / self.denominator
         elif mode == "multiclass":
-            model = CatBoostClassifier(
-                eval_metric=CatBoostMulticlassOptimizedQWK(
-                    reverse=config["post_process"]["params"]["reverse"]),
-                **model_params)
+            model = CatBoostClassifier(**model_params)
         else:
             model = CatBoostClassifier(**model_params)
 
