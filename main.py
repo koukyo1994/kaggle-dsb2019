@@ -25,9 +25,10 @@ if __name__ == "__main__":
         Basic, generate_features, PastAssessment, PastClip, PastGame, Unified,
         ModifiedUnified, UnifiedWithInstallationIDStats, RenewedFeatures,
         PastActivity, ImprovedBasic, ImprovedPastAssessment, ImprovedPastGame,
-        PastSummary)
+        PastSummary, PastSummary2)
     from src.validation import get_validation, select_features
     from src.models import get_model
+    from src.evaluation import eval_with_truncated_data
 
     seed_everything(42)
 
@@ -239,6 +240,13 @@ if __name__ == "__main__":
             plt.title(f"Feature importance: Assessment {k}")
             plt.tight_layout()
             plt.savefig(output_dir / f"feature_importance_assessment_{k}.png")
+
+    truncated_result = eval_with_truncated_data(
+        oof_preds, y_train, groups, n_trials=100)
+    config["truncated_eval_mean"] = truncated_result["mean"]
+    config["truncated_eval_0.95lower"] = truncated_result["0.95lower_bound"]
+    config["truncated_eval_0.95upper"] = truncated_result["0.95upper_bound"]
+    config["truncated_eval_std"] = truncated_result["std"]
 
     # Confusion Matrix
     plot_confusion_matrix(

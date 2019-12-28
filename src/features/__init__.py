@@ -12,3 +12,4 @@ from .improved_basic import ImprovedBasic
 from .improved_past_assessment import ImprovedPastAssessment
 from .improved_past_game import ImprovedPastGame
 from .summarize_past import PastSummary
+from .past_summary2 import PastSummary2

@@ -6237,5 +6237,9 @@
                 }
             }
         }
-    }
+    },
+    "truncated_eval_mean": 0.548953890124667,
+    "truncated_eval_0.95lower": 0.530980722954993,
+    "truncated_eval_0.95upper": 0.566927057294341,
+    "truncated_eval_std": 0.00898658358483699
 }

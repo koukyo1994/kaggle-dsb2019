@@ -324,6 +324,8 @@ def past_summary_features(
             accumulated_failed_attempts += failed_attempt
 
             features["duration_mean"] = np.mean(durations) if durations else 0
+            features["duration_var"] = np.var(durations) \
+                if len(durations) > 1 else 0
             durations.append((sess.iloc[-1, 2] - sess.iloc[0, 2]).seconds)
 
             features["accumulated_acc"] = \
@@ -383,11 +385,19 @@ def past_summary_features(
                     collect(same_assessments, "failed_attempts"))
                 features["success_ratio_same_assess"] = np.mean(
                     collect(same_assessments, "success_ratio"))
+                features["success_var_same_assess"] = np.var(
+                    collect(same_assessments, "success_ratio"))
                 features["mean_accuracy_group_same_assess"] = np.mean(
+                    collect(same_assessments, "accuracy_group"))
+                features["var_accuracy_group_same_assess"] = np.var(
                     collect(same_assessments, "accuracy_group"))
                 features["mean_time_to_get_success_same_assess"] = np.mean(
                     collect(same_assessments, "time_to_get_success"))
+                features["var_time_to_get_success_same_assess"] = np.var(
+                    collect(same_assessments, "time_to_get_success"))
                 features["mean_action_time_same_assess"] = np.mean(
+                    collect(same_assessments, "mean_action_time"))
+                features["var_action_time_same_assess"] = np.var(
                     collect(same_assessments, "mean_action_time"))
 
                 # work on last same assess
@@ -404,9 +414,13 @@ def past_summary_features(
             else:
                 features["n_failure_same_assess"] = -1.0
                 features["success_ratio_same_assess"] = -1.0
+                features["success_var_same_assess"] = -1.0
                 features["mean_accuracy_group_same_assess"] = -1.0
+                features["var_accuracy_group_same_assess"] = -1.0
                 features["mean_time_to_get_success_same_assess"] = -1.0
+                features["var_time_to_get_success_same_assess"] = -1.0
                 features["mean_action_time_same_assess"] = -1.0
+                features["var_action_time_same_assess"] = -1.0
                 features["n_failure_last_same_assess"] = -1.0
                 features["success_ratio_last_same_assess"] = -1.0
                 features["accuracy_group_last_same_assess"] = -1.0
@@ -418,24 +432,42 @@ def past_summary_features(
                 if len(summs) > 0:
                     features[key + "_success_ratio"] = np.mean(
                         collect(summs, "success_ratio"))
+                    features[key + "_var_success_ratio"] = np.var(
+                        collect(summs, "success_ratio"))
                     features[key + "_accuracy_group"] = np.mean(
+                        collect(summs, "accuracy_group"))
+                    features[key + "_var_accuracy_group"] = np.var(
                         collect(summs, "accuracy_group"))
                     features[key + "_time_to_get_success"] = np.mean(
                         collect(summs, "time_to_get_success"))
+                    features[key + "_var_time_to_get_success"] = np.var(
+                        collect(summs, "time_to_get_success"))
                     features[key + "_mean_action_time"] = np.mean(
+                        collect(summs, "mean_action_time"))
+                    features[key + "_var_action_time"] = np.var(
                         collect(summs, "mean_action_time"))
                     codes = assess_codes_map[key]
                     for code in codes:
                         features[key + f"_{str(code)}"] = sum(
                             collect(summs, str(code)))
+                        features[key + f"_{str(code)}_mean"] = np.mean(
+                            collect(summs, str(code)))
+                        features[key + f"_{str(code)}_var"] = np.var(
+                            collect(summs, str(code)))
                 else:
                     features[key + "_success_ratio"] = -1.0
+                    features[key + "_var_success_ratio"] = -1.0
                     features[key + "_accuracy_group"] = -1.0
+                    features[key + "_var_accuracy_group"] = -1.0
                     features[key + "_time_to_get_success"] = -1.0
+                    features[key + "_var_time_to_get_success"] = -1.0
                     features[key + "_mean_action_time"] = -1.0
+                    features[key + "_var_action_time"] = -1.0
                     codes = assess_codes_map[key]
                     for code in codes:
                         features[key + f"_{str(code)}"] = -1.0
+                        features[key + f"_{str(code)}_mean"] = -1.0
+                        features[key + f"_{str(code)}_var"] = -1.0
 
                 for col in [
                         "accuracy_group_last_same_assess",
@@ -501,12 +533,18 @@ def past_summary_features(
                 features["n_last_correct_" + game] = 0.0
                 features["mean_correct_" + game] = 0.0
                 features["mean_incorrect_" + game] = 0.0
+                features["var_correct" + game] = 0.0
+                features["var_incorrect_" + game] = 0.0
                 features["n_incorrect_" + game] = 0.0
                 features["n_last_incorrect_" + game] = 0.0
                 features["success_ratio_" + game] = 0.0
+                features["var_success_ratio_" + game] = 0.0
                 features["last_success_ratio_" + game] = 0.0
                 features["count_4070_" + game] = 0.0
+                features["mean_4070_" + game] = 0.0
+                features["var_4070_" + game] = 0.0
                 features["mean_action_time_" + game] = 0.0
+                features["var_action_time_" + game] = 0.0
 
             for game, summ in past_game_summarys.items():
                 if len(summ) == 0:
@@ -521,13 +559,25 @@ def past_summary_features(
                     collect(summ, "mean_correct"))
                 features["mean_incorrect_" + game] = np.mean(
                     collect(summ, "mean_incorrect"))
+                features["var_correct_" + game] = np.var(
+                    collect(summ, "mean_correct"))
+                features["var_incorrect_" + game] = np.var(
+                    collect(summ, "mean_incorrect"))
                 features["success_ratio_" + game] = np.mean(
+                    collect(summ, "mean_success_ratio"))
+                features["var_success_ratio_" + game] = np.var(
                     collect(summ, "mean_success_ratio"))
                 features["last_success_ratio_" + game] = collect(
                     summ, "mean_success_ratio")[-1]
                 features["count_4070_" + game] = sum(
                     collect(summ, "count_4070"))
+                features["mean_4070_" + game] = np.mean(
+                    collect(summ, "count_4070"))
+                features["var_4070_" + game] = np.var(
+                    collect(summ, "count_4070"))
                 features["mean_action_time_" + game] = np.mean(
+                    collect(summ, "mean_action_time"))
+                features["var_action_time_" + game] = np.var(
                     collect(summ, "mean_action_time"))
 
             for key, summs in past_activity_summarys.items():
