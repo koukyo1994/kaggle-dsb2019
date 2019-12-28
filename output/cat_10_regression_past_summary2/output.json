@@ -2397,5 +2397,10 @@
     "truncated_eval_mean": 0.5455979888753448,
     "truncated_eval_0.95lower": 0.5252565034288939,
     "truncated_eval_0.95upper": 0.5659394743217958,
-    "truncated_eval_std": 0.010170742723225469
+    "truncated_eval_std": 0.010170742723225469,
+    "truncated_group_eval_mean": 0.5447381442282573,
+    "truncated_group_eval_0.95lower": 0.5268117694005938,
+    "truncated_group_eval_0.95upper": 0.5626645190559207,
+    "truncated_group_eval_std": 0.008963187413831746,
+    "group_optimized_qwk": 0.581703853842753
 }
