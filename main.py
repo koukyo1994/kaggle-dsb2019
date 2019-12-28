@@ -28,7 +28,8 @@ if __name__ == "__main__":
         PastSummary, PastSummary2)
     from src.validation import get_validation, select_features
     from src.models import get_model
-    from src.evaluation import eval_with_truncated_data
+    from src.evaluation import (eval_with_truncated_data, GroupWiseOptimizer,
+                                calc_metric)
 
     seed_everything(42)
 
@@ -241,12 +242,33 @@ if __name__ == "__main__":
             plt.tight_layout()
             plt.savefig(output_dir / f"feature_importance_assessment_{k}.png")
 
+    raw_oof_preds = model.raw_oof_preds
+    raw_valid_preds = model.raw_valid_preds
+    raw_test_preds = model.raw_test_preds
+
+    GroupOptR = GroupWiseOptimizer(n_overall=20, n_classwise=20)
+    GroupOptR.fit(raw_oof_preds, y_train, x_train["session_title"].values)
+    group_optimized_oof = GroupOptR.predict(raw_oof_preds,
+                                            x_train["session_title"].values)
+
     truncated_result = eval_with_truncated_data(
         oof_preds, y_train, groups, n_trials=100)
     config["truncated_eval_mean"] = truncated_result["mean"]
     config["truncated_eval_0.95lower"] = truncated_result["0.95lower_bound"]
     config["truncated_eval_0.95upper"] = truncated_result["0.95upper_bound"]
     config["truncated_eval_std"] = truncated_result["std"]
+
+    group_truncated_result = eval_with_truncated_data(
+        group_optimized_oof, y_train, groups, n_trials=100)
+    config["truncated_group_eval_mean"] = group_truncated_result["mean"]
+    config["truncated_group_eval_0.95lower"] = group_truncated_result[
+        "0.95lower_bound"]
+    config["truncated_group_eval_0.95upper"] = group_truncated_result[
+        "0.95upper_bound"]
+    config["truncated_group_eval_std"] = group_truncated_result["std"]
+
+    group_qwk = calc_metric(y_train, group_optimized_oof)
+    config["group_optimized_qwk"] = group_qwk
 
     # Confusion Matrix
     plot_confusion_matrix(
