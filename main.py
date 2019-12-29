@@ -122,9 +122,9 @@ if __name__ == "__main__":
     logging.debug(f"numbber of test samples: {len(x_test)}")
 
     # ===============================
-    # === Feature Selection
+    # === Feature Selection with correlation
     # ===============================
-    with timer("Feature Selection"):
+    with timer("Feature Selection with correlation"):
         to_remove = remove_correlated_features(x_train, cols)
 
     cols = [col for col in cols if col not in to_remove]
@@ -135,66 +135,142 @@ if __name__ == "__main__":
     # === Adversarial Validation
     # ===============================
     logging.info("Adversarial Validation")
-    train_adv = x_train.copy()
-    test_adv = x_valid.copy()
+    with timer("Adversarial Validation"):
+        train_adv = x_train.copy()
+        test_adv = x_valid.copy()
 
-    train_adv["target"] = 0
-    test_adv["target"] = 1
-    groups_adv = np.concatenate([groups, groups_valid])
-    train_test_adv = pd.concat([train_adv, test_adv], axis=0,
-                               sort=False).reset_index(drop=True)
+        train_adv["target"] = 0
+        test_adv["target"] = 1
+        groups_adv = np.concatenate([groups, groups_valid])
+        train_test_adv = pd.concat([train_adv, test_adv], axis=0,
+                            sort=False).reset_index(drop=True)
 
-    train_test_adv["group"] = groups_adv
-    splits = get_validation(train_test_adv, config)
-    train_test_adv.drop("group", axis=1, inplace=True)
+        train_test_adv["group"] = groups_adv
+        splits = get_validation(train_test_adv, config)
+        train_test_adv.drop("group", axis=1, inplace=True)
 
-    aucs = []
-    importance = np.zeros(len(cols))
-    for trn_idx, val_idx in splits:
-        x_train_adv = train_test_adv.loc[trn_idx, cols]
-        y_train_adv = train_test_adv.loc[trn_idx, "target"]
-        x_val_adv = train_test_adv.loc[val_idx, cols]
-        y_val_adv = train_test_adv.loc[val_idx, "target"]
+        aucs = []
+        importance = np.zeros(len(cols))
+        for trn_idx, val_idx in splits:
+            x_train_adv = train_test_adv.loc[trn_idx, cols]
+            y_train_adv = train_test_adv.loc[trn_idx, "target"]
+            x_val_adv = train_test_adv.loc[val_idx, cols]
+            y_val_adv = train_test_adv.loc[val_idx, "target"]
 
-        train_lgb = lgb.Dataset(x_train_adv, label=y_train_adv)
-        valid_lgb = lgb.Dataset(x_val_adv, label=y_val_adv)
+            train_lgb = lgb.Dataset(x_train_adv, label=y_train_adv)
+            valid_lgb = lgb.Dataset(x_val_adv, label=y_val_adv)
 
-        model_params = config["av"]["model_params"]
-        train_params = config["av"]["train_params"]
-        clf = lgb.train(
-            model_params,
-            train_lgb,
-            valid_sets=[train_lgb, valid_lgb],
-            valid_names=["train", "valid"],
-            **train_params)
+            model_params = config["av"]["model_params"]
+            train_params = config["av"]["train_params"]
+            clf = lgb.train(
+                model_params,
+                train_lgb,
+                valid_sets=[train_lgb, valid_lgb],
+                valid_names=["train", "valid"],
+                **train_params)
 
-        aucs.append(clf.best_score)
-        importance += clf.feature_importance(
-            importance_type="gain") / len(splits)
+            aucs.append(clf.best_score)
+            importance += clf.feature_importance(
+                importance_type="gain") / len(splits)
 
-    # Check the feature importance
-    feature_imp = pd.DataFrame(
-        sorted(zip(importance, cols)), columns=["value", "feature"])
+        # Check the feature importance
+        feature_imp = pd.DataFrame(
+            sorted(zip(importance, cols)), columns=["value", "feature"])
 
-    plt.figure(figsize=(20, 10))
-    sns.barplot(
-        x="value",
-        y="feature",
-        data=feature_imp.sort_values(by="value", ascending=False).head(50))
-    plt.title("LightGBM Features")
-    plt.tight_layout()
-    plt.savefig(output_dir / "feature_importance_adv.png")
+        plt.figure(figsize=(20, 10))
+        sns.barplot(
+            x="value",
+            y="feature",
+            data=feature_imp.sort_values(by="value", ascending=False).head(50))
+        plt.title("LightGBM Features")
+        plt.tight_layout()
+        plt.savefig(output_dir / "feature_importance_adv.png")
 
-    config["av_result"] = dict()
-    config["av_result"]["score"] = dict()
-    for i, auc in enumerate(aucs):
-        config["av_result"]["score"][f"fold{i}"] = auc
+        config["av_result"] = dict()
+        config["av_result"]["score"] = dict()
+        for i, auc in enumerate(aucs):
+            config["av_result"]["score"][f"fold{i}"] = auc
 
-    config["av_result"]["feature_importances"] = \
-        feature_imp.set_index("feature").sort_values(
-            by="value",
-            ascending=False
-        ).to_dict()["value"]
+        config["av_result"]["feature_importances"] = \
+            feature_imp.set_index("feature").sort_values(
+                by="value",
+                ascending=False
+            ).to_dict()["value"]
+
+    # ===============================
+    # === Feature Selection with importance
+    # ===============================
+    # get folds
+    x_train["group"] = groups
+    splits = get_validation(x_train, config)
+    x_train.drop("group", axis=1, inplace=True)
+
+    feature_selection_config = {
+        "model": {
+            "name": "lgbm",
+            "mode": "regression",
+            "sampling": {
+                "name": "none"
+            },
+            "model_params": {
+                "boosting_type": "gbdt",
+                "max_depth": 6,
+                "num_leaves": 25,
+                "learning_rate": 0.01,
+                "subsample": 0.8,
+                "subsample_freq": 1,
+                "colsample_bytree": 0.7,
+                "data_random_seed": 9999,
+                "seed": 9999,
+                "bagging_seed": 9999,
+                "feature_fraction_seed": 9999,
+                "reg_alpha": 0.1,
+                "min_split_gain": 0.5,
+                "reg_lambda": 0.1,
+                "min_data_in_leaf": 100,
+                "n_jobs": -1,
+                "verbose": -1,
+                "first_metric_only": True
+            },
+            "train_params": {
+                "num_boost_round": 5000,
+                "early_stopping_rounds": 100,
+                "verbose_eval": 100
+            }
+        },
+        "post_process": {
+            "params": {
+                "reverse": False,
+                "n_overall": 20,
+                "n_classwise": 20
+            }
+        }
+    }
+    with timer("Feature Selection with importance"):
+        model = get_model(feature_selection_config)
+        _, _, _, _, feature_importance, _ = model.cv(
+            y_train,
+            x_train[cols],
+            x_test[cols],
+            y_valid,
+            x_valid[cols],
+            feature_name=cols,
+            folds_ids=splits,
+            config=feature_selection_config,
+            log=True)
+
+        feature_imp = feature_importance.reset_index().rename(
+            columns={
+                "index": "feature",
+                0: "value"
+            })
+        cols = select_features(
+            cols,
+            feature_imp,
+            config,
+            delete_higher_importance=False)
+        logging.info(f"Train cols: {len(cols)}")
+        x_train, x_valid, x_test = x_train[cols], x_valid[cols], x_test[cols]
 
     # ===============================
     # === Train model
