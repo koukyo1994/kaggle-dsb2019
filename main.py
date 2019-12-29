@@ -26,7 +26,8 @@ if __name__ == "__main__":
         ModifiedUnified, UnifiedWithInstallationIDStats, RenewedFeatures,
         PastActivity, ImprovedBasic, ImprovedPastAssessment, ImprovedPastGame,
         PastSummary, PastSummary2)
-    from src.validation import get_validation, select_features
+    from src.validation import (get_validation, select_features,
+                                remove_correlated_features)
     from src.models import get_model
     from src.evaluation import (eval_with_truncated_data, GroupWiseOptimizer,
                                 calc_metric)
@@ -119,6 +120,16 @@ if __name__ == "__main__":
     logging.debug(f"number of features: {len(cols)}")
     logging.debug(f"number of train samples: {len(x_train)}")
     logging.debug(f"numbber of test samples: {len(x_test)}")
+
+    # ===============================
+    # === Feature Selection
+    # ===============================
+    with timer("Feature Selection"):
+        to_remove = remove_correlated_features(x_train, cols)
+
+    cols = [col for col in cols if col not in to_remove]
+    logging.info('Training with {} features'.format(len(cols)))
+    x_train, x_valid, x_test = x_train[cols], x_valid[cols], x_test[cols]
 
     # ===============================
     # === Adversarial Validation

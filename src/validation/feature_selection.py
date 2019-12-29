@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from typing import List
@@ -21,3 +22,19 @@ def select_features(cols: List[str], feature_importance: pd.DataFrame,
         for col in remove_cols:
             cols.remove(col)
     return cols
+
+
+def remove_correlated_features(df: pd.DataFrame, features: List[str]):
+    counter = 0
+    to_remove: List[str] = []
+    for feat_a in features:
+        for feat_b in features:
+            if feat_a != feat_b and feat_a not in to_remove and \
+                    feat_b not in to_remove:
+                c = np.corrcoef(df[feat_a], df[feat_b])[0][1]
+                if c > 0.995:
+                    counter += 1
+                    to_remove.append(feat_b)
+                    print('{}: FEAT_A: {} FEAT_B: {} - Correlation: {}'.format(
+                        counter, feat_a, feat_b, c))
+    return to_remove
