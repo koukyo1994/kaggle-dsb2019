@@ -1,0 +1,432 @@
+{
+    "dataset": {
+        "dir": "input/data-science-bowl-2019/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "av": {
+        "params": {},
+        "split_params": {
+            "random_state": 42,
+            "n_splits": 5
+        },
+        "model_params": {
+            "objective": "binary",
+            "metric": "auc",
+            "boosting": "gbdt",
+            "max_depth": 7,
+            "num_leaves": 75,
+            "learning_rate": 0.01,
+            "colsample_bytree": 0.7,
+            "subsample": 0.1,
+            "subsample_freq": 1,
+            "seed": 111,
+            "feature_fraction_seed": 111,
+            "drop_seed": 111,
+            "verbose": -1,
+            "first_metric_only": true
+        },
+        "train_params": {
+            "num_boost_round": 10000,
+            "early_stopping_rounds": 200,
+            "verbose_eval": 200
+        }
+    },
+    "model": {
+        "name": "catboost",
+        "sampling": {
+            "name": "none",
+            "params": {}
+        },
+        "model_params": {
+            "loss_function": "MultiClass",
+            "task_type": "CPU",
+            "iterations": 6000,
+            "learning_rate": 0.03,
+            "bagging_temperature": 0.8,
+            "l2_leaf_reg": 1,
+            "random_strength": 1,
+            "early_stopping_rounds": 100,
+            "random_seed": 42
+        },
+        "train_params": {
+            "mode": "multiclass"
+        },
+        "mode": "multiclass"
+    },
+    "post_process": {
+        "params": {
+            "reverse": false,
+            "n_overall": 20,
+            "n_classwise": 20
+        }
+    },
+    "val": {
+        "name": "group_kfold",
+        "params": {
+            "n_splits": 5,
+            "random_state": 111
+        },
+        "n_delete": 0.8
+    },
+    "output_dir": "output",
+    "features": [
+        "PastSummary2"
+    ],
+    "args": {
+        "config": "config/cat_13_top20per_multiclass.yml"
+    },
+    "model_output_dir": "output/cat_13_top20per_multiclass",
+    "av_result": {
+        "score": {
+            "fold0": {
+                "train": {
+                    "auc": 0.9409271865215284
+                },
+                "valid": {
+                    "auc": 0.5558646057660015
+                }
+            },
+            "fold1": {
+                "train": {
+                    "auc": 0.7215298479423681
+                },
+                "valid": {
+                    "auc": 0.5999305876769668
+                }
+            },
+            "fold2": {
+                "train": {
+                    "auc": 0.6887715011370993
+                },
+                "valid": {
+                    "auc": 0.5476451696087394
+                }
+            },
+            "fold3": {
+                "train": {
+                    "auc": 0.8869100725700789
+                },
+                "valid": {
+                    "auc": 0.603384506294245
+                }
+            },
+            "fold4": {
+                "train": {
+                    "auc": 0.8550843164026849
+                },
+                "valid": {
+                    "auc": 0.5984694804852166
+                }
+            }
+        },
+        "feature_importances": {
+            "duration_mean": 634.4581215405673,
+            "mean_4070_All Star Sorting": 610.0944518976434,
+            "mean_action_time_Dino Drink": 542.7864674677139,
+            "mean_action_time_Chow Time": 524.6546286397592,
+            "mean_action_time_All Star Sorting": 508.52781394101726,
+            "3110": 488.532322902143,
+            "Cart Balancer (Assessment)_mean_action_time": 480.567763949772,
+            "4070": 477.81662888450137,
+            "4020": 457.46051241580597,
+            "mean_action_time_Scrub-A-Dub": 455.12844343228267,
+            "mean_action_time_Happy Camel": 448.1358422637243,
+            "Cauldron Filler (Assessment)_mean_action_time": 445.7910885949712,
+            "4035": 425.0852985226007,
+            "4030": 420.0509308719462,
+            "1325467d": 419.59535681301395,
+            "Mushroom Sorter (Assessment)_mean_action_time": 415.601373736421,
+            "mean_target": 404.1362922505249,
+            "7372e1a5": 362.8739200258467,
+            "launched_ratio": 335.268243035828,
+            "2000": 330.0009395720395,
+            "Sandcastle Builder (Activity)_duration": 327.4047622507083,
+            "4022": 324.48764816121405,
+            "4090": 313.482200835983,
+            "success_ratio_Chow Time": 310.12331873474176,
+            "mean_incorrect_Scrub-A-Dub": 307.2182470917716,
+            "Bird Measurer (Assessment)_mean_action_time": 304.2947156879542,
+            "Bug Measurer (Activity)_duration": 302.5802911405781,
+            "3120": 301.70224555455667,
+            "Chest Sorter (Assessment)_mean_action_time": 298.84462636491577,
+            "363c86c9": 292.1949673323517,
+            "8fee50e2": 290.3996053759729,
+            "memory_decay_coeff_from_last_assess": 283.2172210918857,
+            "mean_incorrect_Chow Time": 283.2045420262595,
+            "27253bdc": 281.9857713274156,
+            "acf5c23f": 274.91110583525665,
+            "success_ratio_All Star Sorting": 265.4520694651025,
+            "3ee399c3": 262.7706102400596,
+            "3121": 259.796093535068,
+            "accumulated_acc": 258.3287727644223,
+            "84538528": 255.86548947195342,
+            "n_launched_False": 254.26417332931086,
+            "565a3990": 247.3452009286353,
+            "7da34a02": 240.24526603388384,
+            "Mushroom Sorter (Assessment)_time_to_get_success": 227.61618468824238,
+            "sand_filled_ratio": 226.99386544292975,
+            "mean_4070_Chow Time": 226.64807843018207,
+            "success_ratio_Scrub-A-Dub": 220.34163177207873,
+            "Bird Measurer (Assessment)_success_ratio": 217.53813909226704,
+            "mean_correct_Chow Time": 200.53420483649097,
+            "last_success_ratio_Dino Dive": 198.27700969241977,
+            "562cec5f": 193.83229362117126,
+            "success_ratio_Happy Camel": 183.61010352951288,
+            "mean_4070_Leaf Leader": 174.91201264800765,
+            "Cauldron Filler (Assessment)_4070_mean": 168.63321925614127,
+            "Mushroom Sorter (Assessment)_4070_mean": 167.97055336449776,
+            "last_success_ratio_Chow Time": 166.9969839054931,
+            "last_success_ratio_Scrub-A-Dub": 162.1777466448772,
+            "Mushroom Sorter (Assessment)_var_action_time": 159.67642004522858,
+            "accumulated_failed_attempts": 158.73512058119485,
+            "a8efe47b": 158.70960478548076,
+            "mean_action_time_same_assess": 158.5921112573529,
+            "Crystal Caves - Level 2_2000": 156.79351542310397,
+            "mean_incorrect_Pan Balance": 151.31304990495423,
+            "Mushroom Sorter (Assessment)_4070": 147.27513472236458,
+            "accumulated_accuracy_group": 140.42992552316574,
+            "mean_incorrect_Happy Camel": 139.90185441537906,
+            "mean_incorrect_All Star Sorting": 139.29102638695912,
+            "2010": 138.0823320697853,
+            "mean_correct_Leaf Leader": 136.14282384493237,
+            "var_action_time_Dino Drink": 128.5592014862884,
+            "success_ratio_Crystals Rule": 128.23713443525284,
+            "Crystal Caves - Level 3_2000": 121.80280039977296,
+            "mean_incorrect_Crystals Rule": 121.04788002779388,
+            "success_ratio_Pan Balance": 115.09143781935691,
+            "var_action_time_Scrub-A-Dub": 112.81605354898275,
+            "Cart Balancer (Assessment)_success_ratio": 110.21721946759935,
+            "0db6d71d": 109.88393574412895,
+            "mean_correct_Pan Balance": 108.13669791154862,
+            "last_success_ratio_All Star Sorting": 106.84152669791382,
+            "n_last_correct_Dino Dive": 104.23528355793825,
+            "Crystal Caves - Level 1_2000": 103.39333400329897,
+            "mean_time_to_get_success_same_assess": 96.44298754243064,
+            "memory_decay_coeff_from_last_same_assess": 94.75437253619785,
+            "last_success_ratio_Leaf Leader": 93.06069313436164,
+            "Cauldron Filler (Assessment)_3020_mean": 92.80707586818025,
+            "mean_action_time_last_same_assess": 92.51512930717882,
+            "success_ratio_Air Show": 89.31536667019354,
+            "0": 86.16342276296655,
+            "session_title": 83.0153389800547,
+            "var_action_time_same_assess": 81.99989159669786,
+            "b120f2ac": 81.9853084231967,
+            "last_success_ratio_Crystals Rule": 77.75049171132179,
+            "decayed_accuracy_group_last_same_assess": 75.54353299928988,
+            "Chest Sorter (Assessment)_success_ratio": 68.76324638992519,
+            "Chest Sorter (Assessment)_var_action_time": 68.30586010179141,
+            "Cauldron Filler (Assessment)_3020_var": 67.84947973347772,
+            "mean_correct_Air Show": 66.46381173340706,
+            "f6947f54": 66.36653143937292,
+            "Chest Sorter (Assessment)_time_to_get_success": 63.20088274648006,
+            "Bird Measurer (Assessment)_accuracy_group": 60.190153265136914,
+            "Mushroom Sorter (Assessment)_success_ratio": 59.783939559561986,
+            "last_success_ratio_Happy Camel": 58.79857617689677,
+            "070a5291": 57.99035323525895,
+            "time_to_get_success_last_same_assess": 57.67864484994206,
+            "Mushroom Sorter (Assessment)_accuracy_group": 49.337350318940665,
+            "Cart Balancer (Assessment)_accuracy_group": 47.19013912675728,
+            "04df9b66": 46.09342121921581,
+            "Chest Sorter (Assessment)_accuracy_group": 44.712233161143374,
+            "last_success_ratio_Pan Balance": 43.687596189820034,
+            "decayed_success_ratio_last_same_assess": 42.80089361066257,
+            "n_last_correct_Leaf Leader": 42.13798475991061,
+            "success_ratio_same_assess": 34.793386043095964,
+            "decayed_n_failure_last_same_assess": 34.718332967797735,
+            "last_success_ratio_Air Show": 34.18545813560486,
+            "var_time_to_get_success_same_assess": 28.866120039857922,
+            "n_failure_same_assess": 24.296791438043876,
+            "n_last_correct_Air Show": 22.0073598751449,
+            "mean_accuracy_group_same_assess": 21.587674560758753,
+            "success_var_same_assess": 19.88105437275153,
+            "success_ratio_last_same_assess": 15.407988720247522,
+            "n_failure_last_same_assess": 10.146185663360301,
+            "accuracy_group_last_same_assess": 1.2879667907989643
+        }
+    },
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 0.6081810142997325,
+            "cv_score": {
+                "cv1": {
+                    "learn": {
+                        "MultiClass": -0.8742681411332758
+                    },
+                    "validation_0": {
+                        "MultiClass": -0.9664564758000993
+                    }
+                },
+                "cv2": {
+                    "learn": {
+                        "MultiClass": -0.867382366073257
+                    },
+                    "validation_0": {
+                        "MultiClass": -0.9642019411649101
+                    }
+                },
+                "cv3": {
+                    "learn": {
+                        "MultiClass": -0.8700356158450401
+                    },
+                    "validation_0": {
+                        "MultiClass": -0.9633825992608038
+                    }
+                },
+                "cv4": {
+                    "learn": {
+                        "MultiClass": -0.8529148010346731
+                    },
+                    "validation_0": {
+                        "MultiClass": -0.9679882985094254
+                    }
+                },
+                "cv5": {
+                    "learn": {
+                        "MultiClass": -0.8060498907169168
+                    },
+                    "validation_0": {
+                        "MultiClass": -0.9631901943567788
+                    }
+                }
+            },
+            "n_data": 17690,
+            "best_iteration": 701.2,
+            "n_features": 122,
+            "feature_importance": {
+                "mean_target": 22.14855091301834,
+                "session_title": 3.182002857326215,
+                "4070": 2.332008249247422,
+                "mean_accuracy_group_same_assess": 1.7422895879785874,
+                "accumulated_accuracy_group": 1.715778347270462,
+                "27253bdc": 1.6728987679733127,
+                "accumulated_acc": 1.6644918511087359,
+                "success_ratio_last_same_assess": 1.5063414368774155,
+                "3120": 1.5017075053423337,
+                "2000": 1.4276090388105922,
+                "time_to_get_success_last_same_assess": 1.4104959249426308,
+                "success_ratio_same_assess": 1.4066122425913963,
+                "decayed_accuracy_group_last_same_assess": 1.4065649137686795,
+                "accuracy_group_last_same_assess": 1.3383936576277962,
+                "3121": 1.3240432727478586,
+                "mean_correct_Chow Time": 1.3176327690459646,
+                "decayed_success_ratio_last_same_assess": 1.2328011512681643,
+                "mean_time_to_get_success_same_assess": 1.1243018883249096,
+                "mean_incorrect_Pan Balance": 1.0492414791406395,
+                "0": 0.9876852953394117,
+                "decayed_n_failure_last_same_assess": 0.978449076202533,
+                "4020": 0.8692575600283652,
+                "Mushroom Sorter (Assessment)_success_ratio": 0.8613866294362271,
+                "4030": 0.8243257649577569,
+                "Cauldron Filler (Assessment)_3020_mean": 0.787332716435548,
+                "Mushroom Sorter (Assessment)_accuracy_group": 0.7824619326782435,
+                "3110": 0.7735940553937931,
+                "Cauldron Filler (Assessment)_mean_action_time": 0.760397755317601,
+                "success_ratio_All Star Sorting": 0.7586912519296922,
+                "n_failure_last_same_assess": 0.7586470235816515,
+                "84538528": 0.753451740165066,
+                "sand_filled_ratio": 0.7517228612754414,
+                "mean_4070_Chow Time": 0.709177866923444,
+                "mean_incorrect_All Star Sorting": 0.7054791486144418,
+                "4035": 0.7029638764606886,
+                "success_ratio_Scrub-A-Dub": 0.7014476890080058,
+                "var_time_to_get_success_same_assess": 0.7010549698616231,
+                "var_action_time_Scrub-A-Dub": 0.6959048157052283,
+                "Chest Sorter (Assessment)_mean_action_time": 0.6866156263771624,
+                "mean_incorrect_Scrub-A-Dub": 0.6861966292235785,
+                "success_ratio_Happy Camel": 0.6849731023985682,
+                "launched_ratio": 0.6826844734066027,
+                "mean_action_time_All Star Sorting": 0.6633816977612238,
+                "last_success_ratio_All Star Sorting": 0.6566649177959147,
+                "Crystal Caves - Level 2_2000": 0.6490066352822941,
+                "n_failure_same_assess": 0.645048953726188,
+                "Bird Measurer (Assessment)_success_ratio": 0.6293217680558488,
+                "mean_correct_Leaf Leader": 0.6221519551515284,
+                "Crystal Caves - Level 3_2000": 0.6132149146422863,
+                "memory_decay_coeff_from_last_same_assess": 0.6008789513459208,
+                "7372e1a5": 0.5937300452100682,
+                "last_success_ratio_Happy Camel": 0.5895828289861621,
+                "0db6d71d": 0.5845099290597521,
+                "mean_action_time_Scrub-A-Dub": 0.5638485004219898,
+                "Cart Balancer (Assessment)_mean_action_time": 0.554001847484272,
+                "mean_action_time_Happy Camel": 0.5267713493607449,
+                "accumulated_failed_attempts": 0.5202291962601959,
+                "last_success_ratio_Pan Balance": 0.5183590438240016,
+                "success_ratio_Chow Time": 0.5021460675992742,
+                "2010": 0.49975993471037194,
+                "mean_action_time_last_same_assess": 0.4925700110087865,
+                "a8efe47b": 0.4923134598582222,
+                "success_ratio_Pan Balance": 0.4907863471652025,
+                "Sandcastle Builder (Activity)_duration": 0.49021357697502344,
+                "success_var_same_assess": 0.4791785581721843,
+                "memory_decay_coeff_from_last_assess": 0.4700436595677176,
+                "last_success_ratio_Dino Dive": 0.46610660235152357,
+                "Bird Measurer (Assessment)_accuracy_group": 0.4630172797677551,
+                "mean_incorrect_Chow Time": 0.4616029019608202,
+                "mean_incorrect_Crystals Rule": 0.45415148731271626,
+                "mean_action_time_same_assess": 0.45263828540755213,
+                "n_last_correct_Dino Dive": 0.44804872338886775,
+                "duration_mean": 0.4412257182800265,
+                "Chest Sorter (Assessment)_success_ratio": 0.43549204262152275,
+                "mean_4070_All Star Sorting": 0.42778059328731377,
+                "last_success_ratio_Chow Time": 0.423576973869633,
+                "success_ratio_Air Show": 0.42071795425177283,
+                "var_action_time_same_assess": 0.4182592690008155,
+                "Mushroom Sorter (Assessment)_time_to_get_success": 0.41379152271649355,
+                "Cauldron Filler (Assessment)_4070_mean": 0.40642458748758103,
+                "Bug Measurer (Activity)_duration": 0.4046828814113176,
+                "last_success_ratio_Leaf Leader": 0.3950408125038842,
+                "acf5c23f": 0.3890252871562134,
+                "n_last_correct_Leaf Leader": 0.3865774973040959,
+                "last_success_ratio_Crystals Rule": 0.38349553010536863,
+                "1325467d": 0.38216222354504514,
+                "562cec5f": 0.3809049785116909,
+                "n_launched_False": 0.37519370113695033,
+                "3ee399c3": 0.35993847924884237,
+                "mean_action_time_Dino Drink": 0.35370885744183306,
+                "success_ratio_Crystals Rule": 0.35227727982609575,
+                "Bird Measurer (Assessment)_mean_action_time": 0.35211628154101277,
+                "Chest Sorter (Assessment)_time_to_get_success": 0.3459303808678041,
+                "4022": 0.33741244326494446,
+                "4090": 0.33723925841994407,
+                "Chest Sorter (Assessment)_accuracy_group": 0.33356814155526504,
+                "mean_action_time_Chow Time": 0.3192040567839219,
+                "04df9b66": 0.31397018610345157,
+                "b120f2ac": 0.311664149577931,
+                "mean_correct_Pan Balance": 0.3110149111650494,
+                "f6947f54": 0.30598626009466523,
+                "last_success_ratio_Air Show": 0.30594852996074556,
+                "363c86c9": 0.29498668054004595,
+                "mean_4070_Leaf Leader": 0.2939372390562001,
+                "last_success_ratio_Scrub-A-Dub": 0.2926664974083312,
+                "Mushroom Sorter (Assessment)_4070_mean": 0.2766950658600538,
+                "mean_incorrect_Happy Camel": 0.27222867393485145,
+                "7da34a02": 0.269496751464949,
+                "565a3990": 0.26918759283682203,
+                "Crystal Caves - Level 1_2000": 0.2623434705736344,
+                "Cauldron Filler (Assessment)_3020_var": 0.24501762269110933,
+                "Mushroom Sorter (Assessment)_4070": 0.24407374313194766,
+                "Mushroom Sorter (Assessment)_var_action_time": 0.22369358076329426,
+                "Mushroom Sorter (Assessment)_mean_action_time": 0.22368318373417123,
+                "Cart Balancer (Assessment)_success_ratio": 0.21879952913979372,
+                "8fee50e2": 0.21130324822498614,
+                "mean_correct_Air Show": 0.19597489684721153,
+                "var_action_time_Dino Drink": 0.19202039636463503,
+                "Chest Sorter (Assessment)_var_action_time": 0.18374394517386153,
+                "070a5291": 0.15912626213986042,
+                "Cart Balancer (Assessment)_accuracy_group": 0.15170920794511172,
+                "n_last_correct_Air Show": 0.09403447838136966
+            }
+        },
+        "valid_score": 0.5818110125172331
+    },
+    "truncated_eval_mean": 0.5526862379662684,
+    "truncated_eval_0.95lower": 0.5336504105473128,
+    "truncated_eval_0.95upper": 0.571722065385224,
+    "truncated_eval_std": 0.009517913709477816,
+    "truncated_group_eval_mean": 0.5538156879464392,
+    "truncated_group_eval_0.95lower": 0.5366101736656405,
+    "truncated_group_eval_0.95upper": 0.571021202227238,
+    "truncated_group_eval_std": 0.008602757140399386,
+    "group_optimized_qwk": 0.5974015060658757
+}
