@@ -132,72 +132,6 @@ if __name__ == "__main__":
     x_train, x_valid, x_test = x_train[cols], x_valid[cols], x_test[cols]
 
     # ===============================
-    # === Adversarial Validation
-    # ===============================
-    logging.info("Adversarial Validation")
-    with timer("Adversarial Validation"):
-        train_adv = x_train.copy()
-        test_adv = x_valid.copy()
-
-        train_adv["target"] = 0
-        test_adv["target"] = 1
-        groups_adv = np.concatenate([groups, groups_valid])
-        train_test_adv = pd.concat([train_adv, test_adv], axis=0,
-                            sort=False).reset_index(drop=True)
-
-        train_test_adv["group"] = groups_adv
-        splits = get_validation(train_test_adv, config)
-        train_test_adv.drop("group", axis=1, inplace=True)
-
-        aucs = []
-        importance = np.zeros(len(cols))
-        for trn_idx, val_idx in splits:
-            x_train_adv = train_test_adv.loc[trn_idx, cols]
-            y_train_adv = train_test_adv.loc[trn_idx, "target"]
-            x_val_adv = train_test_adv.loc[val_idx, cols]
-            y_val_adv = train_test_adv.loc[val_idx, "target"]
-
-            train_lgb = lgb.Dataset(x_train_adv, label=y_train_adv)
-            valid_lgb = lgb.Dataset(x_val_adv, label=y_val_adv)
-
-            model_params = config["av"]["model_params"]
-            train_params = config["av"]["train_params"]
-            clf = lgb.train(
-                model_params,
-                train_lgb,
-                valid_sets=[train_lgb, valid_lgb],
-                valid_names=["train", "valid"],
-                **train_params)
-
-            aucs.append(clf.best_score)
-            importance += clf.feature_importance(
-                importance_type="gain") / len(splits)
-
-        # Check the feature importance
-        feature_imp = pd.DataFrame(
-            sorted(zip(importance, cols)), columns=["value", "feature"])
-
-        plt.figure(figsize=(20, 10))
-        sns.barplot(
-            x="value",
-            y="feature",
-            data=feature_imp.sort_values(by="value", ascending=False).head(50))
-        plt.title("LightGBM Features")
-        plt.tight_layout()
-        plt.savefig(output_dir / "feature_importance_adv.png")
-
-        config["av_result"] = dict()
-        config["av_result"]["score"] = dict()
-        for i, auc in enumerate(aucs):
-            config["av_result"]["score"][f"fold{i}"] = auc
-
-        config["av_result"]["feature_importances"] = \
-            feature_imp.set_index("feature").sort_values(
-                by="value",
-                ascending=False
-            ).to_dict()["value"]
-
-    # ===============================
     # === Feature Selection with importance
     # ===============================
     # get folds
@@ -273,28 +207,96 @@ if __name__ == "__main__":
         x_train, x_valid, x_test = x_train[cols], x_valid[cols], x_test[cols]
 
     # ===============================
+    # === Adversarial Validation
+    # ===============================
+    logging.info("Adversarial Validation")
+    with timer("Adversarial Validation"):
+        train_adv = x_train.copy()
+        test_adv = x_valid.copy()
+
+        train_adv["target"] = 0
+        test_adv["target"] = 1
+        groups_adv = np.concatenate([groups, groups_valid])
+        train_test_adv = pd.concat(
+            [train_adv, test_adv],
+            axis=0,
+            sort=False).reset_index(drop=True)
+
+        train_test_adv["group"] = groups_adv
+        splits = get_validation(train_test_adv, config)
+        train_test_adv.drop("group", axis=1, inplace=True)
+
+        aucs = []
+        importance = np.zeros(len(cols))
+        for trn_idx, val_idx in splits:
+            x_train_adv = train_test_adv.loc[trn_idx, cols]
+            y_train_adv = train_test_adv.loc[trn_idx, "target"]
+            x_val_adv = train_test_adv.loc[val_idx, cols]
+            y_val_adv = train_test_adv.loc[val_idx, "target"]
+
+            train_lgb = lgb.Dataset(x_train_adv, label=y_train_adv)
+            valid_lgb = lgb.Dataset(x_val_adv, label=y_val_adv)
+
+            model_params = config["av"]["model_params"]
+            train_params = config["av"]["train_params"]
+            clf = lgb.train(
+                model_params,
+                train_lgb,
+                valid_sets=[train_lgb, valid_lgb],
+                valid_names=["train", "valid"],
+                **train_params)
+
+            aucs.append(clf.best_score)
+            importance += clf.feature_importance(
+                importance_type="gain") / len(splits)
+
+        # Check the feature importance
+        feature_imp = pd.DataFrame(
+            sorted(zip(importance, cols)), columns=["value", "feature"])
+
+        plt.figure(figsize=(20, 10))
+        sns.barplot(
+            x="value",
+            y="feature",
+            data=feature_imp.sort_values(by="value", ascending=False).head(50))
+        plt.title("LightGBM Features")
+        plt.tight_layout()
+        plt.savefig(output_dir / "feature_importance_adv.png")
+
+        config["av_result"] = dict()
+        config["av_result"]["score"] = dict()
+        for i, auc in enumerate(aucs):
+            config["av_result"]["score"][f"fold{i}"] = auc
+
+        config["av_result"]["feature_importances"] = \
+            feature_imp.set_index("feature").sort_values(
+                by="value",
+                ascending=False
+            ).to_dict()["value"]
+
+    # ===============================
     # === Train model
     # ===============================
     logging.info("Train model")
 
     # get folds
-    x_train["group"] = groups
-    splits = get_validation(x_train, config)
-    x_train.drop("group", axis=1, inplace=True)
+    with timer("Train model"):
+        x_train["group"] = groups
+        splits = get_validation(x_train, config)
+        x_train.drop("group", axis=1, inplace=True)
 
-    cols = select_features(cols, feature_imp, config)
-
-    model = get_model(config)
-    models, oof_preds, test_preds, valid_preds, feature_importance, eval_results = model.cv(
-        y_train,
-        x_train[cols],
-        x_test[cols],
-        y_valid,
-        x_valid[cols],
-        feature_name=cols,
-        folds_ids=splits,
-        config=config,
-        log=True)
+        model = get_model(config)
+        models, oof_preds, test_preds, valid_preds, \
+            feature_importance, eval_results = model.cv(
+                y_train,
+                x_train[cols],
+                x_test[cols],
+                y_valid,
+                x_valid[cols],
+                feature_name=cols,
+                folds_ids=splits,
+                config=config,
+                log=True)
 
     config["eval_results"] = dict()
     for k, v in eval_results.items():
