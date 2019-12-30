@@ -25,7 +25,7 @@ if __name__ == "__main__":
         Basic, generate_features, PastAssessment, PastClip, PastGame, Unified,
         ModifiedUnified, UnifiedWithInstallationIDStats, RenewedFeatures,
         PastActivity, ImprovedBasic, ImprovedPastAssessment, ImprovedPastGame,
-        PastSummary, PastSummary2)
+        PastSummary, PastSummary2, PastSummary3)
     from src.validation import (get_validation, select_features,
                                 remove_correlated_features)
     from src.models import get_model
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     input_dir = Path(config["dataset"]["dir"])
 
     if not feature_existence_checker(feature_dir, config["features"]):
-        with timer(name="load data", log=True):
+        with timer(name="load data"):
             if args.dryrun:
                 train = pd.read_csv(input_dir / "train.csv", nrows=50000)
                 test = pd.read_csv(input_dir / "test.csv", nrows=50000)
@@ -73,13 +73,14 @@ if __name__ == "__main__":
                 test = pd.read_csv(input_dir / "test.csv")
             sample_submission = pd.read_csv(
                 input_dir / "sample_submission.csv")
-        generate_features(
-            train,
-            test,
-            namespace=globals(),
-            required=config["features"],
-            overwrite=args.force,
-            log=True)
+        with timer(name="generate features"):
+            generate_features(
+                train,
+                test,
+                namespace=globals(),
+                required=config["features"],
+                overwrite=args.force,
+                log=True)
 
         del train, test
         gc.collect()
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     if args.dryrun:
         exit(0)
 
-    with timer("feature laoding", log=True):
+    with timer("feature laoding"):
         x_train = pd.concat([
             pd.read_feather(feature_dir / (f + "_train.ftr"), nthreads=-1)
             for f in config["features"]
