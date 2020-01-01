@@ -27,10 +27,12 @@ if __name__ == "__main__":
         PastActivity, ImprovedBasic, ImprovedPastAssessment, ImprovedPastGame,
         PastSummary, PastSummary2, PastSummary3)
     from src.validation import (get_validation, select_features,
-                                remove_correlated_features)
+                                remove_correlated_features,
+                                get_assessment_number)
     from src.models import get_model
     from src.evaluation import (eval_with_truncated_data, GroupWiseOptimizer,
-                                calc_metric)
+                                calc_metric,
+                                truncated_cv_with_adjustment_of_distribution)
 
     seed_everything(42)
 
@@ -110,6 +112,9 @@ if __name__ == "__main__":
 
     groups = x_train["installation_id"].values
     groups_valid = x_valid["installation_id"].values
+
+    test_nth_assessment = get_assessment_number(x_valid, x_test)
+
     y_train = x_train["accuracy_group"].values.reshape(-1)
     y_valid = x_valid["accuracy_group"].values.reshape(-1)
     cols: List[str] = x_train.columns.tolist()
@@ -347,6 +352,20 @@ if __name__ == "__main__":
     config["truncated_eval_0.95lower"] = truncated_result["0.95lower_bound"]
     config["truncated_eval_0.95upper"] = truncated_result["0.95upper_bound"]
     config["truncated_eval_std"] = truncated_result["std"]
+
+    truncated_result2 = truncated_cv_with_adjustment_of_distribution(
+        oof_preds,
+        y_train,
+        groups,
+        test_nth_assessment,
+        n_trials=100)
+
+    config["truncated_eval_mean_adjust"] = truncated_result2["mean"]
+    config["truncated_eval_0.95lower_adjust"] = \
+        truncated_result2["0.95lower_bound"]
+    config["truncated_eval_0.95upper_adjust"] = \
+        truncated_result2["0.95upper_bound"]
+    config["truncated_eval_std_adjust"] = truncated_result2["std"]
 
     group_truncated_result = eval_with_truncated_data(
         group_optimized_oof, y_train, groups, n_trials=100)
