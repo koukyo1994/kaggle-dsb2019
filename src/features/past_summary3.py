@@ -17,16 +17,13 @@ IoS = Union[int, str]
 
 
 class PastSummary3(Feature):
-    def create_features(self, train: pd.DataFrame, test: pd.DataFrame):
-        train_df = train.copy()
-        test_df = test.copy()
-
+    def create_features(self, train_df: pd.DataFrame, test_df: pd.DataFrame):
         train_df["title_event_code"] = list(
-            map(lambda x, y: str(x) + "_" + str(y), train["title"],
-                train["event_code"]))
+            map(lambda x, y: str(x) + "_" + str(y), train_df["title"],
+                train_df["event_code"]))
         test_df["title_event_code"] = list(
-            map(lambda x, y: str(x) + "_" + str(y), test["title"],
-                test["event_code"]))
+            map(lambda x, y: str(x) + "_" + str(y), test_df["title"],
+                test_df["event_code"]))
 
         event_codes = [
             2000, 4070, 3120, 3121, 4020, 4035, 4030, 3110, 4022, 2010, 4090
@@ -298,6 +295,11 @@ def past_summary_features(
 
             features["session_title"] = sess_title
             features["world"] = world
+            features["month"] = sess["month"].iloc[0]
+            features["year"] = sess["year"].iloc[0]
+            features["hour"] = sess["hour"].iloc[0]
+            features["dayofweek"] = sess["dayofweek"].iloc[0]
+            features["weekofyear"] = sess["weekofyear"].iloc[0]
 
             features["accumulated_correct_attempts"] = \
                 accumulated_correct_attempts
