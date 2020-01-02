@@ -121,7 +121,6 @@ class BaseModel2(object):
         sorted_idx = np.argsort(idx_val)
         oof_preds = oof_preds[sorted_idx]
         y_oof = y_oof[sorted_idx]
-        print(idx_val[sorted_idx])
 
         # save raw prediction
         self.raw_oof_preds = oof_preds
