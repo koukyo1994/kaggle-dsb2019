@@ -1,0 +1,435 @@
+{
+    "dataset": {
+        "dir": "input/data-science-bowl-2019/",
+        "feature_dir": "features",
+        "params": null
+    },
+    "av": {
+        "params": {},
+        "split_params": {
+            "n_splits": 5,
+            "random_state": 42
+        },
+        "model_params": {
+            "objective": "binary",
+            "metric": "auc",
+            "boosting": "gbdt",
+            "max_depth": 7,
+            "num_leaves": 75,
+            "learning_rate": 0.01,
+            "colsample_bytree": 0.7,
+            "subsample": 0.1,
+            "subsample_freq": 1,
+            "seed": 111,
+            "feature_fraction_seed": 111,
+            "drop_seed": 111,
+            "verbose": -1,
+            "n_jobs": -1,
+            "first_metric_only": true
+        },
+        "train_params": {
+            "num_boost_round": 50000,
+            "early_stopping_rounds": 200,
+            "verbose_eval": 200
+        }
+    },
+    "model": {
+        "name": "lgbm2",
+        "sampling": {
+            "name": "none",
+            "params": {
+                "k_neighbors": 7,
+                "n_jobs": 4,
+                "random_state": 42,
+                "acc_0_coef": 1.0,
+                "acc_1_coef": 1.0,
+                "acc_2_coef": 1.0,
+                "acc_3_coef": 1.0
+            }
+        },
+        "model_params": {
+            "objective": "multiclass",
+            "num_class": 4,
+            "boosting_type": "gbdt",
+            "max_depth": 6,
+            "num_leaves": 25,
+            "tree_learner": "serial",
+            "learning_rate": 0.01,
+            "subsample": 0.8,
+            "subsample_freq": 1,
+            "colsample_bytree": 0.7,
+            "data_random_seed": 71,
+            "seed": 71,
+            "bagging_seed": 71,
+            "feature_fraction_seed": 71,
+            "drop_seed": 71,
+            "reg_alpha": 0.1,
+            "min_split_gain": 0.5,
+            "reg_lambda": 0.1,
+            "min_data_in_leaf": 100,
+            "verbose": -1,
+            "n_jobs": -1,
+            "first_metric_only": true
+        },
+        "train_params": {
+            "num_boost_round": 10000,
+            "early_stopping_rounds": 100,
+            "verbose_eval": 100
+        },
+        "mode": "multiclass"
+    },
+    "post_process": {
+        "params": {
+            "reverse": false,
+            "n_overall": 20,
+            "n_classwise": 20
+        }
+    },
+    "val": {
+        "name": "stratified_group_kfold",
+        "params": {
+            "n_splits": 5,
+            "random_state": 111
+        },
+        "n_delete": 0.6
+    },
+    "output_dir": "output",
+    "features": [
+        "PastSummary3"
+    ],
+    "args": {
+        "config": "config/lgb_35_stratified_group_kfold.yml"
+    },
+    "model_output_dir": "output/lgb_35_stratified_group_kfold",
+    "av_result": {
+        "score": {
+            "fold0": {
+                "train": {
+                    "auc": 0.6167913031042411
+                },
+                "valid": {
+                    "auc": 0.5661797560201096
+                }
+            },
+            "fold1": {
+                "train": {
+                    "auc": 0.6429888193204446
+                },
+                "valid": {
+                    "auc": 0.5306561447501045
+                }
+            },
+            "fold2": {
+                "train": {
+                    "auc": 0.913025786797867
+                },
+                "valid": {
+                    "auc": 0.5169002194176873
+                }
+            },
+            "fold3": {
+                "train": {
+                    "auc": 0.8122771296808681
+                },
+                "valid": {
+                    "auc": 0.6172773206596459
+                }
+            },
+            "fold4": {
+                "train": {
+                    "auc": 0.9476508867812066
+                },
+                "valid": {
+                    "auc": 0.5528350271018775
+                }
+            }
+        },
+        "feature_importances": {
+            "duration_mean": 615.0864099522303,
+            "mean_4070_All Star Sorting": 610.7070416106583,
+            "4070": 520.067486408449,
+            "mean_action_time_All Star Sorting": 515.3201844501759,
+            "4035": 506.26272505065697,
+            "hour": 504.51854976391115,
+            "mean_action_time_Dino Drink": 482.3083033941668,
+            "mean_action_time_Scrub-A-Dub": 474.7757632667761,
+            "4030": 441.02222902487154,
+            "mean_target": 436.7788943189644,
+            "3110": 436.7146666688219,
+            "mean_action_time_Happy Camel": 425.31841776505627,
+            "4020": 407.4536382725544,
+            "Cauldron Filler (Assessment)_mean_var_action_time": 395.6777461080717,
+            "27253bdc": 392.0018375347581,
+            "4022": 389.87613596291226,
+            "Bug Measurer (Activity)_duration": 383.10958104279143,
+            "3120": 381.9021923198353,
+            "Sandcastle Builder (Activity)_4070": 377.84497083858673,
+            "launched_ratio": 365.44927853307024,
+            "Sandcastle Builder (Activity)_duration": 362.1486170548709,
+            "memory_decay_coeff_from_last_assess": 357.6237005551363,
+            "accumulated_actions": 354.01394438861644,
+            "mean_incorrect_Scrub-A-Dub": 347.69237465172523,
+            "Mushroom Sorter (Assessment)_mean_action_time": 339.23658265455583,
+            "success_ratio_Chow Time": 330.600083451655,
+            "4090": 330.237753225254,
+            "Cart Balancer (Assessment)_4070_mean": 329.67692472823876,
+            "3121": 326.31008269564353,
+            "mean_incorrect_Dino Dive": 316.8366822994423,
+            "sand_filled_ratio": 316.2110583795235,
+            "Chow Time_4070": 313.489934215387,
+            "2000": 312.90977129744215,
+            "Cauldron Filler (Assessment)_mean_action_time": 310.66971873274906,
+            "Mushroom Sorter (Assessment)_mean_var_action_time": 290.06507974236666,
+            "success_ratio_Dino Dive": 279.51483501725727,
+            "mean_incorrect_Chow Time": 273.69237373851354,
+            "Chest Sorter (Assessment)_mean_var_action_time": 268.3991417365999,
+            "Bug Measurer (Activity)_4035": 268.08416221157347,
+            "Cauldron Filler (Assessment)_4070": 267.6475795988291,
+            "accumulated_acc": 266.1294155024558,
+            "Mushroom Sorter (Assessment)_time_to_get_success": 263.1265206244417,
+            "mean_4070_Chow Time": 262.16127219130266,
+            "Chest Sorter (Assessment)_mean_action_time": 261.6199044597014,
+            "Bird Measurer (Assessment)_success_ratio": 260.77022706957086,
+            "mean_correct_Bubble Bath": 260.0377784971317,
+            "Bird Measurer (Assessment)_4020": 257.5761993517579,
+            "Mushroom Sorter (Assessment)_4070_mean": 251.06019268089713,
+            "success_ratio_All Star Sorting": 244.22213458285896,
+            "Sandcastle Builder (Activity)_4020": 236.03644599669684,
+            "last_success_ratio_Chow Time": 233.55103991469002,
+            "success_ratio_Bubble Bath": 232.20410839316992,
+            "n_launched_False": 220.29320607943285,
+            "success_ratio_Scrub-A-Dub": 216.2013392339432,
+            "Cauldron Filler (Assessment)_4070_mean": 202.26156198717922,
+            "Mushroom Sorter (Assessment)_4070": 202.00299094777074,
+            "success_ratio_Crystals Rule": 195.59304549212703,
+            "success_ratio_Happy Camel": 191.63933368110156,
+            "mean_4070_Leaf Leader": 185.3717788590591,
+            "accumulated_accuracy_group": 174.41847577947593,
+            "last_success_ratio_Scrub-A-Dub": 168.98633307721428,
+            "Crystal Caves - Level 1_2000": 163.8474132012634,
+            "mean_correct_Chow Time": 162.05769081609725,
+            "Mushroom Sorter (Assessment)_var_mean_action_time": 160.7930264143174,
+            "0": 158.5314910716501,
+            "accumulated_failed_attempts": 157.56208494541465,
+            "mean_incorrect_Pan Balance": 156.98968223357076,
+            "Cart Balancer (Assessment)_success_ratio": 156.8850909814304,
+            "Cauldron Filler (Assessment)_success_ratio": 153.2922321067912,
+            "Mushroom Sorter (Assessment)_success_ratio": 153.11289770810194,
+            "Crystal Caves - Level 2_2000": 151.5174236491104,
+            "last_success_ratio_All Star Sorting": 150.2397728468619,
+            "mean_correct_Leaf Leader": 149.23806094590364,
+            "mean_incorrect_All Star Sorting": 147.00411282888527,
+            "mean_incorrect_Crystals Rule": 143.0461511546786,
+            "mean_action_time_same_assess": 139.8165127242264,
+            "last_success_ratio_Happy Camel": 136.97230915813998,
+            "mean_var_action_time_same_assess": 135.45932207733594,
+            "success_ratio_Air Show": 135.08060119721995,
+            "session_title": 127.79164785164176,
+            "var_action_time_Dino Drink": 125.33272113687198,
+            "memory_decay_coeff_from_last_same_assess": 123.93630828920932,
+            "var_action_time_last_same_assess": 121.42778379741675,
+            "success_ratio_Pan Balance": 118.79321913184648,
+            "Bird Measurer (Assessment)_accuracy_group": 118.72945397545118,
+            "var_action_time_Scrub-A-Dub": 116.67606256039362,
+            "Crystal Caves - Level 3_2000": 116.04799180474275,
+            "Chest Sorter (Assessment)_4020": 115.04611432250749,
+            "var_action_time_same_assess": 113.97951130681085,
+            "2010": 106.32017068446203,
+            "Chest Sorter (Assessment)_success_ratio": 100.38331889303227,
+            "n_last_correct_Dino Dive": 90.90201788792619,
+            "mean_action_time_last_same_assess": 89.0246310540133,
+            "time_to_get_success_last_same_assess": 87.15203908326731,
+            "last_success_ratio_Pan Balance": 86.36550847178879,
+            "All Star Sorting_2025": 83.95730226594132,
+            "last_success_ratio_Crystals Rule": 75.90349023775124,
+            "mean_timte_to_get_success_same_assess": 75.73185573737138,
+            "Cauldron Filler (Assessment)_3020_mean": 73.13607916939691,
+            "decayed_accuracy_group_last_same_assess": 70.01685008647037,
+            "Chest Sorter (Assessment)_var_mean_action_time": 68.8136798175963,
+            "Mushroom Sorter (Assessment)_accuracy_group": 67.67129678067249,
+            "Chest Sorter (Assessment)_time_to_get_success": 59.08122203693202,
+            "world": 43.27834490282694,
+            "success_var_same_assess": 43.175544905662534,
+            "last_success_ratio_Air Show": 34.536874344584795,
+            "Chest Sorter (Assessment)_accuracy_group": 33.8013379514683,
+            "decayed_success_ratio_last_same_assess": 33.770396338056884,
+            "decayed_n_failure_last_same_assess": 32.790723237943894,
+            "var_time_to_get_success_same_assess": 31.58328048503354,
+            "success_ratio_same_assess": 30.78549400696793,
+            "n_last_correct_Leaf Leader": 30.101942957751454,
+            "Cauldron Filler (Assessment)_3020": 29.182221504468906,
+            "n_failure_same_assess": 21.885565902947565,
+            "n_failure_last_same_assess": 19.55202123147901,
+            "n_last_correct_Air Show": 15.097604978655,
+            "mean_accuracy_group_same_assess": 12.91837620772867,
+            "success_ratio_last_same_assess": 6.424431884288788,
+            "accuracy_group_last_same_assess": 0.0002710940083488822
+        }
+    },
+    "eval_results": {
+        "evals_result": {
+            "oof_score": 0.598143501249492,
+            "normal_oof_score": 0.6101101865150905,
+            "truncated_eval_mean": 0.562966050476129,
+            "truncated_eval_0.95upper": 0.5803939872510443,
+            "truncated_eval_0.95lower": 0.5455381137012137,
+            "truncated_eval_std": 0.008713968387457641,
+            "cv_score": {
+                "cv1": {
+                    "val": {
+                        "multi_logloss": 1.001972519829189,
+                        "qwk": 0.5812702547149473
+                    }
+                },
+                "cv2": {
+                    "val": {
+                        "multi_logloss": 1.0036945331578582,
+                        "qwk": 0.5758813181832974
+                    }
+                },
+                "cv3": {
+                    "val": {
+                        "multi_logloss": 0.9724400865901476,
+                        "qwk": 0.6124935199585277
+                    }
+                },
+                "cv4": {
+                    "val": {
+                        "multi_logloss": 0.9755690876323199,
+                        "qwk": 0.5980864228470866
+                    }
+                },
+                "cv5": {
+                    "val": {
+                        "multi_logloss": 0.9845222546381215,
+                        "qwk": 0.5899489849474896
+                    }
+                }
+            },
+            "n_data": 17690,
+            "best_iteration": 869.4,
+            "n_features": 119,
+            "feature_importance": {
+                "mean_target": 98906.24491908122,
+                "session_title": 19616.923200784622,
+                "accumulated_accuracy_group": 12763.221826493555,
+                "success_ratio_last_same_assess": 11966.329740321637,
+                "accumulated_acc": 11632.572673067265,
+                "decayed_success_ratio_last_same_assess": 9006.130526196957,
+                "mean_accuracy_group_same_assess": 8392.56491440013,
+                "27253bdc": 8112.732855378837,
+                "success_ratio_same_assess": 7884.592637316976,
+                "2000": 7267.988662181609,
+                "0": 7156.540524324775,
+                "4070": 6051.632942465879,
+                "Crystal Caves - Level 3_2000": 6015.719122445584,
+                "3120": 5736.061870850157,
+                "mean_timte_to_get_success_same_assess": 5625.278542048111,
+                "world": 5109.888971283287,
+                "mean_action_time_Happy Camel": 5057.640432220418,
+                "memory_decay_coeff_from_last_same_assess": 4987.500223441835,
+                "mean_action_time_All Star Sorting": 4809.072420499474,
+                "memory_decay_coeff_from_last_assess": 4808.444128962629,
+                "Mushroom Sorter (Assessment)_success_ratio": 4681.283536763489,
+                "mean_correct_Chow Time": 4620.974376110733,
+                "decayed_accuracy_group_last_same_assess": 4573.924322897173,
+                "mean_incorrect_Pan Balance": 4454.431333869696,
+                "Bird Measurer (Assessment)_success_ratio": 4432.544434901327,
+                "mean_action_time_Scrub-A-Dub": 4148.724622518569,
+                "duration_mean": 4140.450377161859,
+                "decayed_n_failure_last_same_assess": 3936.041379471682,
+                "mean_action_time_Dino Drink": 3922.0423257395623,
+                "Cauldron Filler (Assessment)_mean_action_time": 3921.0359932303427,
+                "3121": 3867.1806002585217,
+                "var_action_time_Scrub-A-Dub": 3863.104886585474,
+                "Cauldron Filler (Assessment)_3020_mean": 3820.3451723627745,
+                "Cauldron Filler (Assessment)_success_ratio": 3817.223063366581,
+                "success_ratio_Happy Camel": 3753.1320730939506,
+                "4035": 3655.1528941565894,
+                "Mushroom Sorter (Assessment)_accuracy_group": 3639.4107266109436,
+                "Chest Sorter (Assessment)_mean_var_action_time": 3599.893133664876,
+                "success_ratio_Pan Balance": 3556.5379162848926,
+                "success_ratio_Scrub-A-Dub": 3522.2100695356726,
+                "Cart Balancer (Assessment)_success_ratio": 3514.1618442155423,
+                "time_to_get_success_last_same_assess": 3463.031075467542,
+                "mean_4070_Chow Time": 3335.186501508765,
+                "n_failure_same_assess": 3313.236092248559,
+                "Cauldron Filler (Assessment)_mean_var_action_time": 3312.888692319393,
+                "4030": 3251.5232362630313,
+                "Chow Time_4070": 3167.9249091915785,
+                "4020": 3060.5970838719977,
+                "Chest Sorter (Assessment)_mean_action_time": 2842.767445239425,
+                "success_ratio_All Star Sorting": 2841.8139346301555,
+                "mean_action_time_last_same_assess": 2767.7917141764424,
+                "mean_correct_Leaf Leader": 2743.0435027629137,
+                "Chest Sorter (Assessment)_success_ratio": 2725.848457375169,
+                "3110": 2723.834585340507,
+                "launched_ratio": 2708.4742406227624,
+                "mean_var_action_time_same_assess": 2658.735161373438,
+                "sand_filled_ratio": 2653.1557608418166,
+                "mean_action_time_same_assess": 2652.606629290059,
+                "var_action_time_last_same_assess": 2643.041549639683,
+                "mean_incorrect_All Star Sorting": 2484.6864733964203,
+                "var_action_time_same_assess": 2440.7396179465577,
+                "success_ratio_Chow Time": 2424.6026314899327,
+                "mean_incorrect_Chow Time": 2403.336867403239,
+                "mean_4070_All Star Sorting": 2401.9089661680628,
+                "hour": 2393.2829099550845,
+                "Sandcastle Builder (Activity)_duration": 2387.534457335062,
+                "accumulated_failed_attempts": 2373.963756301999,
+                "Chest Sorter (Assessment)_4020": 2324.5602065403014,
+                "Cart Balancer (Assessment)_4070_mean": 2321.375299390033,
+                "Sandcastle Builder (Activity)_4070": 2294.1731728792192,
+                "Mushroom Sorter (Assessment)_mean_var_action_time": 2233.2115259213374,
+                "Mushroom Sorter (Assessment)_mean_action_time": 2224.135417085141,
+                "mean_incorrect_Scrub-A-Dub": 2218.4577295824884,
+                "Mushroom Sorter (Assessment)_time_to_get_success": 2150.211634503305,
+                "last_success_ratio_Pan Balance": 2108.7123184174297,
+                "accumulated_actions": 2101.4599438061937,
+                "Bug Measurer (Activity)_duration": 2085.6234972134234,
+                "Cauldron Filler (Assessment)_4070_mean": 2029.2919993432238,
+                "last_success_ratio_Chow Time": 2018.6678992224856,
+                "4022": 2018.2865957461297,
+                "Sandcastle Builder (Activity)_4020": 2016.2085571229459,
+                "mean_4070_Leaf Leader": 1979.500592389703,
+                "last_success_ratio_Crystals Rule": 1973.5005563020707,
+                "mean_incorrect_Dino Dive": 1963.301491111517,
+                "Mushroom Sorter (Assessment)_4070_mean": 1939.8534160932527,
+                "var_time_to_get_success_same_assess": 1883.7319664597512,
+                "success_ratio_Bubble Bath": 1829.9972428720444,
+                "last_success_ratio_Happy Camel": 1818.931447251141,
+                "Mushroom Sorter (Assessment)_4070": 1792.4609340105205,
+                "Chest Sorter (Assessment)_time_to_get_success": 1775.7520610108973,
+                "success_ratio_Dino Dive": 1749.9792491946369,
+                "mean_incorrect_Crystals Rule": 1709.2721154227852,
+                "2010": 1684.1391149956733,
+                "mean_correct_Bubble Bath": 1682.8968440499157,
+                "Bird Measurer (Assessment)_accuracy_group": 1680.9842254698276,
+                "last_success_ratio_All Star Sorting": 1667.7679331950844,
+                "success_ratio_Crystals Rule": 1660.3288032770156,
+                "n_last_correct_Leaf Leader": 1623.597918817401,
+                "Cauldron Filler (Assessment)_4070": 1622.2711297150702,
+                "Bug Measurer (Activity)_4035": 1595.7106285125017,
+                "n_launched_False": 1536.861673971638,
+                "success_ratio_Air Show": 1534.5291836559772,
+                "Mushroom Sorter (Assessment)_var_mean_action_time": 1503.49701218009,
+                "4090": 1482.7860772192478,
+                "success_var_same_assess": 1473.1493253163994,
+                "var_action_time_Dino Drink": 1439.5022272787987,
+                "Crystal Caves - Level 2_2000": 1416.7417217418551,
+                "n_last_correct_Dino Dive": 1381.5809895783664,
+                "n_failure_last_same_assess": 1297.443576401472,
+                "last_success_ratio_Scrub-A-Dub": 1272.2624979794025,
+                "accuracy_group_last_same_assess": 1178.45717266798,
+                "Chest Sorter (Assessment)_var_mean_action_time": 1178.0338065214455,
+                "Cauldron Filler (Assessment)_3020": 1155.590827524662,
+                "Bird Measurer (Assessment)_4020": 1126.3628452181815,
+                "last_success_ratio_Air Show": 913.1198070585727,
+                "Crystal Caves - Level 1_2000": 881.9425389284268,
+                "All Star Sorting_2025": 870.611284866929,
+                "Chest Sorter (Assessment)_accuracy_group": 753.3325596988201,
+                "n_last_correct_Air Show": 603.8203681051731
+            }
+        }
+    }
+}
