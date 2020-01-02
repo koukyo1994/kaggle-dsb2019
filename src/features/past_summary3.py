@@ -628,8 +628,6 @@ def past_summary_features(
         df = pd.DataFrame(all_assessments)
         return df, None
 
-    raise NotImplementedError
-
 
 def add_date_features(df: pd.DataFrame):
     df["date"] = df["timestamp"].dt.date

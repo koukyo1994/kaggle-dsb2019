@@ -58,6 +58,7 @@ class BaseModel2(object):
         normal_oof_preds = np.zeros(len(train_features))
         oof_preds_list: List[np.ndarray] = []
         y_val_list: List[np.ndarray] = []
+        idx_val_list: List[np.ndarray] = []
 
         importances = pd.DataFrame(index=feature_name)
         best_iteration = 0.0
@@ -97,6 +98,7 @@ class BaseModel2(object):
             # predict oof and test
             oof_preds_list.append(self.predict(model, x_val).reshape(-1))
             y_val_list.append(y_val)
+            idx_val_list.append(new_idx)
             normal_oof_preds[val_idx] = self.predict(model,
                                                      x_val_normal).reshape(-1)
             test_preds += self.predict(
@@ -114,6 +116,12 @@ class BaseModel2(object):
 
         oof_preds = np.concatenate(oof_preds_list)
         y_oof = np.concatenate(y_val_list)
+        idx_val = np.concatenate(idx_val_list)
+
+        sorted_idx = np.argsort(idx_val)
+        oof_preds = oof_preds[sorted_idx]
+        y_oof = y_oof[sorted_idx]
+        print(idx_val[sorted_idx])
 
         # save raw prediction
         self.raw_oof_preds = oof_preds
@@ -128,6 +136,8 @@ class BaseModel2(object):
         print(f"oof score: {oof_score:.5f}")
 
         # normal oof score
+        self.raw_normal_oof = normal_oof_preds
+
         OptR = OptimizedRounder()
         OptR.fit(normal_oof_preds, y_train)
         normal_oof_preds = OptR.predict(normal_oof_preds)
