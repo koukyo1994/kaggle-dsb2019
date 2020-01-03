@@ -15,3 +15,4 @@ from .summarize_past import PastSummary
 from .past_summary2 import PastSummary2
 from .past_summary3 import PastSummary3
 from .past_summary4 import PastSummary4
+from .nakama_v8 import NakamaV8

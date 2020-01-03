@@ -25,7 +25,7 @@ if __name__ == "__main__":
         Basic, generate_features, PastAssessment, PastClip, PastGame, Unified,
         ModifiedUnified, UnifiedWithInstallationIDStats, RenewedFeatures,
         PastActivity, ImprovedBasic, ImprovedPastAssessment, ImprovedPastGame,
-        PastSummary, PastSummary2, PastSummary3, PastSummary4)
+        PastSummary, PastSummary2, PastSummary3, PastSummary4, NakamaV8)
     from src.validation import (get_validation, select_features,
                                 remove_correlated_features,
                                 get_assessment_number)
@@ -81,8 +81,9 @@ if __name__ == "__main__":
                 overwrite=args.force,
                 log=True)
 
-        del train, test
-        gc.collect()
+        if globals().get("train") is not None:
+            del train, test
+            gc.collect()
 
     if args.dryrun:
         exit(0)
