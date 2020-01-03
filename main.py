@@ -358,7 +358,7 @@ if __name__ == "__main__":
         y_train,
         groups,
         test_nth_assessment,
-        n_trials=100)
+        n_trials=1000)
 
     config["truncated_eval_mean_adjust"] = truncated_result2["mean"]
     config["truncated_eval_0.95lower_adjust"] = \

@@ -109,10 +109,6 @@ if __name__ == "__main__":
                            axis=1,
                            sort=False)
 
-    x_train = x_train.fillna(-1.0)
-    x_valid = x_valid.fillna(-1.0)
-    x_test = x_test.fillna(-1.0)
-
     x_train = delete_duplicated_columns(x_train)
     x_valid = delete_duplicated_columns(x_valid)
     x_test = delete_duplicated_columns(x_test)

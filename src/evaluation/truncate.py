@@ -49,13 +49,19 @@ def truncated_cv_with_adjustment_of_distribution(
 
     n_first_assess = len(test_groups[test_groups == 1])
     n_second_assess = len(test_groups[test_groups == 2])
-    n_over_third_assess = len(test_groups[test_groups >= 3])
+    n_third_assess = len(test_groups[test_groups == 3])
+    n_fourth_assess = len(test_groups[test_groups == 4])
+    n_fifth_assess = len(test_groups[test_groups == 5])
+    n_over_sixth_assess = len(test_groups[test_groups >= 6])
 
     index = np.arange(len(groups))
 
     first_assess_idx = []
     second_assess_idx = []
-    over_third_assess_idx = []
+    third_assess_idx = []
+    fourth_assess_idx = []
+    fifth_assess_idx = []
+    over_sixth_assess = []
 
     for inst_id in np.unique(groups):
         idx_inst = index[groups == inst_id]
@@ -64,11 +70,23 @@ def truncated_cv_with_adjustment_of_distribution(
             second_assess_idx.append(idx_inst[1])
 
         if len(idx_inst) > 2:
-            over_third_assess_idx.append(idx_inst[2])
+            third_assess_idx.append(idx_inst[2])
+
+        if len(idx_inst) > 3:
+            fourth_assess_idx.append(idx_inst[3])
+
+        if len(idx_inst) > 4:
+            fifth_assess_idx.append(idx_inst[4])
+
+        if len(idx_inst) > 5:
+            over_sixth_assess.extend(idx_inst[5:])
 
     first_assess_dice_result = []
     second_assess_dice_result = []
-    over_third_dice_result = []
+    third_assess_dice_result = []
+    fourth_assess_dice_result = []
+    fifth_assess_dice_result = []
+    over_sixth_dice_result = []
     for _ in range(n_trials):
         first_assess_dice_result.append(
             np.random.choice(
@@ -76,16 +94,30 @@ def truncated_cv_with_adjustment_of_distribution(
         second_assess_dice_result.append(
             np.random.choice(
                 second_assess_idx, size=n_second_assess, replace=False))
-        over_third_dice_result.append(
+        third_assess_dice_result.append(
             np.random.choice(
-                over_third_assess_idx, size=n_over_third_assess,
-                replace=False))
+                third_assess_idx, size=n_third_assess, replace=False))
+        fourth_assess_dice_result.append(
+            np.random.choice(
+                fourth_assess_idx, size=n_fourth_assess, replace=True))
+        fifth_assess_dice_result.append(
+            np.random.choice(
+                fifth_assess_idx, size=n_fifth_assess, replace=True))
+        over_sixth_dice_result.append(
+            np.random.choice(
+                over_sixth_assess, size=n_over_sixth_assess, replace=True))
 
     first_assess = np.asarray(first_assess_dice_result).T
     second_assess = np.asarray(second_assess_dice_result).T
-    over_third_assess = np.asarray(over_third_dice_result).T
+    third_assess = np.asarray(third_assess_dice_result).T
+    fourth_assess = np.asarray(fourth_assess_dice_result).T
+    fifth_assess = np.asarray(fifth_assess_dice_result).T
+    over_sixth = np.asarray(over_sixth_dice_result).T
 
-    assess = np.vstack([first_assess, second_assess, over_third_assess])
+    assess = np.vstack([
+        first_assess, second_assess, third_assess, fourth_assess, fifth_assess,
+        over_sixth
+    ])
 
     for i in range(n_trials):
         y_pred_choice = y_pred[assess[:, i]]
