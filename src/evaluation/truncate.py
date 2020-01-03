@@ -47,9 +47,9 @@ def truncated_cv_with_adjustment_of_distribution(
     eval_result: Dict[str, Union[List[float], float]] = {}
     trials: List[float] = []
 
-    first_assess_ratio = len(test_groups[test_groups == 1]) / len(test_groups)
-    second_assess_ratio = len(test_groups[test_groups == 2]) / len(test_groups)
-    over_third_ratio = len(test_groups[test_groups >= 3]) / len(test_groups)
+    n_first_assess = len(test_groups[test_groups == 1])
+    n_second_assess = len(test_groups[test_groups == 2])
+    n_over_third_assess = len(test_groups[test_groups >= 3])
 
     index = np.arange(len(groups))
 
@@ -65,25 +65,6 @@ def truncated_cv_with_adjustment_of_distribution(
 
         if len(idx_inst) > 2:
             over_third_assess_idx.append(idx_inst[2])
-
-    total_assess = len(groups)
-    for i in np.arange(1.0, 0.0, -0.1):
-        n_assess = int(total_assess * i)
-        n_first_assess = int(first_assess_ratio * n_assess)
-        n_second_assess = int(second_assess_ratio * n_assess)
-        n_over_third_assess = int(over_third_ratio * n_assess)
-
-        if (n_first_assess < len(first_assess_idx)
-                and n_second_assess < len(second_assess_idx)
-                and n_over_third_assess < len(over_third_assess_idx)):
-            break
-
-    print("n_first_assess: {} ({:.3f} %)".format(
-        n_first_assess, n_first_assess / n_assess * 100))
-    print("n_second_assess: {} ({:.3f} %)".format(
-        n_second_assess, n_second_assess / n_assess * 100))
-    print("n_over_assess: {} ({:.3f} %)".format(
-        n_over_third_assess, n_over_third_assess / n_assess * 100))
 
     first_assess_dice_result = []
     second_assess_dice_result = []
