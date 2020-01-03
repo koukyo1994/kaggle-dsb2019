@@ -104,12 +104,13 @@ class NakamaV8(Feature):
             'year', 'game_time', 'event_code', 'type',
             'timestamp', 'event_count']
         features = [c for c in features if c not in drop_features]
-        ce_oe = ce.OrdinalEncoder(cols=cat_features, handle_unknown='impute')
-        ce_oe.fit(train)
 
         train = train[features]
         valid = valid[features]
         test = test[features]
+
+        ce_oe = ce.OrdinalEncoder(cols=cat_features, handle_unknown='impute')
+        ce_oe.fit(train)
 
         train = ce_oe.transform(train)
         valid = ce_oe.transform(valid)

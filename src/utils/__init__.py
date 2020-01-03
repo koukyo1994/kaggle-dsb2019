@@ -7,3 +7,4 @@ from .tools import reduce_mem_usage
 from .checker import feature_existence_checker
 from .visualization import plot_confusion_matrix
 from .reproductive import seed_everything
+from .duplicate import delete_duplicated_columns

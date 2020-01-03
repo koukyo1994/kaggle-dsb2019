@@ -20,7 +20,8 @@ if __name__ == "__main__":
 
     from src.utils import (get_preprocess_parser, load_config,
                            configure_logger, timer, feature_existence_checker,
-                           save_json, plot_confusion_matrix, seed_everything)
+                           save_json, plot_confusion_matrix, seed_everything,
+                           delete_duplicated_columns)
     from src.features import (
         Basic, generate_features, PastAssessment, PastClip, PastGame, Unified,
         ModifiedUnified, UnifiedWithInstallationIDStats, RenewedFeatures,
@@ -88,7 +89,7 @@ if __name__ == "__main__":
     if args.dryrun:
         exit(0)
 
-    with timer("feature laoding"):
+    with timer("feature loading"):
         x_train = pd.concat([
             pd.read_feather(feature_dir / (f + "_train.ftr"), nthreads=-1)
             for f in config["features"]
@@ -107,6 +108,14 @@ if __name__ == "__main__":
         ],
                            axis=1,
                            sort=False)
+
+    x_train = x_train.fillna(-1.0)
+    x_valid = x_valid.fillna(-1.0)
+    x_test = x_test.fillna(-1.0)
+
+    x_train = delete_duplicated_columns(x_train)
+    x_valid = delete_duplicated_columns(x_valid)
+    x_test = delete_duplicated_columns(x_test)
 
     groups = x_train["installation_id"].values
     groups_valid = x_valid["installation_id"].values
