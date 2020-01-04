@@ -476,7 +476,7 @@
                         "qwk": 0.572496071427834
                     },
                     "data_from_train": {
-                        "multi_logloss": 0.9393667992118071,
+                        "multi_logloss": 0.939366799211807,
                         "qwk": 0.6405204395496782
                     }
                 },
@@ -496,7 +496,7 @@
                         "qwk": 0.5785641732602943
                     },
                     "data_from_train": {
-                        "multi_logloss": 0.9633131536812417,
+                        "multi_logloss": 0.9633131536812416,
                         "qwk": 0.6030609146318494
                     }
                 },
@@ -516,7 +516,7 @@
                         "qwk": 0.5816257766664602
                     },
                     "data_from_train": {
-                        "multi_logloss": 0.9873726009822307,
+                        "multi_logloss": 0.9873726009822306,
                         "qwk": 0.5844244009855206
                     }
                 }
@@ -851,13 +851,13 @@
     "truncated_eval_0.95lower": 0.5469202549863543,
     "truncated_eval_0.95upper": 0.5828042826836415,
     "truncated_eval_std": 0.008971006924321769,
-    "truncated_eval_mean_adjust": 0.5720115061624731,
-    "truncated_eval_0.95lower_adjust": 0.5246569030586834,
-    "truncated_eval_0.95upper_adjust": 0.6193661092662628,
-    "truncated_eval_std_adjust": 0.023677301551894826,
-    "truncated_group_eval_mean": 0.5596914103416764,
-    "truncated_group_eval_0.95lower": 0.5432179541530666,
-    "truncated_group_eval_0.95upper": 0.5761648665302861,
-    "truncated_group_eval_std": 0.008236728094304868,
+    "truncated_eval_mean_adjust": 0.5725331927475816,
+    "truncated_eval_0.95lower_adjust": 0.5267755031904473,
+    "truncated_eval_0.95upper_adjust": 0.618290882304716,
+    "truncated_eval_std_adjust": 0.022878844778567158,
+    "truncated_group_eval_mean": 0.5577155584510795,
+    "truncated_group_eval_0.95lower": 0.5390674147337601,
+    "truncated_group_eval_0.95upper": 0.5763637021683988,
+    "truncated_group_eval_std": 0.009324071858659688,
     "group_optimized_qwk": 0.6003749764433861
 }
