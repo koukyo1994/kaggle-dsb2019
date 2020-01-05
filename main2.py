@@ -31,6 +31,8 @@ if __name__ == "__main__":
                                 remove_correlated_features,
                                 get_assessment_number)
     from src.models import get_model
+    from src.evaluation import (
+        OptimizedRounder, truncated_cv_with_adjustment_of_distribution)
 
     seed_everything(42)
 
@@ -350,6 +352,23 @@ if __name__ == "__main__":
         classes=np.array(["acc_0", "acc_1", "acc_2", "acc_3"]),
         normalize=True,
         save_path=output_dir / "confusion_matrix_oof.png")
+
+    raw_normal_oof = model.raw_normal_oof
+    OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+    OptR.fit(raw_normal_oof, y_train)
+    normal_oof_preds = OptR.predict(raw_normal_oof)
+    truncated_result = truncated_cv_with_adjustment_of_distribution(
+        normal_oof_preds, y_train, groups, test_nth_assessment, n_trials=1000)
+    config["truncated_mean_adjust"] = truncated_result["mean"]
+    config["truncated_std_adjust"] = truncated_result["std"]
+    config["truncated_upper"] = truncated_result["0.95upper_bound"]
+    config["truncated_lower"] = truncated_result["0.95lower_bound"]
+    plot_confusion_matrix(
+        y_train,
+        normal_oof_preds,
+        classes=np.array(["acc_0", "acc_1", "acc_2", "acc_3"]),
+        normalize=True,
+        save_path=output_dir / "confusion_matrix_normal_oof.png")
 
     # ===============================
     # === Save
