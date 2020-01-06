@@ -6,6 +6,7 @@ from .cat_not_scaled import CatBoostNotScaledModel
 from .lgbm_not_scaled import LightGBMNotScaled
 from .lgbm2 import LightGBM2
 from .cat2 import CatBoostModel2
+from .weighted_lgbm import WeightedLightGBM
 
 
 def lgbm() -> LightGBM:
@@ -14,6 +15,10 @@ def lgbm() -> LightGBM:
 
 def lgbm2() -> LightGBM2:
     return LightGBM2()
+
+
+def weighted_lgbm() -> WeightedLightGBM:
+    return WeightedLightGBM()
 
 
 def catboost() -> CatBoostModel:
