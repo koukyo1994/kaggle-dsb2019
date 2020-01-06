@@ -102,7 +102,7 @@ class BaseModel2(object):
             normal_oof_preds[val_idx] = self.predict(model,
                                                      x_val_normal).reshape(-1)
             test_preds += self.predict(
-                model, test_features).reshape(-1) / len(folds_ids)
+                model, test_features.values).reshape(-1) / len(folds_ids)
 
             # get feature importances
             importances_tmp = pd.DataFrame(

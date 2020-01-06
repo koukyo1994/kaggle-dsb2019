@@ -1,0 +1,75 @@
+dataset:
+  dir: "input/data-science-bowl-2019/"
+  feature_dir: "features"
+  params:
+
+features:
+  - PastSummary3
+
+av:
+  split_params:
+    n_splits: 5
+    random_state: 42
+
+  model_params:
+    objective: "binary"
+    metric: "auc"
+    boosting: "gbdt"
+    max_depth: 7
+    num_leaves: 75
+    learning_rate: 0.01
+    colsample_bytree: 0.7
+    subsample: 0.1
+    subsample_freq: 1
+    seed: 111
+    feature_fraction_seed: 111
+    drop_seed: 111
+    verbose: -1
+    n_jobs: -1
+    first_metric_only: True
+
+  train_params:
+    num_boost_round: 50000
+    early_stopping_rounds: 200
+    verbose_eval: 200
+
+model:
+  name: "xgb2"
+  mode: "multiclass"
+
+  model_params:
+    objective: "multi:softmax"
+    num_class: 4
+    booster: "gbtree"
+    eval_metric: "mlogloss"
+    max_depth: 6
+    learning_rate: 0.02
+    n_estimators: 10000
+    min_child_weight: 110
+    gamma: 0.1
+    colsample_bytree: 0.7
+    colsample_bylevel: 0.8
+    reg_alpha: 0.1
+    reg_lambda: 0.1
+    verbosity: 1
+    seed: 71
+    random_state: 71
+    n_jobs: -1
+
+  train_params:
+    early_stopping_rounds: 100
+
+post_process:
+  params:
+    reverse: False
+    n_overall: 20
+    n_classwise: 20
+
+val:
+  name: "group_kfold"
+  n_delete: 0.6
+  params:
+    n_splits: 5
+    random_state: 111
+
+output_dir: "output"
