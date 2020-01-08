@@ -3,6 +3,8 @@ import pandas as pd
 
 from typing import List
 
+from tqdm import tqdm
+
 
 def select_features(cols: List[str],
                     feature_importance: pd.DataFrame,
@@ -28,14 +30,16 @@ def select_features(cols: List[str],
 def remove_correlated_features(df: pd.DataFrame, features: List[str]):
     counter = 0
     to_remove: List[str] = []
-    for feat_a in features:
-        for feat_b in features:
-            if feat_a != feat_b and feat_a not in to_remove and \
-                    feat_b not in to_remove:
-                c = np.corrcoef(df[feat_a], df[feat_b])[0][1]
-                if c > 0.995:
-                    counter += 1
-                    to_remove.append(feat_b)
-                    print('{}: FEAT_A: {} FEAT_B: {} - Correlation: {}'.format(
-                        counter, feat_a, feat_b, c))
+    for i in tqdm(range(len(features) - 1)):
+        feat_a = features[i]
+        for j in range(i + 1, len(features)):
+            feat_b = features[j]
+            if feat_a in to_remove or feat_b in to_remove:
+                continue
+            c = np.corrcoef(df[feat_a], df[feat_b])[0][1]
+            if c > 0.995:
+                counter += 1
+                to_remove.append(feat_b)
+                print('{}: FEAT_A: {} FEAT_B: {} - Correlation: {}'.format(
+                    counter, feat_a, feat_b, c))
     return to_remove
