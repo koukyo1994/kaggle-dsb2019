@@ -27,7 +27,7 @@ if __name__ == "__main__":
         ModifiedUnified, UnifiedWithInstallationIDStats, RenewedFeatures,
         PastActivity, ImprovedBasic, ImprovedPastAssessment, ImprovedPastGame,
         PastSummary, PastSummary2, PastSummary3, PastSummary4, NakamaV8, Ratio,
-        PastSummary3TimeEncoding, Tfidf)
+        PastSummary3TimeEncoding, Tfidf, Tfidf2)
     from src.validation import (get_validation, select_features,
                                 remove_correlated_features,
                                 get_assessment_number)
