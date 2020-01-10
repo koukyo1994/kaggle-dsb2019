@@ -110,6 +110,7 @@ venv.bak/
 *.pkl
 *.npy
 catboost_info/
+*.pth
 
 # editor
 .vscode

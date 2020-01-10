@@ -17,6 +17,7 @@ decorator==4.4.0
 defusedxml==0.5.0
 easydict==1.9.0
 entrypoints==0.3
+fastprogress==0.2.2
 feather-format
 future==0.17.1
 graphviz==0.8.4

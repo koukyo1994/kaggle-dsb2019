@@ -28,6 +28,7 @@ def _get_default() -> dict:
     cfg["model"]["sampling"]["params"] = dict()
     cfg["model"]["model_params"] = dict()
     cfg["model"]["train_params"] = dict()
+    cfg["model"]["train_params"]["scheduler"] = dict()
 
     # post_process
     cfg["post_process"] = dict()

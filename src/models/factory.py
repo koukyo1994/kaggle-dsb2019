@@ -8,6 +8,7 @@ from .lgbm2 import LightGBM2
 from .cat2 import CatBoostModel2
 from .weighted_lgbm import WeightedLightGBM
 from .xgb2 import XGBoost2
+from .nn import NNTrainer
 
 
 def lgbm() -> LightGBM:
@@ -28,6 +29,10 @@ def catboost() -> CatBoostModel:
 
 def catboost2() -> CatBoostModel2:
     return CatBoostModel2()
+
+
+def nn() -> NNTrainer:
+    return NNTrainer()
 
 
 def classwise_cat() -> ClassWiseCatBoost:
