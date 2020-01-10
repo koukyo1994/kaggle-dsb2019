@@ -93,7 +93,7 @@ class DSBRegressor(nn.Module):
         x = self.base(non_cat, cat)
         x = self.drop(x)
         x = F.relu(self.head(x))
-        return torch.clamp(x, 0.0, 1.0)
+        return x
 
 
 class DSBClassifier(nn.Module):
@@ -176,9 +176,8 @@ class NNTrainer(object):
                 n_non_categorical=n_non_categorical,
                 **model_params).to(device)
             loss_fn = nn.MSELoss().to(device)
-            self.denominator = y_train.max()
-            y_train = y_train / self.denominator
-            y_valid = y_valid / self.denominator
+            y_train = y_train.astype(float)
+            y_valid = y_valid.astype(float)
         else:
             model = DSBClassifier(
                 cat_dims=cat_dims,
@@ -250,13 +249,13 @@ class NNTrainer(object):
                     avg_val_loss += loss.item() / len(valid_loader)
                     valid_preds[
                         i*512:(i+1)*512
-                    ] = y_pred.cpu().numpy()
+                    ] = y_pred.cpu().numpy().reshape(-1)
 
             if self.mode == "regression":
                 OptR = OptimizedRounder(n_overall=20, n_classwise=20)
-                OptR.fit(valid_preds, (y_valid * 3).astype(int))
-                valid_preds = OptR.predict(valid_preds)
-                score = calc_metric((y_valid * 3).astype(int), valid_preds)
+                OptR.fit(valid_preds / 3, y_valid.astype(int))
+                valid_preds = OptR.predict(valid_preds / 3)
+                score = calc_metric(y_valid.astype(int), valid_preds)
             else:
                 valid_preds = valid_preds @ np.arange(4) / 3
                 OptR = OptimizedRounder(n_overall=20, n_classwise=20)
@@ -310,12 +309,12 @@ class NNTrainer(object):
                 avg_val_loss += loss.item() / len(valid_loader)
                 valid_preds[
                     i*512:(i+1)*512
-                ] = y_pred.cpu().numpy()
+                ] = y_pred.cpu().numpy().reshape(-1)
         if self.mode == "regression":
             OptR = OptimizedRounder(n_overall=20, n_classwise=20)
-            OptR.fit(valid_preds, (y_valid * 3).astype(int))
-            valid_preds = OptR.predict(valid_preds)
-            score = calc_metric((y_valid * 3).astype(int), valid_preds)
+            OptR.fit(valid_preds / 3, y_valid.astype(int))
+            valid_preds = OptR.predict(valid_preds / 3)
+            score = calc_metric(y_valid.astype(int), valid_preds)
         else:
             valid_preds = valid_preds @ np.arange(4) / 3
             OptR = OptimizedRounder(n_overall=20, n_classwise=20)
@@ -460,12 +459,19 @@ class NNTrainer(object):
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
                      y: np.ndarray,
                      config: dict) -> Tuple[np.ndarray, np.ndarray]:
-        if self.mode == "regression" or self.mode == "multiclass":
+        if self.mode == "multiclass":
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)
             oof_preds_ = OptR.predict(oof_preds)
             test_preds_ = OptR.predict(test_preds)
+            return oof_preds_, test_preds_
+        elif self.mode == "regression":
+            params = config["post_process"]["params"]
+            OptR = OptimizedRounder(**params)
+            OptR.fit(oof_preds / 3, y)
+            oof_preds_ = OptR.predict(oof_preds / 3)
+            test_preds_ = OptR.predict(test_preds / 3)
             return oof_preds_, test_preds_
         return oof_preds, test_preds
 
@@ -495,6 +501,9 @@ class NNTrainer(object):
 
         for i_fold, (trn_idx, val_idx) in enumerate(folds_ids):
             self.fold = i_fold
+            print("=" * 20)
+            print(f"Fold: {self.fold}")
+            print("=" * 20)
 
             x_trn = X.loc[trn_idx, :]
             y_trn = y[trn_idx]
