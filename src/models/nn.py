@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler
 from src.evaluation import (
     calc_metric, eval_with_truncated_data, OptimizedRounder)
 from .neural_network.model import (
-    DSBRegressor, DSBClassifier, DSBBinary
+    DSBRegressor, DSBClassifier, DSBBinary, DSBOvR
 )
 from .neural_network.loss import RMSELoss
 from .neural_network.dataset import DSBDataset
@@ -73,6 +73,24 @@ class NNTrainer(object):
             loss_fn = nn.BCELoss().to(device)
             y_train_ = (y_train > 0).astype(float)
             y_valid_ = (y_valid > 0).astype(float)
+        elif mode == "ovr":
+            model = DSBOvR(
+                cat_dims=cat_dims,
+                n_non_categorical=n_non_categorical,
+                **model_params).to(device)
+            loss_fn = nn.BCELoss().to(device)
+            y_train_ = np.asarray([
+                (y_train == 0).astype(float),
+                (y_train == 1).astype(float),
+                (y_train == 2).astype(float),
+                (y_train == 3).astype(float)
+            ]).T.astype(np.float32)
+            y_valid_ = np.asarray([
+                (y_valid == 0).astype(float),
+                (y_valid == 1).astype(float),
+                (y_valid == 2).astype(float),
+                (y_valid == 3).astype(float)
+            ]).T.astype(np.float32)
         else:
             raise NotImplementedError
 
@@ -125,7 +143,7 @@ class NNTrainer(object):
                 avg_loss += loss.item() / len(train_loader)
 
             model.eval()
-            if self.mode == "multiclass":
+            if self.mode == "multiclass" or self.mode == "ovr":
                 valid_preds = np.zeros((len(x_valid), 4))
             else:
                 valid_preds = np.zeros(len(x_valid))
@@ -149,6 +167,14 @@ class NNTrainer(object):
                 valid_preds = OptR.predict(valid_preds)
                 score = calc_metric(y_valid.astype(int), valid_preds)
             elif self.mode == "multiclass":
+                valid_preds = valid_preds @ np.arange(4) / 3
+                OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+                OptR.fit(valid_preds, y_valid.astype(int))
+                valid_preds = OptR.predict(valid_preds)
+                score = calc_metric(y_valid.astype(int), valid_preds)
+            elif self.mode == "ovr":
+                valid_preds = valid_preds / np.repeat(
+                    valid_preds.sum(axis=1), 4).reshape(-1, 4)
                 valid_preds = valid_preds @ np.arange(4) / 3
                 OptR = OptimizedRounder(n_overall=20, n_classwise=20)
                 OptR.fit(valid_preds, y_valid.astype(int))
@@ -186,7 +212,7 @@ class NNTrainer(object):
         model.load_state_dict(torch.load(weight))
 
         model.eval()
-        if self.mode == "multiclass":
+        if self.mode == "multiclass" or self.mode == "ovr":
             valid_preds = np.zeros((len(x_valid), 4))
         else:
             valid_preds = np.zeros(len(x_valid))
@@ -208,6 +234,14 @@ class NNTrainer(object):
             valid_preds = OptR.predict(valid_preds)
             score = calc_metric(y_valid.astype(int), valid_preds)
         elif self.mode == "multiclass":
+            valid_preds = valid_preds @ np.arange(4) / 3
+            OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+            OptR.fit(valid_preds, y_valid.astype(int))
+            valid_preds = OptR.predict(valid_preds)
+            score = calc_metric(y_valid.astype(int), valid_preds)
+        elif self.mode == "ovr":
+            valid_preds = valid_preds / np.repeat(
+                valid_preds.sum(axis=1), 4).reshape(-1, 4)
             valid_preds = valid_preds @ np.arange(4) / 3
             OptR = OptimizedRounder(n_overall=20, n_classwise=20)
             OptR.fit(valid_preds, y_valid.astype(int))
@@ -254,6 +288,19 @@ class NNTrainer(object):
                     predictions[
                         i * batch_size:(i+1) * batch_size, :
                     ] = pred.cpu().numpy()
+            return predictions @ np.arange(4) / 3
+        elif self.mode == "ovr":
+            predictions = np.zeros((len(features), 4))
+            for i, (non_cat, cat) in enumerate(loader):
+                with torch.no_grad():
+                    non_cat = non_cat.to(device)
+                    cat = cat.to(device)
+                    pred = model(non_cat.float(), cat).detach()
+                    predictions[
+                        i * batch_size:(i+1) * batch_size, :
+                    ] = pred.cpu().numpy()
+            predictions = predictions / np.repeat(
+                predictions.sum(axis=1), 4).reshape(-1, 4)
             return predictions @ np.arange(4) / 3
         else:
             raise NotImplementedError
@@ -353,7 +400,7 @@ class NNTrainer(object):
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
                      y: np.ndarray,
                      config: dict) -> Tuple[np.ndarray, np.ndarray]:
-        if self.mode in ["multiclass", "regression", "binary"]:
+        if self.mode in ["multiclass", "regression", "binary", "ovr"]:
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)

@@ -79,6 +79,21 @@ class DSBBinary(nn.Module):
         return x.view(-1)
 
 
+class DSBOvR(nn.Module):
+    def __init__(self, cat_dims: List[Tuple[int, int]], n_non_categorical: int,
+                 **params):
+        super().__init__()
+        self.base = DSBBase(cat_dims, n_non_categorical, **params)
+        self.drop = nn.Dropout(0.3)
+        self.head = nn.Linear(50, 4)
+
+    def forward(self, non_cat, cat) -> torch.Tensor:
+        x = self.base(non_cat, cat)
+        x = self.drop(x)
+        x = F.sigmoid(self.head(x))
+        return x
+
+
 class DSBMultiTaskA(nn.Module):
     def __init__(self, cat_dims: List[Tuple[int, int]], n_non_categorical: int,
                  **params):
