@@ -49,7 +49,7 @@ class OptimizedRounder(object):
     def fit(self, X: np.ndarray, y: np.ndarray):
         golden1 = 0.618
         golden2 = 1 - golden1
-        ab_start = [(0.01, 0.4), (0.4, 0.7), (0.7, 0.9)]
+        ab_start = [(0.01, 0.5), (0.5, 0.7), (0.7, 0.9)]
         for _ in range(self.n_overall):
             if self.reverse:
                 search = reversed(range(3))

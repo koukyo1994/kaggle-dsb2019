@@ -53,8 +53,8 @@
             "n_epochs": 50,
             "lr": 0.001
         },
-        "mode": "multiclass",
-        "save_path": "output/nn_0/pth/",
+        "mode": "regression",
+        "save_path": "output/nn_1_regression/pth/",
         "policy": "best_score"
     },
     "post_process": {
@@ -78,9 +78,9 @@
         "NakamaV8"
     ],
     "args": {
-        "config": "config/nn_0.yml"
+        "config": "config/nn_1_regression.yml"
     },
-    "model_output_dir": "output/nn_0",
+    "model_output_dir": "output/nn_1_regression",
     "av_result": {
         "score": {
             "fold0": {
@@ -551,40 +551,40 @@
     },
     "eval_results": {
         "evals_result": {
-            "oof_score": 0.5764365358282469,
-            "normal_oof_score": 0.5909371843363929,
-            "truncated_eval_mean": 0.5362542707645201,
-            "truncated_eval_0.95upper": 0.553330595104102,
-            "truncated_eval_0.95lower": 0.5191779464249383,
-            "truncated_eval_std": 0.00853816216979093,
+            "oof_score": 0.5878959199272658,
+            "normal_oof_score": 0.603127494578562,
+            "truncated_eval_mean": 0.5501420384357468,
+            "truncated_eval_0.95upper": 0.5658178286617734,
+            "truncated_eval_0.95lower": 0.5344662482097202,
+            "truncated_eval_std": 0.007837895113013308,
             "cv_score": {
                 "cv1": {
-                    "loss": 1.1022432247797649,
-                    "qwk": 0.6087281861298804
+                    "loss": 0.32911401490370434,
+                    "qwk": 0.6195377850063568
                 },
                 "cv2": {
-                    "loss": 1.122040073076884,
-                    "qwk": 0.5767565298255024
+                    "loss": 0.3422313580910365,
+                    "qwk": 0.5908257179209243
                 },
                 "cv3": {
-                    "loss": 1.122736891110738,
-                    "qwk": 0.5791854009634264
+                    "loss": 0.34069320062796277,
+                    "qwk": 0.5879834263405519
                 },
                 "cv4": {
-                    "loss": 1.1325777967770896,
-                    "qwk": 0.5714831428483151
+                    "loss": 0.33221888542175293,
+                    "qwk": 0.5971259119329003
                 },
                 "cv5": {
-                    "loss": 1.1281470259030661,
-                    "qwk": 0.5618513674530446
+                    "loss": 0.336195429166158,
+                    "qwk": 0.5912373567876648
                 }
             },
             "n_data": 17690,
             "n_features": 422
         }
     },
-    "truncated_mean_adjust": 0.5518571102612622,
-    "truncated_std_adjust": 0.024584411628921485,
-    "truncated_upper": 0.6010259335191052,
-    "truncated_lower": 0.5026882870034192
+    "truncated_mean_adjust": 0.5626494667667098,
+    "truncated_std_adjust": 0.023091168870250287,
+    "truncated_upper": 0.6088318045072104,
+    "truncated_lower": 0.5164671290262092
 }

@@ -37,8 +37,8 @@ av:
 model:
   name: "nn"
   mode: "regression"
-  save_path: "output/nn_0/pth/"
-  policy: "best_loss"
+  save_path: "output/nn_1_regression/pth/"
+  policy: "best_score"
 
   model_params:
     emb_drop: 0.3
@@ -51,7 +51,7 @@ model:
     scheduler:
       name: "cosine"
       T_max: 10
-      eta_min: 0.000001
+      eta_min: 0.00001
 
 post_process:
   params:
@@ -61,7 +61,7 @@ post_process:
 
 val:
   name: "group_kfold"
-  n_delete: 0.6
+  n_delete: 0.7
   params:
     n_splits: 5
     random_state: 111

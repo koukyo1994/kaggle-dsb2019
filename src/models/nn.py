@@ -93,7 +93,7 @@ class DSBRegressor(nn.Module):
         x = self.base(non_cat, cat)
         x = self.drop(x)
         x = F.relu(self.head(x))
-        return x
+        return torch.clamp(x.view(-1), 0.0, 1.0)
 
 
 class DSBClassifier(nn.Module):
@@ -114,36 +114,32 @@ class DSBClassifier(nn.Module):
         return x
 
 
-class Attention(nn.Module):
-    def __init__(self, feature_dims, step_dims, n_middle, n_attention,
-                 **kwargs):
-        super(Attention, self).__init__(**kwargs)
-        self.support_masking = True
-        self.feature_dims = feature_dims
-        self.step_dims = step_dims
-        self.n_middle = n_middle
-        self.n_attention = n_attention
-        self.features_dim = 0
+class DSBMultiTaskA(nn.Module):
+    def __init__(
+            self,
+            cat_dims: List[Tuple[int, int]],
+            n_non_categorical: int,
+            **params):
+        super().__init__()
+        self.base = DSBBase(cat_dims, n_non_categorical, **params)
+        self.drop = nn.Dropout(0.3)
+        self.regression_head = nn.Linear(50, 1)
+        self.multiclass_head = nn.Linear(50, 4)
 
-        self.lin1 = nn.Linear(feature_dims, n_middle, bias=False)
-        self.lin2 = nn.Linear(n_middle, n_attention, bias=False)
+    def forward(self, non_cat, cat):
+        x = self.base(non_cat, cat)
+        x = self.drop(x)
+        x_regr = F.relu(self.regression_head(x)).view(-1)
+        x_multi = F.softmax(self.multiclass_head(x))
+        return x_regr, x_multi
 
-    def forward(self, x, mask=None):
-        step_dims = self.step_dims
 
-        eij = self.lin1(x)
-        eij = torch.tanh(eij)
-        eij = self.lin2(eij)
+class RMSELoss(nn.Module):
+    def __init__(self):
+        super().__init__()
 
-        a = torch.exp(eij).reshape(-1, self.n_attention, step_dims)
-
-        if mask is not None:
-            a = a * mask
-
-        a = a / torch.sum(a, 2, keepdim=True) + 1e-10
-
-        weighted_input = torch.bmm(a, x)
-        return torch.sum(weighted_input, 1)
+    def forward(self, y_pred, y_true):
+        return ((y_pred - y_true) ** 2).mean().sqrt()
 
 
 class NNTrainer(object):
@@ -175,9 +171,10 @@ class NNTrainer(object):
                 cat_dims=cat_dims,
                 n_non_categorical=n_non_categorical,
                 **model_params).to(device)
-            loss_fn = nn.MSELoss().to(device)
-            y_train = y_train.astype(float)
-            y_valid = y_valid.astype(float)
+            loss_fn = RMSELoss().to(device)
+            self.denominator = y_train.max()
+            y_train = y_train / self.denominator
+            y_valid = y_valid / self.denominator
         else:
             model = DSBClassifier(
                 cat_dims=cat_dims,
@@ -245,17 +242,18 @@ class NNTrainer(object):
                     y_pred = model(non_cat.float(), cat).detach()
                     if self.mode != "regression":
                         target = target.long()
+
                     loss = loss_fn(y_pred, target)
                     avg_val_loss += loss.item() / len(valid_loader)
                     valid_preds[
                         i*512:(i+1)*512
-                    ] = y_pred.cpu().numpy().reshape(-1)
+                    ] = y_pred.cpu().numpy()
 
             if self.mode == "regression":
                 OptR = OptimizedRounder(n_overall=20, n_classwise=20)
-                OptR.fit(valid_preds / 3, y_valid.astype(int))
-                valid_preds = OptR.predict(valid_preds / 3)
-                score = calc_metric(y_valid.astype(int), valid_preds)
+                OptR.fit(valid_preds, (y_valid * 3).astype(int))
+                valid_preds = OptR.predict(valid_preds)
+                score = calc_metric((y_valid * 3).astype(int), valid_preds)
             else:
                 valid_preds = valid_preds @ np.arange(4) / 3
                 OptR = OptimizedRounder(n_overall=20, n_classwise=20)
@@ -264,8 +262,8 @@ class NNTrainer(object):
                 score = calc_metric(y_valid.astype(int), valid_preds)
 
             print(
-                "loss: {:.4f} val_loss: {:.4f} qwk: {:.4f}".format(
-                    avg_loss, avg_val_loss, score
+                "epoch: {} loss: {:.4f} val_loss: {:.4f} qwk: {:.4f}".format(
+                    epoch, avg_loss, avg_val_loss, score
                 ))
             if score > best_score and avg_val_loss < best_loss:
                 torch.save(
@@ -309,12 +307,12 @@ class NNTrainer(object):
                 avg_val_loss += loss.item() / len(valid_loader)
                 valid_preds[
                     i*512:(i+1)*512
-                ] = y_pred.cpu().numpy().reshape(-1)
+                ] = y_pred.cpu().numpy()
         if self.mode == "regression":
             OptR = OptimizedRounder(n_overall=20, n_classwise=20)
-            OptR.fit(valid_preds / 3, y_valid.astype(int))
-            valid_preds = OptR.predict(valid_preds / 3)
-            score = calc_metric(y_valid.astype(int), valid_preds)
+            OptR.fit(valid_preds, (y_valid * 3).astype(int))
+            valid_preds = OptR.predict(valid_preds)
+            score = calc_metric((y_valid * 3).astype(int), valid_preds)
         else:
             valid_preds = valid_preds @ np.arange(4) / 3
             OptR = OptimizedRounder(n_overall=20, n_classwise=20)
@@ -459,19 +457,12 @@ class NNTrainer(object):
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
                      y: np.ndarray,
                      config: dict) -> Tuple[np.ndarray, np.ndarray]:
-        if self.mode == "multiclass":
+        if self.mode == "multiclass" or self.mode == "regression":
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)
             oof_preds_ = OptR.predict(oof_preds)
             test_preds_ = OptR.predict(test_preds)
-            return oof_preds_, test_preds_
-        elif self.mode == "regression":
-            params = config["post_process"]["params"]
-            OptR = OptimizedRounder(**params)
-            OptR.fit(oof_preds / 3, y)
-            oof_preds_ = OptR.predict(oof_preds / 3)
-            test_preds_ = OptR.predict(test_preds / 3)
             return oof_preds_, test_preds_
         return oof_preds, test_preds
 
