@@ -94,18 +94,18 @@ class DSBOvR(nn.Module):
         return x
 
 
-class DSBMultiTaskA(nn.Module):
+class DSBRegressionOvR(nn.Module):
     def __init__(self, cat_dims: List[Tuple[int, int]], n_non_categorical: int,
                  **params):
         super().__init__()
         self.base = DSBBase(cat_dims, n_non_categorical, **params)
         self.drop = nn.Dropout(0.3)
         self.regression_head = nn.Linear(50, 1)
-        self.multiclass_head = nn.Linear(50, 4)
+        self.ovr_head = nn.Linear(50, 4)
 
     def forward(self, non_cat, cat):
         x = self.base(non_cat, cat)
         x = self.drop(x)
         x_regr = F.relu(self.regression_head(x)).view(-1)
-        x_multi = F.softmax(self.multiclass_head(x))
-        return x_regr, x_multi
+        x_ovr = F.sigmoid(self.ovr_head(x))
+        return torch.clamp(x_regr, 0.0, 1.0), x_ovr
