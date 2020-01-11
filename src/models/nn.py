@@ -16,9 +16,9 @@ from src.evaluation import (
 from src.ensemble.blending import search_blending_weight, rmse
 from .neural_network.model import (
     DSBRegressor, DSBClassifier, DSBBinary, DSBOvR, DSBRegressionOvR,
-    DSBRegressionBinary
+    DSBRegressionBinary, DSBRegressionOvRBinary
 )
-from .neural_network.loss import RMSELoss, RMSEBCELoss
+from .neural_network.loss import RMSELoss, RMSEBCELoss, RMSE2BCELoss
 from .neural_network.dataset import DSBDataset
 
 # type alias
@@ -109,6 +109,14 @@ class NNTrainer(object):
             loss_fn = RMSEBCELoss(weights=(0.8, 0.2)).to(device)
             y_train_ = y_train
             y_valid_ = y_valid
+        elif self.mode == "regression_ovr_binary":
+            model = DSBRegressionOvRBinary(
+                cat_dims=cat_dims,
+                n_non_categorical=n_non_categorical,
+                **model_params).to(device)
+            loss_fn = RMSE2BCELoss(weights=(0.1, 0.8, 0.1)).to(device)
+            y_train_ = y_train
+            y_valid_ = y_valid
         else:
             raise NotImplementedError
 
@@ -168,6 +176,23 @@ class NNTrainer(object):
                     target_bin = (target > 0).float()
                     loss = loss_fn(
                         y_pred_regr, target_regr, y_pred_bin, target_bin)
+                elif self.mode == "regression_ovr_binary":
+                    y_pred_regr, y_pred_ovr, y_pred_bin = model(
+                        non_cat.float(), cat)
+                    target_regr = target / 3.0
+                    target_ovr = torch.from_numpy(
+                        np.asarray([
+                            (target.numpy() == 0.0),
+                            (target.numpy() == 1.0),
+                            (target.numpy() == 2.0),
+                            (target.numpy() == 3.0)
+                        ]).T.astype(np.float32)
+                    )
+                    target_bin = (target > 0).float()
+                    loss = loss_fn(
+                        y_pred_regr, target_regr,
+                        y_pred_ovr, target_ovr,
+                        y_pred_bin, target_bin)
                 else:
                     y_pred = model(non_cat.float(), cat)
                     if self.mode == "multiclass":
@@ -188,6 +213,10 @@ class NNTrainer(object):
                 valid_preds_ovr = np.zeros((len(x_valid), 4))
             elif self.mode == "regression_binary":
                 valid_preds_regr = np.zeros(len(x_valid))
+                valid_preds_bin = np.zeros(len(x_valid))
+            elif self.mode == "regression_ovr_binary":
+                valid_preds_regr = np.zeros(len(x_valid))
+                valid_preds_ovr = np.zeros((len(x_valid), 4))
                 valid_preds_bin = np.zeros(len(x_valid))
             else:
                 valid_preds = np.zeros(len(x_valid))
@@ -230,6 +259,36 @@ class NNTrainer(object):
                         valid_preds_regr[
                             i*512:(i+1)*512
                         ] = y_pred_regr.cpu().numpy()
+                        valid_preds_bin[
+                            i*512:(i+1)*512
+                        ] = y_pred_bin.cpu().numpy()
+                    elif self.mode == "regression_ovr_binary":
+                        y_pred_regr, y_pred_ovr, y_pred_bin = model(
+                            non_cat.float(), cat)
+                        y_pred_regr = y_pred_regr.detach()
+                        y_pred_ovr = y_pred_ovr.detach()
+                        y_pred_bin = y_pred_bin.detach()
+                        target_regr = target / 3.0
+                        target_ovr = torch.from_numpy(
+                            np.asarray([
+                                (target.numpy() == 0.0),
+                                (target.numpy() == 1.0),
+                                (target.numpy() == 2.0),
+                                (target.numpy() == 3.0)
+                            ]).T.astype(np.float32)
+                        )
+                        target_bin = (target > 0).float()
+                        loss = loss_fn(
+                            y_pred_regr, target_regr,
+                            y_pred_ovr, target_ovr,
+                            y_pred_bin, target_bin)
+                        avg_val_loss += loss.item() / len(valid_loader)
+                        valid_preds_regr[
+                            i*512:(i+1)*512
+                        ] = y_pred_regr.cpu().numpy()
+                        valid_preds_ovr[
+                            i*512:(i+1)*512
+                        ] = y_pred_ovr.cpu().numpy()
                         valid_preds_bin[
                             i*512:(i+1)*512
                         ] = y_pred_bin.cpu().numpy()
@@ -308,6 +367,39 @@ class NNTrainer(object):
                 bin_score = calc_metric(y_valid.astype(int), valid_preds_bin)
                 print(f"regr score: {regr_score:.4f}")
                 print(f"bin score: {bin_score:.4f}")
+            elif self.mode == "regression_ovr_binary":
+                valid_preds_ovr = valid_preds_ovr / np.repeat(
+                    valid_preds_ovr.sum(axis=1), 4).reshape(-1, 4)
+                valid_preds_ovr = valid_preds_ovr @ np.arange(4) / 3
+                _, best_weights = search_blending_weight(
+                    [valid_preds_regr, valid_preds_ovr, valid_preds_bin],
+                    y_valid / 3.0,
+                    n_iter=100,
+                    func=rmse,
+                    is_higher_better=False)
+                valid_preds = best_weights[0] * valid_preds_regr + \
+                    best_weights[1] * valid_preds_ovr + \
+                    best_weights[2] * valid_preds_bin
+
+                OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+                OptR.fit(valid_preds, y_valid.astype(int))
+                valid_preds = OptR.predict(valid_preds)
+                score = calc_metric(y_valid.astype(int), valid_preds)
+
+                OptR.fit(valid_preds_regr, y_valid.astype(int))
+                valid_preds_regr = OptR.predict(valid_preds_regr)
+                regr_score = calc_metric(y_valid.astype(int), valid_preds_regr)
+
+                OptR.fit(valid_preds_ovr, y_valid.astype(int))
+                valid_preds_ovr = OptR.predict(valid_preds_ovr)
+                ovr_score = calc_metric(y_valid.astype(int), valid_preds_ovr)
+
+                OptR.fit(valid_preds_bin, y_valid.astype(int))
+                valid_preds_bin = OptR.predict(valid_preds_bin)
+                bin_score = calc_metric(y_valid.astype(int), valid_preds_bin)
+                print(f"regr score: {regr_score:.4f}")
+                print(f"ovr score: {ovr_score:.4f}")
+                print(f"bin score: {bin_score:.4f}")
 
             print(
                 "epoch: {} loss: {:.4f} val_loss: {:.4f} qwk: {:.4f}".format(
@@ -347,6 +439,10 @@ class NNTrainer(object):
             valid_preds_ovr = np.zeros((len(x_valid), 4))
         elif self.mode == "regression_binary":
             valid_preds_regr = np.zeros(len(x_valid))
+            valid_preds_bin = np.zeros(len(x_valid))
+        elif self.mode == "regression_ovr_binary":
+            valid_preds_regr = np.zeros(len(x_valid))
+            valid_preds_ovr = np.zeros((len(x_valid), 4))
             valid_preds_bin = np.zeros(len(x_valid))
         else:
             valid_preds = np.zeros(len(x_valid))
@@ -389,6 +485,36 @@ class NNTrainer(object):
                     valid_preds_regr[
                         i*512:(i+1)*512
                     ] = y_pred_regr.cpu().numpy()
+                    valid_preds_bin[
+                        i*512:(i+1)*512
+                    ] = y_pred_bin.cpu().numpy()
+                elif self.mode == "regression_ovr_binary":
+                    y_pred_regr, y_pred_ovr, y_pred_bin = model(
+                        non_cat.float(), cat)
+                    y_pred_regr = y_pred_regr.detach()
+                    y_pred_ovr = y_pred_ovr.detach()
+                    y_pred_bin = y_pred_bin.detach()
+                    target_regr = target / 3.0
+                    target_ovr = torch.from_numpy(
+                        np.asarray([
+                            (target.numpy() == 0.0),
+                            (target.numpy() == 1.0),
+                            (target.numpy() == 2.0),
+                            (target.numpy() == 3.0)
+                        ]).T.astype(np.float32)
+                    )
+                    target_bin = (target > 0).float()
+                    loss = loss_fn(
+                        y_pred_regr, target_regr,
+                        y_pred_ovr, target_ovr,
+                        y_pred_bin, target_bin)
+                    avg_val_loss += loss.item() / len(valid_loader)
+                    valid_preds_regr[
+                        i*512:(i+1)*512
+                    ] = y_pred_regr.cpu().numpy()
+                    valid_preds_ovr[
+                        i*512:(i+1)*512
+                    ] = y_pred_ovr.cpu().numpy()
                     valid_preds_bin[
                         i*512:(i+1)*512
                     ] = y_pred_bin.cpu().numpy()
@@ -451,7 +577,7 @@ class NNTrainer(object):
             _, best_weights = search_blending_weight(
                 [valid_preds_regr, valid_preds_bin],
                 y_valid / 3.0,
-                n_iter=100,
+                n_iter=1000,
                 func=rmse,
                 is_higher_better=False)
             valid_preds = best_weights[0] * valid_preds_regr + \
@@ -469,6 +595,39 @@ class NNTrainer(object):
             valid_preds_bin = OptR.predict(valid_preds_bin)
             bin_score = calc_metric(y_valid.astype(int), valid_preds_bin)
             print(f"regr score: {regr_score:.4f}")
+            print(f"bin score: {bin_score:.4f}")
+        elif self.mode == "regression_ovr_binary":
+            valid_preds_ovr = valid_preds_ovr / np.repeat(
+                valid_preds_ovr.sum(axis=1), 4).reshape(-1, 4)
+            valid_preds_ovr = valid_preds_ovr @ np.arange(4) / 3
+            _, best_weights = search_blending_weight(
+                [valid_preds_regr, valid_preds_ovr, valid_preds_bin],
+                y_valid / 3.0,
+                n_iter=1000,
+                func=rmse,
+                is_higher_better=False)
+            valid_preds = best_weights[0] * valid_preds_regr + \
+                best_weights[1] * valid_preds_ovr + \
+                best_weights[2] * valid_preds_bin
+
+            OptR = OptimizedRounder(n_overall=20, n_classwise=20)
+            OptR.fit(valid_preds, y_valid.astype(int))
+            valid_preds = OptR.predict(valid_preds)
+            score = calc_metric(y_valid.astype(int), valid_preds)
+            self.best_weights = best_weights
+            OptR.fit(valid_preds_regr, y_valid.astype(int))
+            valid_preds_regr = OptR.predict(valid_preds_regr)
+            regr_score = calc_metric(y_valid.astype(int), valid_preds_regr)
+
+            OptR.fit(valid_preds_ovr, y_valid.astype(int))
+            valid_preds_ovr = OptR.predict(valid_preds_ovr)
+            ovr_score = calc_metric(y_valid.astype(int), valid_preds_ovr)
+
+            OptR.fit(valid_preds_bin, y_valid.astype(int))
+            valid_preds_bin = OptR.predict(valid_preds_bin)
+            bin_score = calc_metric(y_valid.astype(int), valid_preds_bin)
+            print(f"regr score: {regr_score:.4f}")
+            print(f"ovr score: {ovr_score:.4f}")
             print(f"bin score: {bin_score:.4f}")
 
         best_score_dict = {
@@ -566,6 +725,34 @@ class NNTrainer(object):
                     ] = bin_.cpu().numpy()
             predictions = self.best_weights[0] * pred_regr + \
                 self.best_weights[1] * pred_bin
+            return predictions
+        elif self.mode == "regression_ovr_binary":
+            pred_regr = np.zeros(len(features))
+            pred_ovr = np.zeros((len(features), 4))
+            pred_bin = np.zeros(len(features))
+            for i, (non_cat, cat) in enumerate(loader):
+                with torch.no_grad():
+                    non_cat = non_cat.to(device)
+                    cat = cat.to(device)
+                    regr, ovr, bin_ = model(non_cat.float(), cat)
+                    regr = regr.detach()
+                    ovr = ovr.detach()
+                    bin_ = bin_.detach()
+                    pred_regr[
+                        i * batch_size:(i+1) * batch_size
+                    ] = regr.cpu().numpy()
+                    pred_ovr[
+                        i * batch_size:(i+1)*batch_size, :
+                    ] = ovr.cpu().numpy()
+                    pred_bin[
+                        i * batch_size:(i+1)*batch_size,
+                    ] = bin_.cpu().numpy()
+            pred_ovr = pred_ovr / np.repeat(
+                pred_ovr.sum(axis=1), 4).reshape(-1, 4)
+            pred_ovr = pred_ovr @ np.arange(4) / 3
+            predictions = self.best_weights[0] * pred_regr + \
+                self.best_weights[1] * pred_ovr + \
+                self.best_weights[2] * pred_bin
             return predictions
         else:
             raise NotImplementedError
@@ -668,7 +855,8 @@ class NNTrainer(object):
         if self.mode in [
                 "multiclass", "regression",
                 "binary", "ovr",
-                "regression_ovr", "regression_binary"]:
+                "regression_ovr", "regression_binary",
+                "regression_ovr_binary"]:
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)
