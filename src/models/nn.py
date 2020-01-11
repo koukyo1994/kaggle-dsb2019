@@ -4,9 +4,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as torchdata
-import torch.nn.functional as F
 
-from typing import Union, Tuple, List, Optional
+from typing import Union, Tuple, List
 from pathlib import Path
 
 from fastprogress import progress_bar
@@ -14,150 +13,15 @@ from sklearn.preprocessing import StandardScaler
 
 from src.evaluation import (
     calc_metric, eval_with_truncated_data, OptimizedRounder)
+from .neural_network.model import (
+    DSBRegressor, DSBClassifier, DSBBinary
+)
+from .neural_network.loss import RMSELoss
+from .neural_network.dataset import DSBDataset
 
 # type alias
 AoD = Union[np.ndarray, pd.DataFrame]
 AoS = Union[np.ndarray, pd.Series]
-
-
-class DSBDataset(torchdata.Dataset):
-    def __init__(self, df: pd.DataFrame, categorical_features: List[str],
-                 y: Optional[AoS]=None):
-        non_categorical = [
-            col for col in df.columns
-            if col not in categorical_features
-        ]
-        self.non_categorical = df[non_categorical].values
-        self.categorical = df[categorical_features].values
-        self.y = y
-
-    def __len__(self):
-        return len(self.categorical)
-
-    def __getitem__(self, idx):
-        categorical = self.categorical[idx, :]
-        non_categorical = self.non_categorical[idx, :]
-        if self.y is not None:
-            y = self.y[idx]
-            return non_categorical, categorical, y
-        else:
-            return non_categorical, categorical
-
-
-class DSBBase(nn.Module):
-    def __init__(
-            self,
-            cat_dims: List[Tuple[int, int]],
-            n_non_categorical: int,
-            emb_drop: float,
-            drop: float):
-        super().__init__()
-        self.n_non_categorical = n_non_categorical
-
-        self.embeddings = nn.ModuleList([
-            nn.Embedding(x, y) for x, y in cat_dims
-        ])
-        n_emb_out = sum([y for x, y in cat_dims])
-        self.emb_drop = nn.Dropout(emb_drop)
-        self.cat_bn = nn.BatchNorm1d(n_non_categorical + n_emb_out)
-        self.lin1 = nn.Linear(n_non_categorical + n_emb_out, 150)
-        self.bn1 = nn.BatchNorm1d(150)
-        self.drop = nn.Dropout(drop)
-        self.lin2 = nn.Linear(150, 50)
-        self.bn2 = nn.BatchNorm1d(50)
-
-    def forward(self, non_cat, cat) -> torch.Tensor:
-        emb = [
-            emb_layer(cat[:, j]) for j, emb_layer in enumerate(self.embeddings)
-        ]
-        emb = self.emb_drop(torch.cat(emb, 1))
-        concat = torch.cat([non_cat, emb], 1)
-        x = F.relu(self.bn1(self.lin1(concat)))
-        x = self.drop(x)
-        x = F.relu(self.bn2(self.lin2(x)))
-        return x
-
-
-class DSBRegressor(nn.Module):
-    def __init__(
-            self,
-            cat_dims: List[Tuple[int, int]],
-            n_non_categorical: int,
-            **params):
-        super().__init__()
-        self.base = DSBBase(cat_dims, n_non_categorical, **params)
-        self.drop = nn.Dropout(0.3)
-        self.head = nn.Linear(50, 1)
-
-    def forward(self, non_cat, cat) -> torch.Tensor:
-        x = self.base(non_cat, cat)
-        x = self.drop(x)
-        x = F.relu(self.head(x))
-        return torch.clamp(x.view(-1), 0.0, 1.0)
-
-
-class DSBClassifier(nn.Module):
-    def __init__(
-            self,
-            cat_dims: List[Tuple[int, int]],
-            n_non_categorical: int,
-            **params):
-        super().__init__()
-        self.base = DSBBase(cat_dims, n_non_categorical, **params)
-        self.drop = nn.Dropout(0.3)
-        self.head = nn.Linear(50, 4)
-
-    def forward(self, non_cat, cat) -> torch.Tensor:
-        x = self.base(non_cat, cat)
-        x = self.drop(x)
-        x = F.softmax(self.head(x))
-        return x
-
-
-class DSBBinary(nn.Module):
-    def __init__(
-            self,
-            cat_dims: List[Tuple[int, int]],
-            n_non_categorical: int,
-            **params):
-        super().__init__()
-        self.base = DSBBase(cat_dims, n_non_categorical, **params)
-        self.drop = nn.Dropout(0.3)
-        self.head = nn.Linear(50, 1)
-
-    def forward(self, non_cat, cat) -> torch.Tensor:
-        x = self.base(non_cat, cat)
-        x = self.drop(x)
-        x = F.sigmoid(self.head(x))
-        return x.view(-1)
-
-
-class DSBMultiTaskA(nn.Module):
-    def __init__(
-            self,
-            cat_dims: List[Tuple[int, int]],
-            n_non_categorical: int,
-            **params):
-        super().__init__()
-        self.base = DSBBase(cat_dims, n_non_categorical, **params)
-        self.drop = nn.Dropout(0.3)
-        self.regression_head = nn.Linear(50, 1)
-        self.multiclass_head = nn.Linear(50, 4)
-
-    def forward(self, non_cat, cat):
-        x = self.base(non_cat, cat)
-        x = self.drop(x)
-        x_regr = F.relu(self.regression_head(x)).view(-1)
-        x_multi = F.softmax(self.multiclass_head(x))
-        return x_regr, x_multi
-
-
-class RMSELoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, y_pred, y_true):
-        return ((y_pred - y_true) ** 2).mean().sqrt()
 
 
 class NNTrainer(object):
