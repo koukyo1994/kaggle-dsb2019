@@ -114,6 +114,24 @@ class DSBClassifier(nn.Module):
         return x
 
 
+class DSBBinary(nn.Module):
+    def __init__(
+            self,
+            cat_dims: List[Tuple[int, int]],
+            n_non_categorical: int,
+            **params):
+        super().__init__()
+        self.base = DSBBase(cat_dims, n_non_categorical, **params)
+        self.drop = nn.Dropout(0.3)
+        self.head = nn.Linear(50, 1)
+
+    def forward(self, non_cat, cat) -> torch.Tensor:
+        x = self.base(non_cat, cat)
+        x = self.drop(x)
+        x = F.sigmoid(self.head(x))
+        return x.view(-1)
+
+
 class DSBMultiTaskA(nn.Module):
     def __init__(
             self,
@@ -173,19 +191,31 @@ class NNTrainer(object):
                 **model_params).to(device)
             loss_fn = RMSELoss().to(device)
             self.denominator = y_train.max()
-            y_train = y_train / self.denominator
-            y_valid = y_valid / self.denominator
-        else:
+            y_train_ = y_train / self.denominator
+            y_valid_ = y_valid / self.denominator
+        elif mode == "multiclass":
             model = DSBClassifier(
                 cat_dims=cat_dims,
                 n_non_categorical=n_non_categorical,
                 **model_params).to(device)
             loss_fn = nn.CrossEntropyLoss().to(device)
+            y_train_ = y_train
+            y_valid_ = y_valid
+        elif mode == "binary":
+            model = DSBBinary(
+                cat_dims=cat_dims,
+                n_non_categorical=n_non_categorical,
+                **model_params).to(device)
+            loss_fn = nn.BCELoss().to(device)
+            y_train_ = (y_train > 0).astype(float)
+            y_valid_ = (y_valid > 0).astype(float)
+        else:
+            raise NotImplementedError
 
         train_dataset = DSBDataset(
             df=x_train,
             categorical_features=self.categorical_features,
-            y=y_train)
+            y=y_train_)
         train_loader = torchdata.DataLoader(
             train_dataset,
             batch_size=train_params["batch_size"],
@@ -194,7 +224,7 @@ class NNTrainer(object):
         valid_dataset = DSBDataset(
             df=x_valid,
             categorical_features=self.categorical_features,
-            y=y_valid)
+            y=y_valid_)
         valid_loader = torchdata.DataLoader(
             valid_dataset,
             batch_size=512,
@@ -220,7 +250,7 @@ class NNTrainer(object):
             avg_loss = 0.0
             for non_cat, cat, target in progress_bar(train_loader):
                 y_pred = model(non_cat.float(), cat)
-                if self.mode != "regression":
+                if self.mode == "multiclass":
                     target = target.long()
 
                 loss = loss_fn(y_pred, target)
@@ -231,7 +261,7 @@ class NNTrainer(object):
                 avg_loss += loss.item() / len(train_loader)
 
             model.eval()
-            if self.mode != "regression":
+            if self.mode == "multiclass":
                 valid_preds = np.zeros((len(x_valid), 4))
             else:
                 valid_preds = np.zeros(len(x_valid))
@@ -240,7 +270,7 @@ class NNTrainer(object):
                     valid_loader)):
                 with torch.no_grad():
                     y_pred = model(non_cat.float(), cat).detach()
-                    if self.mode != "regression":
+                    if self.mode == "multiclass":
                         target = target.long()
 
                     loss = loss_fn(y_pred, target)
@@ -249,12 +279,12 @@ class NNTrainer(object):
                         i*512:(i+1)*512
                     ] = y_pred.cpu().numpy()
 
-            if self.mode == "regression":
+            if self.mode == "regression" or self.mode == "binary":
                 OptR = OptimizedRounder(n_overall=20, n_classwise=20)
-                OptR.fit(valid_preds, (y_valid * 3).astype(int))
+                OptR.fit(valid_preds, y_valid.astype(int))
                 valid_preds = OptR.predict(valid_preds)
-                score = calc_metric((y_valid * 3).astype(int), valid_preds)
-            else:
+                score = calc_metric(y_valid.astype(int), valid_preds)
+            elif self.mode == "multiclass":
                 valid_preds = valid_preds @ np.arange(4) / 3
                 OptR = OptimizedRounder(n_overall=20, n_classwise=20)
                 OptR.fit(valid_preds, y_valid.astype(int))
@@ -292,7 +322,7 @@ class NNTrainer(object):
         model.load_state_dict(torch.load(weight))
 
         model.eval()
-        if self.mode != "regression":
+        if self.mode == "multiclass":
             valid_preds = np.zeros((len(x_valid), 4))
         else:
             valid_preds = np.zeros(len(x_valid))
@@ -301,19 +331,19 @@ class NNTrainer(object):
                 progress_bar(valid_loader)):
             with torch.no_grad():
                 y_pred = model(non_cat.float(), cat).detach()
-                if self.mode != "regression":
+                if self.mode == "multiclass":
                     target = target.long()
                 loss = loss_fn(y_pred, target)
                 avg_val_loss += loss.item() / len(valid_loader)
                 valid_preds[
                     i*512:(i+1)*512
                 ] = y_pred.cpu().numpy()
-        if self.mode == "regression":
+        if self.mode == "regression" or self.mode == "binary":
             OptR = OptimizedRounder(n_overall=20, n_classwise=20)
-            OptR.fit(valid_preds, (y_valid * 3).astype(int))
+            OptR.fit(valid_preds, y_valid.astype(int))
             valid_preds = OptR.predict(valid_preds)
-            score = calc_metric((y_valid * 3).astype(int), valid_preds)
-        else:
+            score = calc_metric(y_valid.astype(int), valid_preds)
+        elif self.mode == "multiclass":
             valid_preds = valid_preds @ np.arange(4) / 3
             OptR = OptimizedRounder(n_overall=20, n_classwise=20)
             OptR.fit(valid_preds, y_valid.astype(int))
@@ -339,7 +369,7 @@ class NNTrainer(object):
             drop_last=False)
         model.eval()
         model = model.to(device)
-        if self.mode != "multiclass":
+        if self.mode == "regression" or self.mode == "binary":
             predictions = np.zeros(len(features))
             for i, (non_cat, cat) in enumerate(loader):
                 with torch.no_grad():
@@ -350,7 +380,7 @@ class NNTrainer(object):
                         i*batch_size: (i + 1)*batch_size
                     ] = pred.cpu().numpy()
             return predictions
-        else:
+        elif self.mode == "multiclass":
             predictions = np.zeros((len(features), 4))
             for i, (non_cat, cat) in enumerate(loader):
                 with torch.no_grad():
@@ -361,6 +391,8 @@ class NNTrainer(object):
                         i * batch_size:(i+1) * batch_size, :
                     ] = pred.cpu().numpy()
             return predictions @ np.arange(4) / 3
+        else:
+            raise NotImplementedError
 
     def preprocess(
             self, train_features: pd.DataFrame,
@@ -457,7 +489,7 @@ class NNTrainer(object):
     def post_process(self, oof_preds: np.ndarray, test_preds: np.ndarray,
                      y: np.ndarray,
                      config: dict) -> Tuple[np.ndarray, np.ndarray]:
-        if self.mode == "multiclass" or self.mode == "regression":
+        if self.mode in ["multiclass", "regression", "binary"]:
             params = config["post_process"]["params"]
             OptR = OptimizedRounder(**params)
             OptR.fit(oof_preds, y)
