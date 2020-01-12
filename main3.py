@@ -300,7 +300,7 @@ if __name__ == "__main__":
 
         model = get_model(config)
         models, oof_preds, y_oof, test_preds, \
-            eval_results = model.cv(
+            feature_importance, eval_results = model.cv(
                 y_train,
                 x_train[cols],
                 x_test[cols],
@@ -314,35 +314,20 @@ if __name__ == "__main__":
     config["eval_results"] = dict()
     for k, v in eval_results.items():
         config["eval_results"][k] = v
-    # if "classwise" not in config["model"]["name"]:
-    #     feature_imp = feature_importance.reset_index().rename(
-    #         columns={
-    #             "index": "feature",
-    #             0: "value"
-    #         })
-    #     plt.figure(figsize=(20, 10))
-    #     sns.barplot(
-    #         x="value",
-    #         y="feature",
-    #         data=feature_imp.sort_values(by="value", ascending=False).head(50))
-    #     plt.title("Model Features")
-    #     plt.tight_layout()
-    #     plt.savefig(output_dir / "feature_importance_model.png")
-    # else:
-    #     for k, v in feature_importance.items():
-    #         feature_imp = v.reset_index().rename(columns={
-    #             "index": "feature",
-    #             0: "value"
-    #         })
-    #         plt.figure(figsize=(20, 10))
-    #         sns.barplot(
-    #             x="value",
-    #             y="feature",
-    #             data=feature_imp.sort_values(by="value",
-    #                                          ascending=False).head(50))
-    #         plt.title(f"Feature importance: Assessment {k}")
-    #         plt.tight_layout()
-    #         plt.savefig(output_dir / f"feature_importance_assessment_{k}.png")
+
+    feature_imp = feature_importance.reset_index().rename(
+        columns={
+            "index": "feature",
+            0: "value"
+        })
+    plt.figure(figsize=(20, 10))
+    sns.barplot(
+        x="value",
+        y="feature",
+        data=feature_imp.sort_values(by="value", ascending=False).head(50))
+    plt.title("Model Features")
+    plt.tight_layout()
+    plt.savefig(output_dir / "feature_importance_model.png")
 
     # Confusion Matrix
     plot_confusion_matrix(

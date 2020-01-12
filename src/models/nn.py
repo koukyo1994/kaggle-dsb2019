@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as torchdata
 
-from typing import Union, Tuple, List
+from typing import Union, Tuple, List, Optional
 from pathlib import Path
 
 from fastprogress import progress_bar
@@ -20,6 +20,7 @@ from .neural_network.model import (
 )
 from .neural_network.loss import RMSELoss, RMSEBCELoss, RMSE2BCELoss
 from .neural_network.dataset import DSBDataset
+from .neural_network.importance import permutation_importance
 
 # type alias
 AoD = Union[np.ndarray, pd.DataFrame]
@@ -865,19 +866,33 @@ class NNTrainer(object):
             return oof_preds_, test_preds_
         return oof_preds, test_preds
 
+    def get_feature_importance(
+            self,
+            model: nn.Module,
+            X: pd.DataFrame,
+            y: np.ndarray) -> np.ndarray:
+        return permutation_importance(
+            model,
+            X, y,
+            self.categorical_features,
+            self.mode)
+
     def cv(self, y_train: AoS, train_features: pd.DataFrame,
            test_features: pd.DataFrame, groups: np.ndarray,
            feature_name: List[str],
            categorical_features: List[str],
            folds_ids: List[Tuple[np.ndarray, np.ndarray]], threshold: float,
            config: dict) -> Tuple[List[nn.Module], np.ndarray, np.ndarray, np.
-                                  ndarray, dict]:
+                                  ndarray, Optional[pd.DataFrame], dict]:
         test_preds = np.zeros(len(test_features))
         normal_oof_preds = np.zeros(len(train_features))
         oof_preds_list: List[np.ndarray] = []
         y_val_list: List[np.ndarray] = []
         idx_val_list: List[np.ndarray] = []
 
+        importances = pd.DataFrame(index=feature_name)
+        modes_to_return_importance = [
+            "regression", "multiclass", "ovr", "binary"]
         cv_score_list: List[dict] = []
         models: List[nn.Module] = []
 
@@ -922,6 +937,18 @@ class NNTrainer(object):
                 model, x_val_normal).reshape(-1)
             test_preds += self.predict(
                 model, test_features).reshape(-1) / len(folds_ids)
+
+            if self.mode in modes_to_return_importance:
+                importances_tmp = pd.DataFrame(
+                    self.get_feature_importance(model, x_val, y_val),
+                    columns=[f"importance_{i_fold+1}"],
+                    index=feature_name)
+                importances = importances.join(importances_tmp, how="inner")
+
+        if self.mode in modes_to_return_importance:
+            feature_importance = importances.mean(axis=1)
+        else:
+            feature_importance = None
 
         oof_preds = np.concatenate(oof_preds_list)
         y_oof = np.concatenate(y_val_list)
@@ -975,11 +1002,13 @@ class NNTrainer(object):
                 "n_data":
                 len(train_features),
                 "n_features":
-                len(train_features.columns),
-                # "feature_importance":
-                # feature_importance.sort_values(ascending=False).to_dict()
+                len(train_features.columns)
             }
         }
 
-        return (models, oof_preds, y_oof, test_preds,  # feature_importance,
+        if self.mode in modes_to_return_importance:
+            evals_results["feature_importance"] = \
+                feature_importance.sort_values(ascending=False).to_dict()
+
+        return (models, oof_preds, y_oof, test_preds,  feature_importance,
                 evals_results)
