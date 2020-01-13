@@ -37,7 +37,7 @@ av:
 model:
   name: "nn"
   mode: "ovr"
-  save_path: "output/nn_3_ovr/pth/"
+  save_path: "output/nn_8_ovr_0.9_reduction/pth/"
   policy: "best_score"
 
   model_params:
