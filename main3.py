@@ -120,7 +120,7 @@ if __name__ == "__main__":
     groups_valid = x_valid["installation_id"].values
 
     test_nth_assessment = get_assessment_number(x_valid, x_test)
-    threshold = np.percentile(test_nth_assessment, 95)
+    threshold = np.percentile(test_nth_assessment, config["val"]["percentile"])
 
     y_train = x_train["accuracy_group"].values.reshape(-1)
     y_valid = x_valid["accuracy_group"].values.reshape(-1)

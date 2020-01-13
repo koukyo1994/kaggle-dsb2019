@@ -38,6 +38,7 @@ def _get_default() -> dict:
     cfg["val"] = dict()
     cfg["val"]["name"] = "simple_split"
     cfg["val"]["params"] = dict()
+    cfg["val"]["percentile"] = 95
 
     # others
     cfg["output_dir"] = "../output"
