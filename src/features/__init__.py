@@ -20,3 +20,4 @@ from .nakama_ratio import Ratio
 from .time_encoding import PastSummary3TimeEncoding
 from .tfidf import Tfidf
 from .tfidf2 import Tfidf2
+from .past_summary3_decay import DecayedPastSummary3
