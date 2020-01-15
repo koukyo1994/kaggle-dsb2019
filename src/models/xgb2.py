@@ -17,6 +17,9 @@ class XGBoost2(BaseModel2):
         model_params = config["model"]["model_params"]
         train_params = config["model"]["train_params"]
 
+        if train_params.get("scheduler") is not None:
+            train_params.pop("scheduler")
+
         mode = config["model"]["mode"]
         self.mode = mode
 
