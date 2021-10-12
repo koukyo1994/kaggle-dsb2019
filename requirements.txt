@@ -61,7 +61,7 @@ notebook==5.7.6
 numba==0.45.1
 numpy==1.15.4
 olefile==0.46
-opencv-contrib-python-headless==4.1.0.25
+opencv-contrib-python-headless==4.1.1.26
 pandas==0.24.2
 pandas-profiling==2.3.0
 pandocfilters==1.4.2
